@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/e-money/bep3/module/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	"github.com/tendermint/tendermint/libs/kv"
-
-	"github.com/cosmos/cosmos-sdk/codec"
-
-	"github.com/e-money/bep3/module/types"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the module's corresponding type

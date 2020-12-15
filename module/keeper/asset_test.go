@@ -5,13 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
 )
 
 type AssetTestSuite struct {
@@ -92,7 +90,6 @@ func (suite *AssetTestSuite) TestIncrementCurrentAssetSupply() {
 	for _, tc := range testCases {
 		suite.SetupTest()
 		suite.Run(tc.name, func() {
-
 			preSupply, found := suite.keeper.GetAssetSupply(suite.ctx, tc.args.coin.Denom)
 			err := suite.keeper.IncrementCurrentAssetSupply(suite.ctx, tc.args.coin)
 			postSupply, _ := suite.keeper.GetAssetSupply(suite.ctx, tc.args.coin.Denom)
@@ -132,7 +129,8 @@ func (suite *AssetTestSuite) TestIncrementTimeLimitedCurrentAssetSupply() {
 					OutgoingSupply:           c("inc", 5),
 					CurrentSupply:            c("inc", 10),
 					TimeLimitedCurrentSupply: c("inc", 5),
-					TimeElapsed:              time.Duration(0)},
+					TimeElapsed:              time.Duration(0),
+				},
 			},
 			errArgs{
 				expectPass: true,
@@ -209,7 +207,6 @@ func (suite *AssetTestSuite) TestDecrementCurrentAssetSupply() {
 	for _, tc := range testCases {
 		suite.SetupTest()
 		suite.Run(tc.name, func() {
-
 			preSupply, found := suite.keeper.GetAssetSupply(suite.ctx, tc.args.coin.Denom)
 			err := suite.keeper.DecrementCurrentAssetSupply(suite.ctx, tc.args.coin)
 			postSupply, _ := suite.keeper.GetAssetSupply(suite.ctx, tc.args.coin.Denom)
@@ -307,7 +304,8 @@ func (suite *AssetTestSuite) TestIncrementTimeLimitedIncomingAssetSupply() {
 					OutgoingSupply:           c("inc", 5),
 					CurrentSupply:            c("inc", 5),
 					TimeLimitedCurrentSupply: c("inc", 0),
-					TimeElapsed:              time.Duration(0)},
+					TimeElapsed:              time.Duration(0),
+				},
 			},
 			errArgs{
 				expectPass: true,
@@ -384,7 +382,6 @@ func (suite *AssetTestSuite) TestDecrementIncomingAssetSupply() {
 	for _, tc := range testCases {
 		suite.SetupTest()
 		suite.Run(tc.name, func() {
-
 			preSupply, found := suite.keeper.GetAssetSupply(suite.ctx, tc.args.coin.Denom)
 			err := suite.keeper.DecrementIncomingAssetSupply(suite.ctx, tc.args.coin)
 			postSupply, _ := suite.keeper.GetAssetSupply(suite.ctx, tc.args.coin.Denom)
@@ -443,7 +440,6 @@ func (suite *AssetTestSuite) TestIncrementOutgoingAssetSupply() {
 	for _, tc := range testCases {
 		suite.SetupTest()
 		suite.Run(tc.name, func() {
-
 			preSupply, found := suite.keeper.GetAssetSupply(suite.ctx, tc.args.coin.Denom)
 			err := suite.keeper.IncrementOutgoingAssetSupply(suite.ctx, tc.args.coin)
 			postSupply, _ := suite.keeper.GetAssetSupply(suite.ctx, tc.args.coin.Denom)

@@ -2,20 +2,17 @@ package keeper_test
 
 import (
 	"encoding/hex"
-	app "github.com/e-money/bep3/testapp"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
+	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
+	abci "github.com/tendermint/tendermint/abci/types"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 const (

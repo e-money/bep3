@@ -2,15 +2,13 @@ package keeper_test
 
 import (
 	"errors"
-	app "github.com/e-money/bep3/testapp"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
+	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
 )
 
 type ParamsTestSuite struct {
@@ -61,7 +59,6 @@ func (suite *ParamsTestSuite) TestGetSetDeputyAddress() {
 	addr, err := suite.keeper.GetDeputyAddress(suite.ctx, "bnb")
 	suite.Require().NoError(err)
 	suite.Equal(suite.addrs[1], addr)
-
 }
 
 func (suite *ParamsTestSuite) TestGetDeputyFixedFee() {

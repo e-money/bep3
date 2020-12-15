@@ -7,10 +7,9 @@ import (
 	"fmt"
 	"strings"
 
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 // AtomicSwap contains the information for an atomic swap

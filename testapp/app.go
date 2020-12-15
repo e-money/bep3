@@ -9,7 +9,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
-const(
+const (
 	Bech32MainPrefix = "app"
 )
 

@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	bep3 "github.com/e-money/bep3/module"
 	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
 )
 
 type GenesisTestSuite struct {
@@ -33,7 +31,6 @@ func (suite *GenesisTestSuite) SetupTest() {
 }
 
 func (suite *GenesisTestSuite) TestGenesisState() {
-
 	type GenState func() app.GenesisState
 
 	testCases := []struct {
@@ -298,7 +295,6 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				}, tc.name)
 			}
 		})
-
 	}
 }
 

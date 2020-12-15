@@ -3,14 +3,11 @@ package types_test
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/e-money/bep3/module/types"
 	"github.com/stretchr/testify/require"
-
 	"github.com/tendermint/tendermint/crypto"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/e-money/bep3/module/types"
 )
 
 var (

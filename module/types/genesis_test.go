@@ -4,12 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
 )
 
 type GenesisTestSuite struct {
@@ -114,7 +112,6 @@ func (suite *GenesisTestSuite) TestValidate() {
 			} else {
 				suite.Require().Error(err, tc.name)
 			}
-
 		})
 	}
 }

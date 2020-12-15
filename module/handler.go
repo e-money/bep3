@@ -45,7 +45,6 @@ func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg MsgCreateAtomicSwa
 
 // handleMsgClaimAtomicSwap handles requests to claim funds in an active AtomicSwap
 func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg MsgClaimAtomicSwap) (*sdk.Result, error) {
-
 	err := k.ClaimAtomicSwap(ctx, msg.From, msg.SwapID, msg.RandomNumber)
 	if err != nil {
 		return nil, err
@@ -66,7 +65,6 @@ func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg MsgClaimAtomicSwap)
 
 // handleMsgRefundAtomicSwap handles requests to refund an active AtomicSwap
 func handleMsgRefundAtomicSwap(ctx sdk.Context, k Keeper, msg MsgRefundAtomicSwap) (*sdk.Result, error) {
-
 	err := k.RefundAtomicSwap(ctx, msg.From, msg.SwapID)
 	if err != nil {
 		return nil, err

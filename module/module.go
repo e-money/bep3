@@ -4,21 +4,18 @@ import (
 	"encoding/json"
 	"math/rand"
 
-	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	sim "github.com/cosmos/cosmos-sdk/x/simulation"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	"github.com/e-money/bep3/module/client/cli"
 	"github.com/e-money/bep3/module/client/rest"
 	"github.com/e-money/bep3/module/simulation"
 	"github.com/e-money/bep3/module/types"
+	"github.com/gorilla/mux"
+	"github.com/spf13/cobra"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (

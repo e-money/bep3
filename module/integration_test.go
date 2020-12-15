@@ -5,11 +5,9 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	tmtime "github.com/tendermint/tendermint/types/time"
-
 	bep3 "github.com/e-money/bep3/module"
 	app "github.com/e-money/bep3/testapp"
+	tmtime "github.com/tendermint/tendermint/types/time"
 )
 
 const (
@@ -41,7 +39,6 @@ func NewBep3GenStateMulti(deputy sdk.AccAddress) app.GenesisState {
 }
 
 func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
-
 	bep3Genesis := bep3.GenesisState{
 		Params: bep3.Params{
 			AssetParams: bep3.AssetParams{

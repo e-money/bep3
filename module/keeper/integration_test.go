@@ -7,12 +7,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
-
-	"github.com/tendermint/tendermint/crypto"
-	tmtime "github.com/tendermint/tendermint/types/time"
-
 	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
+	"github.com/tendermint/tendermint/crypto"
+	tmtime "github.com/tendermint/tendermint/types/time"
 )
 
 const (

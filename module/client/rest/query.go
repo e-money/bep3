@@ -9,13 +9,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/gorilla/mux"
-
 	"github.com/e-money/bep3/module/types"
+	"github.com/gorilla/mux"
 )
 
-const restSwapID = "swap-id"
-const restDenom = "denom"
+const (
+	restSwapID = "swap-id"
+	restDenom  = "denom"
+)
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/%s/swap/{%s}", types.ModuleName, restSwapID), queryAtomicSwapHandlerFn(cliCtx)).Methods("GET")
@@ -23,7 +24,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/%s/supply/{%s}", types.ModuleName, restDenom), queryAssetSupplyHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/supplies", types.ModuleName), queryAssetSuppliesHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/parameters", types.ModuleName), queryParamsHandlerFn(cliCtx)).Methods("GET")
-
 }
 
 func queryAtomicSwapHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {

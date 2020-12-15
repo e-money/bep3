@@ -3,13 +3,11 @@ package bep3_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-
 	bep3 "github.com/e-money/bep3/module"
 	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 type HandlerTestSuite struct {

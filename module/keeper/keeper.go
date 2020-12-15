@@ -9,9 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params/subspace"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/e-money/bep3/module/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 // Keeper of the bep3 store

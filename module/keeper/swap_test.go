@@ -1,22 +1,19 @@
 package keeper_test
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	app "github.com/e-money/bep3/testapp"
-	"github.com/tendermint/tendermint/crypto/ed25519"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/suite"
-
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	tmtime "github.com/tendermint/tendermint/types/time"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
+	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
+	"github.com/tendermint/tendermint/crypto/ed25519"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	tmtime "github.com/tendermint/tendermint/types/time"
 )
 
 type AtomicSwapTestSuite struct {

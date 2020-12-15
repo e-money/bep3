@@ -9,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
-
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
 )
@@ -32,7 +31,7 @@ func WeightedOperations(
 
 	appParams.GetOrGenerate(cdc, OpWeightMsgCreateAtomicSwap, &weightCreateAtomicSwap, nil,
 		func(_ *rand.Rand) {
-			//weightCreateAtomicSwap = appparams.DefaultWeightMsgCreateAtomicSwap
+			// weightCreateAtomicSwap = appparams.DefaultWeightMsgCreateAtomicSwap
 			// TODO
 			weightCreateAtomicSwap = 20
 		},
@@ -134,7 +133,6 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, k keeper.Keeper) simula
 		}
 		// The maximum amount for outgoing swaps is limited by the asset's current supply
 		if recipient.Address.Equals(asset.DeputyAddress) {
-
 			if maximumAmount.GT(assetSupply.CurrentSupply.Amount.Sub(assetSupply.OutgoingSupply.Amount)) {
 				maximumAmount = assetSupply.CurrentSupply.Amount.Sub(assetSupply.OutgoingSupply.Amount)
 			}

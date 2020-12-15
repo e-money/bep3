@@ -3,14 +3,11 @@ package types_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 type AtomicSwapTestSuite struct {

@@ -1,21 +1,18 @@
 package keeper_test
 
 import (
-	bep3 "github.com/e-money/bep3/module"
-	app "github.com/e-money/bep3/testapp"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-
-	tmtime "github.com/tendermint/tendermint/types/time"
-
+	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
+	app "github.com/e-money/bep3/testapp"
+	"github.com/stretchr/testify/suite"
+	tmtime "github.com/tendermint/tendermint/types/time"
 )
 
 const LongtermStorageDuration = 86400
@@ -110,6 +107,7 @@ func (suite *KeeperTestSuite) TestRemoveAtomicSwap() {
 	_, found = suite.keeper.GetAtomicSwap(suite.ctx, atomicSwap.GetSwapID())
 	suite.False(found)
 }
+
 func (suite *KeeperTestSuite) TestIterateAtomicSwaps() {
 	suite.ResetChain()
 
@@ -356,7 +354,6 @@ func (suite *KeeperTestSuite) TestGetSetAssetSupply() {
 }
 
 func (suite *KeeperTestSuite) TestGetAllAssetSupplies() {
-
 	// Put asset supply in store
 	assetSupply := types.NewAssetSupply(c("bnb", 0), c("bnb", 0), c("bnb", 50000), c("bnb", 0), time.Duration(0))
 	suite.keeper.SetAssetSupply(suite.ctx, assetSupply, "bnb")

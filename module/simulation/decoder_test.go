@@ -5,15 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
-	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	"github.com/tendermint/tendermint/libs/kv"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/e-money/bep3/module/types"
+	"github.com/stretchr/testify/require"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	"github.com/tendermint/tendermint/libs/kv"
 )
 
 func makeTestCodec() (cdc *codec.Codec) {
