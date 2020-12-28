@@ -89,22 +89,31 @@ func (k Keeper) GetMaxSwapAmount(ctx sdk.Context, denom string) (sdk.Int, error)
 	return asset.MaxSwapAmount, nil
 }
 
-// GetMinBlockLock returns the minimum block lock
-func (k Keeper) GetMinBlockLock(ctx sdk.Context, denom string) (uint64, error) {
+// GetSwapTime returns the swap creation block Unix seconds timestamp
+func (k Keeper) GetSwapTime(ctx sdk.Context, denom string) (uint64, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
 		return uint64(0), err
 	}
-	return asset.MinBlockLock, nil
+	return asset.SwapTime, nil
 }
 
-// GetMaxBlockLock returns the maximum block lock
-func (k Keeper) GetMaxBlockLock(ctx sdk.Context, denom string) (uint64, error) {
+// GetTimeSpan returns the swap seconds allowance
+func (k Keeper) GetTimeSpan(ctx sdk.Context, denom string) (uint64, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
 		return uint64(0), err
 	}
-	return asset.MaxBlockLock, nil
+	return asset.TimeSpan, nil
+}
+
+// GetBlockTime returns the latest block Unix seconds timestamp
+func (k Keeper) GetBlockTime(ctx sdk.Context, denom string) (uint64, error) {
+	asset, err := k.GetAsset(ctx, denom)
+	if err != nil {
+		return uint64(0), err
+	}
+	return asset.BlockTime, nil
 }
 
 // GetAssetByCoinID returns an asset by its denom

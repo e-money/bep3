@@ -16,7 +16,7 @@ import (
 type AtomicSwap struct {
 	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
-	ExpireHeight        uint64           `json:"expire_height"  yaml:"expire_height"`
+	ExpireTime          uint64           `json:"expire_time"  yaml:"expire_time"`
 	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
 	Sender              sdk.AccAddress   `json:"sender"  yaml:"sender"`
 	Recipient           sdk.AccAddress   `json:"recipient"  yaml:"recipient"`
@@ -29,13 +29,13 @@ type AtomicSwap struct {
 }
 
 // NewAtomicSwap returns a new AtomicSwap
-func NewAtomicSwap(amount sdk.Coins, randomNumberHash tmbytes.HexBytes, expireHeight uint64, timestamp int64,
+func NewAtomicSwap(amount sdk.Coins, randomNumberHash tmbytes.HexBytes, expireTime uint64, timestamp int64,
 	sender, recipient sdk.AccAddress, senderOtherChain string, recipientOtherChain string, closedBlock int64,
 	status SwapStatus, crossChain bool, direction SwapDirection) AtomicSwap {
 	return AtomicSwap{
 		Amount:              amount,
 		RandomNumberHash:    randomNumberHash,
-		ExpireHeight:        expireHeight,
+		ExpireTime:          expireTime,
 		Timestamp:           timestamp,
 		Sender:              sender,
 		Recipient:           recipient,
@@ -69,8 +69,8 @@ func (a AtomicSwap) Validate() error {
 	if len(a.RandomNumberHash) != RandomNumberHashLength {
 		return fmt.Errorf("the length of random number hash should be %d", RandomNumberHashLength)
 	}
-	if a.ExpireHeight == 0 {
-		return errors.New("expire height cannot be 0")
+	if a.ExpireTime == 0 {
+		return errors.New("expire time cannot be 0")
 	}
 	if a.Timestamp == 0 {
 		return errors.New("timestamp cannot be 0")
@@ -123,7 +123,7 @@ func (a AtomicSwap) String() string {
 		"\n    Cross chain:              %t"+
 		"\n    Direction:                %s",
 		a.GetSwapID(), a.Status.String(), a.Amount.String(),
-		hex.EncodeToString(a.RandomNumberHash), a.ExpireHeight,
+		hex.EncodeToString(a.RandomNumberHash), a.ExpireTime,
 		a.Timestamp, a.Sender.String(), a.Recipient.String(),
 		a.SenderOtherChain, a.RecipientOtherChain, a.ClosedBlock,
 		a.CrossChain, a.Direction)
@@ -271,7 +271,7 @@ type AugmentedAtomicSwap struct {
 	// This prevents breaking changes for clients using REST API
 	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
-	ExpireHeight        uint64           `json:"expire_height"  yaml:"expire_height"`
+	ExpireTime          uint64           `json:"expire_time"  yaml:"expire_time"`
 	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
 	Sender              sdk.AccAddress   `json:"sender"  yaml:"sender"`
 	Recipient           sdk.AccAddress   `json:"recipient"  yaml:"recipient"`
@@ -288,7 +288,7 @@ func NewAugmentedAtomicSwap(swap AtomicSwap) AugmentedAtomicSwap {
 		ID:                  hex.EncodeToString(swap.GetSwapID()),
 		Amount:              swap.Amount,
 		RandomNumberHash:    swap.RandomNumberHash,
-		ExpireHeight:        swap.ExpireHeight,
+		ExpireTime:          swap.ExpireTime,
 		Timestamp:           swap.Timestamp,
 		Sender:              swap.Sender,
 		Recipient:           swap.Recipient,

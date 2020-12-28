@@ -14,7 +14,7 @@ const (
 	AttributeKeyRandomNumberHash = "random_number_hash"
 	AttributeKeyTimestamp        = "timestamp"
 	AttributeKeySenderOtherChain = "sender_other_chain"
-	AttributeKeyExpireHeight     = "expire_height"
+	AttributeKeyExpireTime       = "expire_time"
 	AttributeKeyAmount           = "amount"
 	AttributeKeyDirection        = "direction"
 	AttributeKeyClaimSender      = "claim_sender"

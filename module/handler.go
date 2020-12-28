@@ -24,7 +24,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgCreateAtomicSwap handles requests to create a new AtomicSwap
 func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg MsgCreateAtomicSwap) (*sdk.Result, error) {
-	err := k.CreateAtomicSwap(ctx, msg.RandomNumberHash, msg.Timestamp, msg.HeightSpan,
+	err := k.CreateAtomicSwap(ctx, msg.RandomNumberHash, msg.Timestamp, msg.TimeSpan,
 		msg.From, msg.To, msg.SenderOtherChain, msg.RecipientOtherChain, msg.Amount, true)
 	if err != nil {
 		return nil, err

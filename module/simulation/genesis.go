@@ -95,7 +95,6 @@ func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
 	limit := GenSupplyLimit(r, MaxSupplyLimit)
 
 	minSwapAmount := GenMinSwapAmount(r)
-	minBlockLock := GenMinBlockLock(r)
 	timeLimited := r.Float32() < 0.5
 	timeBasedLimit := sdk.ZeroInt()
 	if timeLimited {
@@ -118,8 +117,8 @@ func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
 		FixedFee:      GenRandFixedFee(r),
 		MinSwapAmount: minSwapAmount,
 		MaxSwapAmount: GenMaxSwapAmount(r, minSwapAmount, limit),
-		MinBlockLock:  minBlockLock,
-		MaxBlockLock:  GenMaxBlockLock(r, minBlockLock),
+		SwapTime:      uint64(time.Now().Unix()),
+		TimeSpan:      limit.Uint64(),
 	}
 }
 

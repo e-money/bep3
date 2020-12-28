@@ -23,7 +23,7 @@ const (
 	AttributeKeyRandomNumberHash   = types.AttributeKeyRandomNumberHash
 	AttributeKeyTimestamp          = types.AttributeKeyTimestamp
 	AttributeKeySenderOtherChain   = types.AttributeKeySenderOtherChain
-	AttributeKeyExpireHeight       = types.AttributeKeyExpireHeight
+	AttributeKeyExpireTime         = types.AttributeKeyExpireTime
 	AttributeKeyAmount             = types.AttributeKeyAmount
 	AttributeKeyDirection          = types.AttributeKeyDirection
 	AttributeKeyClaimSender        = types.AttributeKeyClaimSender
@@ -93,7 +93,7 @@ var (
 	// variable aliases
 	ModuleCdc                       = types.ModuleCdc
 	ErrInvalidTimestamp             = types.ErrInvalidTimestamp
-	ErrInvalidHeightSpan            = types.ErrInvalidHeightSpan
+	ErrInvalidTimeSpan              = types.ErrInvalidTimeSpan
 	ErrInsufficientAmount           = types.ErrInsufficientAmount
 	ErrAssetNotSupported            = types.ErrAssetNotSupported
 	ErrAssetNotActive               = types.ErrAssetNotActive
@@ -118,9 +118,9 @@ var (
 	DefaultBnbDeputyFixedFee        = types.DefaultBnbDeputyFixedFee
 	DefaultMinAmount                = types.DefaultMinAmount
 	DefaultMaxAmount                = types.DefaultMaxAmount
-	DefaultMinBlockLock             = types.DefaultMinBlockLock
-	DefaultMaxBlockLock             = types.DefaultMaxBlockLock
 	DefaultPreviousBlockTime        = types.DefaultPreviousBlockTime
+	DefaultSwapBlockTime            = types.DefaultSwapBlockTime
+	DefaultSwapTimeSpan             = types.DefaultSwapTimeSpan
 	ModulePermissionsUpgradeTime    = types.ModulePermissionsUpgradeTime
 )
 

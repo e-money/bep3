@@ -9,8 +9,8 @@ import (
 var (
 	// ErrInvalidTimestamp error for when an timestamp is outside of bounds. Assumes block time of 10 seconds.
 	ErrInvalidTimestamp = sdkerrors.Register(ModuleName, 2, "timestamp can neither be 15 minutes ahead of the current time, nor 30 minutes later")
-	// ErrInvalidHeightSpan error for when a proposed height span is outside of lock time range
-	ErrInvalidHeightSpan = sdkerrors.Register(ModuleName, 3, "height span is outside acceptable range")
+	// ErrInvalidTimeSpan error for when a proposed time span is outside of lock time range
+	ErrInvalidTimeSpan = sdkerrors.Register(ModuleName, 3, "time span is outside acceptable range")
 	// ErrInsufficientAmount error for when a swap's amount cannot cover the deputy's fixed fee
 	ErrInsufficientAmount = sdkerrors.Register(ModuleName, 4, "amount cannot cover the deputy fixed fee")
 	// ErrAssetNotSupported error for when an asset is not supported

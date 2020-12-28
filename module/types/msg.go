@@ -45,13 +45,13 @@ type MsgCreateAtomicSwap struct {
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
 	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
 	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
-	HeightSpan          uint64           `json:"height_span"  yaml:"height_span"`
+	TimeSpan            uint64           `json:"height_span"  yaml:"height_span"`
 }
 
 // NewMsgCreateAtomicSwap initializes a new MsgCreateAtomicSwap
 func NewMsgCreateAtomicSwap(from sdk.AccAddress, to sdk.AccAddress, recipientOtherChain,
 	senderOtherChain string, randomNumberHash tmbytes.HexBytes, timestamp int64,
-	amount sdk.Coins, heightSpan uint64) MsgCreateAtomicSwap {
+	amount sdk.Coins, timeSpan uint64) MsgCreateAtomicSwap {
 	return MsgCreateAtomicSwap{
 		From:                from,
 		To:                  to,
@@ -60,7 +60,7 @@ func NewMsgCreateAtomicSwap(from sdk.AccAddress, to sdk.AccAddress, recipientOth
 		RandomNumberHash:    randomNumberHash,
 		Timestamp:           timestamp,
 		Amount:              amount,
-		HeightSpan:          heightSpan,
+		TimeSpan:            timeSpan,
 	}
 }
 
@@ -74,7 +74,7 @@ func (msg MsgCreateAtomicSwap) Type() string { return CreateAtomicSwap }
 func (msg MsgCreateAtomicSwap) String() string {
 	return fmt.Sprintf("AtomicSwap{%v#%v#%v#%v#%v#%v#%v#%v}",
 		msg.From, msg.To, msg.RecipientOtherChain, msg.SenderOtherChain,
-		msg.RandomNumberHash, msg.Timestamp, msg.Amount, msg.HeightSpan)
+		msg.RandomNumberHash, msg.Timestamp, msg.Amount, msg.TimeSpan)
 }
 
 // GetInvolvedAddresses gets the addresses involved in a MsgCreateAtomicSwap
@@ -122,7 +122,7 @@ func (msg MsgCreateAtomicSwap) ValidateBasic() error {
 	if !msg.Amount.IsValid() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
 	}
-	if msg.HeightSpan <= 0 {
+	if msg.TimeSpan <= 0 {
 		return errors.New("height span must be positive")
 	}
 	return nil

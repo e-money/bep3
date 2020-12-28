@@ -39,6 +39,7 @@ func NewBep3GenStateMulti(deputy sdk.AccAddress) app.GenesisState {
 }
 
 func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
+	_ = &bep3.MsgCreateAtomicSwap{}
 	bep3Genesis := bep3.GenesisState{
 		Params: bep3.Params{
 			AssetParams: bep3.AssetParams{
