@@ -165,7 +165,7 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, k keeper.Keeper) simula
 
 		msg := types.NewMsgCreateAtomicSwap(
 			sender.Address, recipient.Address, recipientOtherChain, senderOtherChain,
-			randomNumberHash, timestamp, coins, asset.TimeSpan,
+			randomNumberHash, timestamp, coins, asset.SwapTimeSpan,
 		)
 
 		tx := helpers.GenTx(
@@ -189,7 +189,7 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, k keeper.Keeper) simula
 		if r.Intn(100) < 50 {
 			// Claim future operation - choose between next block and the block before time span
 			executionTime :=
-				time.Unix(ctx.BlockTime().Unix()+1+int64(r.Intn(int(asset.TimeSpan-1))), 0)
+				time.Unix(ctx.BlockTime().Unix()+1+int64(r.Intn(int(asset.SwapTimeSpan-1))), 0)
 
 			futureOp = simulation.FutureOperation{
 				BlockTime: executionTime,

@@ -117,8 +117,8 @@ func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
 		FixedFee:      GenRandFixedFee(r),
 		MinSwapAmount: minSwapAmount,
 		MaxSwapAmount: GenMaxSwapAmount(r, minSwapAmount, limit),
-		SwapTime:      uint64(time.Now().Unix()),
-		TimeSpan:      limit.Uint64(),
+		SwapTimestamp: uint64(time.Now().Unix()),
+		SwapTimeSpan:  limit.Uint64(),
 	}
 }
 

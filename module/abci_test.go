@@ -2,6 +2,7 @@ package bep3_test
 
 import (
 	"testing"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bep3 "github.com/e-money/bep3/module"
@@ -29,7 +30,9 @@ func (suite *ABCITestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		account.SetCoins(coins)
+		if err := account.SetCoins(coins); err != nil {
+			panic(err)
+		}
 		accountKeeper.SetAccount(ctx, account)
 	}
 
@@ -46,14 +49,14 @@ func (suite *ABCITestSuite) ResetKeeper() {
 	var randomNumbers []tmbytes.HexBytes
 	for i := 0; i < 10; i++ {
 		// Set up atomic swap variables
-		expireHeight := bep3.DefaultMinBlockLock
+		expireTime := bep3.DefaultSwapTimeSpan
 		amount := cs(c("bnb", int64(10000)))
 		timestamp := ts(i)
 		randomNumber, _ := bep3.GenerateSecureRandomNumber()
 		randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 
 		// Create atomic swap and check err to confirm creation
-		err := suite.keeper.CreateAtomicSwap(suite.ctx, randomNumberHash, timestamp, expireHeight,
+		err := suite.keeper.CreateAtomicSwap(suite.ctx, randomNumberHash, timestamp, expireTime,
 			suite.addrs[11], suite.addrs[i], TestSenderOtherChain, TestRecipientOtherChain,
 			amount, true)
 		suite.Nil(err)
@@ -208,12 +211,13 @@ func (suite *ABCITestSuite) TestBeginBlocker_DeleteClosedAtomicSwapsFromLongterm
 			case Refund:
 				for _, swapID := range suite.swapIDs {
 					swap, _ := suite.keeper.GetAtomicSwap(tc.firstCtx, swapID)
-					refundCtx := suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + int64(swap.ExpireHeight))
+					refundCtx := suite.ctx.WithBlockTime(time.Unix(int64(swap.ExpireTimestamp), 0))
 					bep3.BeginBlocker(refundCtx, suite.keeper)
 					err := suite.keeper.RefundAtomicSwap(refundCtx, suite.addrs[5], swapID)
 					suite.Nil(err)
-					// Add expire height to second ctx block height
-					tc.secondCtx = tc.secondCtx.WithBlockHeight(tc.secondCtx.BlockHeight() + int64(swap.ExpireHeight))
+					// Add expiration timestamp to second ctx block timestamp
+					tc.secondCtx = tc.secondCtx.WithBlockTime(
+						time.Unix(tc.secondCtx.BlockTime().Unix()+int64(swap.ExpireTimestamp)-swap.Timestamp, 0))
 				}
 			}
 

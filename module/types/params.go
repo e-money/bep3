@@ -17,12 +17,12 @@ const (
 var (
 	KeyAssetParams = []byte("AssetParams")
 
-	DefaultBnbDeputyFixedFee sdk.Int = sdk.NewInt(1000) // 0.00001 BNB
-	DefaultMinAmount         sdk.Int = sdk.ZeroInt()
-	DefaultMaxAmount         sdk.Int = sdk.NewInt(1000000000000) // 10,000 BNB
-	DefaultPreviousBlockTime         = tmtime.Canonical(time.Unix(0, 0))
-	DefaultSwapBlockTime     uint64  = 10
-	DefaultSwapTimeSpan      uint64  = 60
+	DefaultBnbDeputyFixedFee  sdk.Int = sdk.NewInt(1000) // 0.00001 BNB
+	DefaultMinAmount          sdk.Int = sdk.ZeroInt()
+	DefaultMaxAmount          sdk.Int = sdk.NewInt(1000000000000) // 10,000 BNB
+	DefaultPreviousBlockTime          = tmtime.Canonical(time.Unix(0, 0))
+	DefaultSwapBlockTimestamp uint64  = 10 // At 10th second.
+	DefaultSwapTimeSpan       uint64  = 60 // 1 minute
 )
 
 // Params governance parameters for bep3 module
@@ -60,17 +60,15 @@ type AssetParam struct {
 	FixedFee      sdk.Int        `json:"fixed_fee" yaml:"fixed_fee"`             // the fixed fee charged by the relayer process for outgoing swaps
 	MinSwapAmount sdk.Int        `json:"min_swap_amount" yaml:"min_swap_amount"` // Minimum swap amount
 	MaxSwapAmount sdk.Int        `json:"max_swap_amount" yaml:"max_swap_amount"` // Maximum swap amount
-	SwapTime      uint64         `json:"swap_time" yaml:"swap_time"`             // Unix seconds of swap creation block timestamp
-	TimeSpan      uint64         `json:"time_span" yaml:"time_span"`             // seconds span before time expiration
-	BlockTime     uint64         `json:"block_time" yaml:"block_time"`           // latest block time
+	SwapTimestamp uint64         `json:"swap_time" yaml:"swap_time"`             // Unix seconds of swap creation block timestamp
+	SwapTimeSpan  uint64         `json:"time_span" yaml:"time_span"`             // seconds span before time expiration
 }
 
 // NewAssetParam returns a new AssetParam
 func NewAssetParam(
 	denom string, coinID int, limit SupplyLimit, active bool,
 	deputyAddr sdk.AccAddress, fixedFee sdk.Int, minSwapAmount sdk.Int,
-	maxSwapAmount sdk.Int, minBlockLock uint64, swapTime uint64,
-	timeSpan uint64, blockTime uint64,
+	maxSwapAmount sdk.Int, swapTimestamp uint64, timeSpan uint64,
 ) AssetParam {
 	return AssetParam{
 		Denom:         denom,
@@ -81,9 +79,8 @@ func NewAssetParam(
 		FixedFee:      fixedFee,
 		MinSwapAmount: minSwapAmount,
 		MaxSwapAmount: maxSwapAmount,
-		SwapTime:      swapTime,
-		TimeSpan:      timeSpan,
-		BlockTime:     blockTime,
+		SwapTimestamp: swapTimestamp,
+		SwapTimeSpan:  timeSpan,
 	}
 }
 
@@ -99,10 +96,9 @@ func (ap AssetParam) String() string {
 	Min Swap Amount: %s
 	Max Swap Amount: %s
 	Swap Time in Seconds: %d
-	Time Span in Seconds: %d
-	Block Time in Seconds: %d`,
+	Time Span in Seconds: %d`,
 		ap.Denom, ap.CoinID, ap.SupplyLimit, ap.Active, ap.DeputyAddress, ap.FixedFee,
-		ap.MinSwapAmount, ap.MaxSwapAmount, ap.SwapTime, ap.TimeSpan, ap.BlockTime)
+		ap.MinSwapAmount, ap.MaxSwapAmount, ap.SwapTimestamp, ap.SwapTimeSpan)
 }
 
 // AssetParams array of AssetParam
@@ -205,9 +201,8 @@ func validateAssetParams(i interface{}) error {
 			return fmt.Errorf("asset %s cannot have a negative fixed fee %s", asset.Denom, asset.FixedFee)
 		}
 
-		if asset.SwapTime+asset.TimeSpan > asset.BlockTime {
-			return fmt.Errorf("asset %s has swap time %d + time span %d = %d > block time %d",
-				asset.Denom, asset.SwapTime, asset.TimeSpan, asset.SwapTime+asset.TimeSpan, asset.BlockTime)
+		if asset.SwapTimeSpan < 60 || asset.SwapTimeSpan >= 3*24*3600 {
+			return fmt.Errorf("asset %s swap time span be within [60, 3 days in seconds] %d", asset.Denom, asset.SwapTimeSpan)
 		}
 
 		if !asset.MinSwapAmount.IsPositive() {

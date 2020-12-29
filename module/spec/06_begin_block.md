@@ -15,11 +15,11 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 
 ## Expiration
 
-If an atomic swap's `ExpireHeight` is greater than the current block height, it will be expired. The logic to expire atomic swaps is as follows:
+If an atomic swap's `ExpireTimestamp` is greater than the current block timestamp, it will be expired. The logic to expire atomic swaps is as follows:
 
 ```go
 	var expiredSwapIDs []string
-	k.IterateAtomicSwapsByBlock(ctx, uint64(ctx.BlockHeight()), func(id []byte) bool {
+	k.IterateAtomicSwapsByBlock(ctx, uint64(ctx.BlockTime()), func(id []byte) bool {
 		atomicSwap, found := k.GetAtomicSwap(ctx, id)
 		if !found {
 			return false
@@ -38,7 +38,7 @@ If an atomic swap's `ExpireHeight` is greater than the current block height, it 
 Atomic swaps are deleted 86400 blocks (one week, assuming a block time of 7 seconds) after being completed. The logic to delete atomic swaps is as follows:
 
 ```go
-k.IterateAtomicSwapsLongtermStorage(ctx, uint64(ctx.BlockHeight()), func(id []byte) bool {
+k.IterateAtomicSwapsLongtermStorage(ctx, uint64(ctx.BlockTime()), func(id []byte) bool {
 	swap, found := k.GetAtomicSwap(ctx, id)
 	if !found {
 		return false

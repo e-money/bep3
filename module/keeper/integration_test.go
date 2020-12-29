@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
+	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
 	"github.com/tendermint/tendermint/crypto"
@@ -53,8 +54,8 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
-					MinBlockLock:  types.DefaultMinBlockLock,
-					MaxBlockLock:  types.DefaultMaxBlockLock,
+					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 				types.AssetParam{
 					Denom:  "inc",
@@ -70,8 +71,8 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(100000000000),
-					MinBlockLock:  types.DefaultMinBlockLock,
-					MaxBlockLock:  types.DefaultMaxBlockLock,
+					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 			},
 		},

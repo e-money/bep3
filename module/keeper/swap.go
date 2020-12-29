@@ -125,7 +125,7 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 			sdk.NewAttribute(types.AttributeKeyRandomNumberHash, hex.EncodeToString(atomicSwap.RandomNumberHash)),
 			sdk.NewAttribute(types.AttributeKeyTimestamp, fmt.Sprintf("%d", atomicSwap.Timestamp)),
 			sdk.NewAttribute(types.AttributeKeySenderOtherChain, atomicSwap.SenderOtherChain),
-			sdk.NewAttribute(types.AttributeKeyExpireTime, fmt.Sprintf("%d", atomicSwap.ExpireTime)),
+			sdk.NewAttribute(types.AttributeKeyExpireTime, fmt.Sprintf("%d", atomicSwap.ExpireTimestamp)),
 			sdk.NewAttribute(types.AttributeKeyAmount, atomicSwap.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyDirection, atomicSwap.Direction.String()),
 		),

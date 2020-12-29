@@ -113,7 +113,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				randomNumber, _ := bep3.GenerateSecureRandomNumber()
 				randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 				swap := bep3.NewAtomicSwap(cs(c("bnb", overLimitAmount.Int64())), randomNumberHash,
-					bep3.DefaultMinBlockLock, timestamp, suite.addrs[0], addrs[1], TestSenderOtherChain,
+					bep3.DefaultSwapTimeSpan, timestamp, suite.addrs[0], addrs[1], TestSenderOtherChain,
 					TestRecipientOtherChain, 0, bep3.Open, true, bep3.Incoming)
 				gs.AtomicSwaps = bep3.AtomicSwaps{swap}
 
@@ -174,7 +174,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				randomNumber, _ := bep3.GenerateSecureRandomNumber()
 				randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 				swap := bep3.NewAtomicSwap(cs(c("bnb", overLimitAmount.Int64())), randomNumberHash,
-					bep3.DefaultMinBlockLock, timestamp, addrs[1], suite.addrs[0], TestSenderOtherChain,
+					bep3.DefaultSwapTimeSpan, timestamp, addrs[1], suite.addrs[0], TestSenderOtherChain,
 					TestRecipientOtherChain, 0, bep3.Open, true, bep3.Outgoing)
 				gs.AtomicSwaps = bep3.AtomicSwaps{swap}
 
@@ -240,11 +240,19 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			expectPass: false,
 		},
 		{
-			name: "minimum block lock cannot be > maximum block lock",
+			name: "time lock cannot be < 1 minute",
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
-				gs.Params.AssetParams[0].MinBlockLock = 201
-				gs.Params.AssetParams[0].MaxBlockLock = 200
+				gs.Params.AssetParams[0].SwapTimestamp = 59
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+			},
+			expectPass: false,
+		},
+		{
+			name: "time lock cannot be > 1 week",
+			genState: func() app.GenesisState {
+				gs := baseGenState(suite.addrs[0])
+				gs.Params.AssetParams[0].SwapTimestamp = (3600 * 24 * 7) + 1 // 1 week + 1 seconds
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
 			},
 			expectPass: false,

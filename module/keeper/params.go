@@ -95,7 +95,7 @@ func (k Keeper) GetSwapTime(ctx sdk.Context, denom string) (uint64, error) {
 	if err != nil {
 		return uint64(0), err
 	}
-	return asset.SwapTime, nil
+	return asset.SwapTimestamp, nil
 }
 
 // GetTimeSpan returns the swap seconds allowance
@@ -104,16 +104,7 @@ func (k Keeper) GetTimeSpan(ctx sdk.Context, denom string) (uint64, error) {
 	if err != nil {
 		return uint64(0), err
 	}
-	return asset.TimeSpan, nil
-}
-
-// GetBlockTime returns the latest block Unix seconds timestamp
-func (k Keeper) GetBlockTime(ctx sdk.Context, denom string) (uint64, error) {
-	asset, err := k.GetAsset(ctx, denom)
-	if err != nil {
-		return uint64(0), err
-	}
-	return asset.BlockTime, nil
+	return asset.SwapTimeSpan, nil
 }
 
 // GetAssetByCoinID returns an asset by its denom

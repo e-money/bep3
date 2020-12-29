@@ -51,7 +51,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:              cs(c("bnb", 50000)),
 				RandomNumberHash:    suite.randomNumberHashes[0],
-				ExpireHeight:        360,
+				ExpireTimestamp:     360,
 				Timestamp:           suite.timestamps[0],
 				Sender:              suite.addrs[0],
 				Recipient:           suite.addrs[5],
@@ -91,7 +91,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:           cs(c("bnb", 50000)),
 				RandomNumberHash: suite.randomNumberHashes[0],
-				ExpireHeight:     0,
+				ExpireTimestamp:  0,
 			},
 			false,
 		},
@@ -100,7 +100,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:           cs(c("bnb", 50000)),
 				RandomNumberHash: suite.randomNumberHashes[0],
-				ExpireHeight:     10,
+				ExpireTimestamp:  10,
 				Timestamp:        0,
 			},
 			false,
@@ -110,7 +110,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:           cs(c("bnb", 50000)),
 				RandomNumberHash: suite.randomNumberHashes[0],
-				ExpireHeight:     10,
+				ExpireTimestamp:  10,
 				Timestamp:        10,
 				Sender:           nil,
 			},
@@ -121,7 +121,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:           cs(c("bnb", 50000)),
 				RandomNumberHash: suite.randomNumberHashes[0],
-				ExpireHeight:     10,
+				ExpireTimestamp:  10,
 				Timestamp:        10,
 				Sender:           suite.addrs[0],
 				Recipient:        nil,
@@ -133,7 +133,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:           cs(c("bnb", 50000)),
 				RandomNumberHash: suite.randomNumberHashes[0],
-				ExpireHeight:     10,
+				ExpireTimestamp:  10,
 				Timestamp:        10,
 				Sender:           suite.addrs[0][:10],
 				Recipient:        suite.addrs[5],
@@ -145,7 +145,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:           cs(c("bnb", 50000)),
 				RandomNumberHash: suite.randomNumberHashes[0],
-				ExpireHeight:     10,
+				ExpireTimestamp:  10,
 				Timestamp:        10,
 				Sender:           suite.addrs[0],
 				Recipient:        suite.addrs[5][:10],
@@ -157,7 +157,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:           cs(c("bnb", 50000)),
 				RandomNumberHash: suite.randomNumberHashes[0],
-				ExpireHeight:     10,
+				ExpireTimestamp:  10,
 				Timestamp:        10,
 				Sender:           suite.addrs[0],
 				Recipient:        suite.addrs[5],
@@ -170,7 +170,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:              cs(c("bnb", 50000)),
 				RandomNumberHash:    suite.randomNumberHashes[0],
-				ExpireHeight:        10,
+				ExpireTimestamp:     10,
 				Timestamp:           10,
 				Sender:              suite.addrs[0],
 				Recipient:           suite.addrs[5],
@@ -184,7 +184,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:              cs(c("bnb", 50000)),
 				RandomNumberHash:    suite.randomNumberHashes[0],
-				ExpireHeight:        10,
+				ExpireTimestamp:     10,
 				Timestamp:           10,
 				Sender:              suite.addrs[0],
 				Recipient:           suite.addrs[5],
@@ -200,7 +200,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:              cs(c("bnb", 50000)),
 				RandomNumberHash:    suite.randomNumberHashes[0],
-				ExpireHeight:        10,
+				ExpireTimestamp:     10,
 				Timestamp:           10,
 				Sender:              suite.addrs[0],
 				Recipient:           suite.addrs[5],
@@ -216,7 +216,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			types.AtomicSwap{
 				Amount:              cs(c("bnb", 50000)),
 				RandomNumberHash:    suite.randomNumberHashes[0],
-				ExpireHeight:        10,
+				ExpireTimestamp:     10,
 				Timestamp:           10,
 				Sender:              suite.addrs[0],
 				Recipient:           suite.addrs[5],

@@ -116,10 +116,8 @@ var (
 	AtomicSwapCoinsAccAddr          = types.AtomicSwapCoinsAccAddr
 	KeyAssetParams                  = types.KeyAssetParams
 	DefaultBnbDeputyFixedFee        = types.DefaultBnbDeputyFixedFee
-	DefaultMinAmount                = types.DefaultMinAmount
-	DefaultMaxAmount                = types.DefaultMaxAmount
 	DefaultPreviousBlockTime        = types.DefaultPreviousBlockTime
-	DefaultSwapBlockTime            = types.DefaultSwapBlockTime
+	DefaultSwapBlockTimestamp       = types.DefaultSwapBlockTimestamp
 	DefaultSwapTimeSpan             = types.DefaultSwapTimeSpan
 	ModulePermissionsUpgradeTime    = types.ModulePermissionsUpgradeTime
 )

@@ -145,7 +145,7 @@ func filterAtomicSwaps(ctx sdk.Context, swaps types.AtomicSwaps, params types.Qu
 
 		// match expiration block limit (if supplied)
 		if params.Expiration > 0 {
-			matchExpiration = s.ExpireTime <= params.Expiration
+			matchExpiration = s.ExpireTimestamp <= params.Expiration
 		}
 
 		// match status (if supplied/valid)
