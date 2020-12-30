@@ -48,7 +48,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, supplyKeeper types.SupplyKeeper
 			switch swap.Status {
 			case Open:
 				// This index expires unclaimed swaps
-				keeper.InsertIntoByBlockIndex(ctx, swap)
+				keeper.InsertIntoByTimestamp(ctx, swap)
 				incomingSupplies = incomingSupplies.Add(swap.Amount...)
 			case Expired:
 				incomingSupplies = incomingSupplies.Add(swap.Amount...)
@@ -61,7 +61,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, supplyKeeper types.SupplyKeeper
 		case Outgoing:
 			switch swap.Status {
 			case Open:
-				keeper.InsertIntoByBlockIndex(ctx, swap)
+				keeper.InsertIntoByTimestamp(ctx, swap)
 				outgoingSupplies = outgoingSupplies.Add(swap.Amount...)
 			case Expired:
 				outgoingSupplies = outgoingSupplies.Add(swap.Amount...)

@@ -22,8 +22,8 @@ const (
 	// DefaultParamspace default namestore
 	DefaultParamspace = ModuleName
 
-	// DefaultLongtermStorageDuration is 1 week (assuming a block time of 7 seconds)
-	DefaultLongtermStorageDuration uint64 = 86400
+	// DefaultLongtermStorageDuration is 1 week
+	DefaultLongtermStorageDuration uint64 = 7 * 24 * 60 * 60
 )
 
 // Key prefixes
@@ -41,4 +41,15 @@ var (
 // GetAtomicSwapByHeightKey is used by the AtomicSwapByBlock index and AtomicSwapLongtermStorage index
 func GetAtomicSwapByHeightKey(height uint64, swapID []byte) []byte {
 	return append(sdk.Uint64ToBigEndian(height), swapID...)
+}
+
+func GetTimestampSortableKey(timestamp uint64) []byte {
+	t := time.Unix(int64(timestamp), 0).UTC()
+	return sdk.FormatTimeBytes(t)
+}
+
+// GetAtomicSwapByTimestampKey is used by the AtomicSwapByTimestamp and
+// AtomicSwapLongTermStorage index to generate sortable timestamp keys.
+func GetAtomicSwapByTimestampKey(timestamp uint64, swapID []byte) []byte {
+	return append(GetTimestampSortableKey(timestamp), swapID...)
 }

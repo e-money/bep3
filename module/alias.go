@@ -23,7 +23,7 @@ const (
 	AttributeKeyRandomNumberHash   = types.AttributeKeyRandomNumberHash
 	AttributeKeyTimestamp          = types.AttributeKeyTimestamp
 	AttributeKeySenderOtherChain   = types.AttributeKeySenderOtherChain
-	AttributeKeyExpireTime         = types.AttributeKeyExpireTime
+	AttributeKeyExpireTimestamp    = types.AttributeKeyExpireTimestamp
 	AttributeKeyAmount             = types.AttributeKeyAmount
 	AttributeKeyDirection          = types.AttributeKeyDirection
 	AttributeKeyClaimSender        = types.AttributeKeyClaimSender
@@ -73,7 +73,7 @@ var (
 	GenerateSecureRandomNumber = types.GenerateSecureRandomNumber
 	CalculateRandomHash        = types.CalculateRandomHash
 	CalculateSwapID            = types.CalculateSwapID
-	GetAtomicSwapByHeightKey   = types.GetAtomicSwapByHeightKey
+	GetAtomicSwapByHeightKey   = types.GetAtomicSwapByTimestampKey
 	NewMsgCreateAtomicSwap     = types.NewMsgCreateAtomicSwap
 	NewMsgClaimAtomicSwap      = types.NewMsgClaimAtomicSwap
 	NewMsgRefundAtomicSwap     = types.NewMsgRefundAtomicSwap

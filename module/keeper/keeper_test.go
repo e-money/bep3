@@ -147,7 +147,7 @@ func (suite *KeeperTestSuite) TestInsertIntoByBlockIndex() {
 
 	// Set new atomic swap in by block index
 	atomicSwap := atomicSwap(suite.ctx, 1)
-	suite.keeper.InsertIntoByBlockIndex(suite.ctx, atomicSwap)
+	suite.keeper.InsertIntoByTimestamp(suite.ctx, atomicSwap)
 
 	// Block index lacks getter methods, must use iteration to get count of swaps in store
 	var swapIDs [][]byte
@@ -170,7 +170,7 @@ func (suite *KeeperTestSuite) TestRemoveFromByBlockIndex() {
 
 	// Set new atomic swap in by block index
 	atomicSwap := atomicSwap(suite.ctx, 1)
-	suite.keeper.InsertIntoByBlockIndex(suite.ctx, atomicSwap)
+	suite.keeper.InsertIntoByTimestamp(suite.ctx, atomicSwap)
 
 	// Check stored data in block index
 	var swapIDsPre [][]byte
@@ -180,7 +180,7 @@ func (suite *KeeperTestSuite) TestRemoveFromByBlockIndex() {
 	})
 	suite.Equal(len(swapIDsPre), 1)
 
-	suite.keeper.RemoveFromByBlockIndex(suite.ctx, atomicSwap)
+	suite.keeper.RemoveFromByTimestamp(suite.ctx, atomicSwap)
 
 	// Check stored data not in block index
 	var swapIDsPost [][]byte
@@ -215,7 +215,7 @@ func (suite *KeeperTestSuite) TestIterateAtomicSwapsByBlock() {
 			true, types.Incoming)
 
 		// Insert into block index
-		suite.keeper.InsertIntoByBlockIndex(blockCtx, atomicSwap)
+		suite.keeper.InsertIntoByTimestamp(blockCtx, atomicSwap)
 		// Add to local block index
 		testCases = append(testCases, args{blockCtx, atomicSwap})
 	}

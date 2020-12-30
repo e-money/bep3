@@ -12,12 +12,12 @@ import (
 )
 
 const (
-	sixtySeconds   = 60
-	oneWeekSeconds = 604800
+	sixtySeconds  = 60
+	oneDaySeconds = 60 * 60 * 24
 )
 
 // CreateAtomicSwap creates a new atomic swap.
-func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp int64, timeSpan uint64,
+func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp int64, swapTimeSpan uint64,
 	sender sdk.AccAddress, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string,
 	amount sdk.Coins, crossChain bool) error {
 	// Confirm that this is not a duplicate swap
@@ -84,10 +84,10 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 	case types.Outgoing:
 
 		// Outgoing swaps must have a seconds time span within [60, 1 week]
-		if timeSpan < sixtySeconds || timeSpan > oneWeekSeconds {
+		if swapTimeSpan < sixtySeconds || swapTimeSpan > oneDaySeconds {
 			return sdkerrors.Wrapf(types.ErrInvalidTimeSpan,
-				"seconds span %d outside range of 1 min...1 week[%d, %d]",
-				timeSpan, sixtySeconds, oneWeekSeconds)
+				"seconds span %d outside range of 1 min...1 day[%d, %d]",
+				swapTimeSpan, sixtySeconds, oneDaySeconds)
 		}
 		// Amount in outgoing swaps must be able to pay the deputy's fixed fee.
 		if amount[0].Amount.LTE(asset.FixedFee.Add(asset.MinSwapAmount)) {
@@ -107,13 +107,13 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 	}
 
 	// Store the details of the swap
-	expireTime := uint64(ctx.BlockTime().Unix()) + timeSpan
-	atomicSwap := types.NewAtomicSwap(amount, randomNumberHash, expireTime, timestamp, sender,
+	expireTime := ctx.BlockTime().Add(time.Duration(swapTimeSpan) * time.Second)
+	atomicSwap := types.NewAtomicSwap(amount, randomNumberHash, uint64(expireTime.Unix()), timestamp, sender,
 		recipient, senderOtherChain, recipientOtherChain, 0, types.Open, crossChain, direction)
 
 	// Insert the atomic swap under both keys
 	k.SetAtomicSwap(ctx, atomicSwap)
-	k.InsertIntoByBlockIndex(ctx, atomicSwap)
+	k.InsertIntoByTimestamp(ctx, atomicSwap)
 
 	// Emit 'create_atomic_swap' event
 	ctx.EventManager().EmitEvent(
@@ -125,7 +125,7 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 			sdk.NewAttribute(types.AttributeKeyRandomNumberHash, hex.EncodeToString(atomicSwap.RandomNumberHash)),
 			sdk.NewAttribute(types.AttributeKeyTimestamp, fmt.Sprintf("%d", atomicSwap.Timestamp)),
 			sdk.NewAttribute(types.AttributeKeySenderOtherChain, atomicSwap.SenderOtherChain),
-			sdk.NewAttribute(types.AttributeKeyExpireTime, fmt.Sprintf("%d", atomicSwap.ExpireTimestamp)),
+			sdk.NewAttribute(types.AttributeKeyExpireTimestamp, fmt.Sprintf("%d", atomicSwap.ExpireTimestamp)),
 			sdk.NewAttribute(types.AttributeKeyAmount, atomicSwap.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyDirection, atomicSwap.Direction.String()),
 		),
@@ -200,7 +200,7 @@ func (k Keeper) ClaimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []b
 	k.SetAtomicSwap(ctx, atomicSwap)
 
 	// Remove from byBlock index and transition to longterm storage
-	k.RemoveFromByBlockIndex(ctx, atomicSwap)
+	k.RemoveFromByTimestamp(ctx, atomicSwap)
 	k.InsertIntoLongtermStorage(ctx, atomicSwap)
 
 	// Emit 'claim_atomic_swap' event
@@ -274,6 +274,7 @@ func (k Keeper) RefundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []
 func (k Keeper) UpdateExpiredAtomicSwaps(ctx sdk.Context) {
 	var expiredSwapIDs []string
 	k.IterateAtomicSwapsByBlock(ctx, uint64(ctx.BlockHeight()), func(id []byte) bool {
+	k.IterateAtomicSwapsByBlock(ctx, uint64(ctx.BlockTime().Unix()), func(id []byte) bool {
 		atomicSwap, found := k.GetAtomicSwap(ctx, id)
 		if !found {
 			// NOTE: shouldn't happen. Continue to next item.
@@ -282,7 +283,7 @@ func (k Keeper) UpdateExpiredAtomicSwaps(ctx sdk.Context) {
 		// Expire the uncompleted swap and update both indexes
 		atomicSwap.Status = types.Expired
 		// Note: claimed swaps have already been removed from byBlock index.
-		k.RemoveFromByBlockIndex(ctx, atomicSwap)
+		k.RemoveFromByTimestamp(ctx, atomicSwap)
 		k.SetAtomicSwap(ctx, atomicSwap)
 		expiredSwapIDs = append(expiredSwapIDs, hex.EncodeToString(atomicSwap.GetSwapID()))
 		return false
