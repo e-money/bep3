@@ -15,8 +15,6 @@ import (
 	tmtime "github.com/tendermint/tendermint/types/time"
 )
 
-const LongtermStorageDuration = 86400
-
 type KeeperTestSuite struct {
 	suite.Suite
 
@@ -249,10 +247,13 @@ func (suite *KeeperTestSuite) TestInsertIntoLongtermStorage() {
 
 	// Longterm storage lacks getter methods, must use iteration to get count of swaps in store
 	var swapIDs [][]byte
-	suite.keeper.IterateAtomicSwapsLongtermStorage(suite.ctx, uint64(atomicSwap.ClosedBlock+LongtermStorageDuration), func(id []byte) bool {
-		swapIDs = append(swapIDs, id)
-		return false
-	})
+	suite.keeper.IterateAtomicSwapsLongtermStorage(
+		suite.ctx,
+		uint64(atomicSwap.ClosedBlock)+types.DefaultLongtermStorageDuration,
+		func(id []byte) bool {
+			swapIDs = append(swapIDs, id)
+			return false
+		})
 	suite.Equal(len(swapIDs), 1)
 
 	// Marshal the expected swapID
@@ -273,20 +274,26 @@ func (suite *KeeperTestSuite) TestRemoveFromLongtermStorage() {
 
 	// Longterm storage lacks getter methods, must use iteration to get count of swaps in store
 	var swapIDs [][]byte
-	suite.keeper.IterateAtomicSwapsLongtermStorage(suite.ctx, uint64(atomicSwap.ClosedBlock+LongtermStorageDuration), func(id []byte) bool {
-		swapIDs = append(swapIDs, id)
-		return false
-	})
+	suite.keeper.IterateAtomicSwapsLongtermStorage(
+		suite.ctx,
+		uint64(atomicSwap.ClosedBlock)+types.DefaultLongtermStorageDuration,
+		func(id []byte) bool {
+			swapIDs = append(swapIDs, id)
+			return false
+		})
 	suite.Equal(len(swapIDs), 1)
 
 	suite.keeper.RemoveFromLongtermStorage(suite.ctx, atomicSwap)
 
 	// Check stored data not in block index
 	var swapIDsPost [][]byte
-	suite.keeper.IterateAtomicSwapsLongtermStorage(suite.ctx, uint64(atomicSwap.ClosedBlock+LongtermStorageDuration), func(id []byte) bool {
-		swapIDsPost = append(swapIDsPost, id)
-		return false
-	})
+	suite.keeper.IterateAtomicSwapsLongtermStorage(
+		suite.ctx,
+		uint64(atomicSwap.ClosedBlock)+types.DefaultLongtermStorageDuration,
+		func(id []byte) bool {
+			swapIDsPost = append(swapIDsPost, id)
+			return false
+		})
 	suite.Equal(len(swapIDsPost), 0)
 }
 
@@ -313,11 +320,11 @@ func (suite *KeeperTestSuite) TestIterateAtomicSwapsLongtermStorage() {
 	}
 
 	// Set up the expected swap IDs for a given cutoff block.
-	cutoffBlock := int64(LongtermStorageDuration + 350)
+	cutoffBlock := int64(types.DefaultLongtermStorageDuration + 350)
 	var expectedSwapIDs [][]byte
 	for _, swap := range swaps {
-		if swap.ClosedBlock+LongtermStorageDuration < cutoffBlock ||
-			swap.ClosedBlock+LongtermStorageDuration == cutoffBlock {
+		if swap.ClosedBlock+int64(types.DefaultLongtermStorageDuration) < cutoffBlock ||
+			swap.ClosedBlock+int64(types.DefaultLongtermStorageDuration) == cutoffBlock {
 			expectedSwapIDs = append(expectedSwapIDs, swap.GetSwapID())
 		}
 	}
