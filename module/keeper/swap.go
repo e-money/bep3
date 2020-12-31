@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	sixtySeconds  = 60
-	oneDaySeconds = 60 * 60 * 24
+	sixtySeconds    = 60
+	ThreeDaySeconds = 60 * 60 * 24 * 3
 )
 
 // CreateAtomicSwap creates a new atomic swap.
@@ -84,10 +84,10 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 	case types.Outgoing:
 
 		// Outgoing swaps must have a seconds time span within [60, 1 week]
-		if swapTimeSpan < sixtySeconds || swapTimeSpan > oneDaySeconds {
+		if swapTimeSpan < sixtySeconds || swapTimeSpan > ThreeDaySeconds {
 			return sdkerrors.Wrapf(types.ErrInvalidTimeSpan,
 				"seconds span %d outside range of 1 min...1 day[%d, %d]",
-				swapTimeSpan, sixtySeconds, oneDaySeconds)
+				swapTimeSpan, sixtySeconds, ThreeDaySeconds)
 		}
 		// Amount in outgoing swaps must be able to pay the deputy's fixed fee.
 		if amount[0].Amount.LTE(asset.FixedFee.Add(asset.MinSwapAmount)) {

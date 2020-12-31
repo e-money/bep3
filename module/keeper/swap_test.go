@@ -261,12 +261,12 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			false,
 		},
 		{
-			"small height span on outgoing swap",
+			"small time span on outgoing swap",
 			currentTmTime,
 			args{
 				randomNumberHash:    suite.randomNumberHashes[5],
 				timestamp:           suite.timestamps[5],
-				timeSpan:            uint64(100),
+				timeSpan:            types.DefaultSwapTimeSpan - 1,
 				sender:              suite.addrs[5],
 				recipient:           suite.deputy,
 				senderOtherChain:    TestSenderOtherChain,
@@ -284,7 +284,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[6],
 				timestamp:           suite.timestamps[6],
-				timeSpan:            uint64(300),
+				timeSpan:            keeper.ThreeDaySeconds + 1,
 				sender:              suite.addrs[6],
 				recipient:           suite.deputy,
 				senderOtherChain:    TestSenderOtherChain,
@@ -517,7 +517,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 		},
 		{
 			"normal incoming swap rate-limited",
-			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute * 10)),
+			suite.ctx.WithBlockTime(currentTmTime.Add(time.Second * 10)),
 			args{
 				coins:        cs(c(OTHER_DENOM, 50000)),
 				swapID:       []byte{},
@@ -561,7 +561,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 		},
 		{
 			"past expiration",
-			suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 2000),
+			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute * 10)),
 			args{
 				coins:        cs(c(BNB_DENOM, 50000)),
 				swapID:       []byte{},
@@ -676,6 +676,16 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 	}
 }
 
+// getContextPlusSec returns a context forward or backward in time and block
+// index. Assuming 1 second finality.
+func (suite *AtomicSwapTestSuite) getContextPlusSec(plusSeconds uint64) sdk.Context {
+	offset := int64(plusSeconds)
+	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Second))
+	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + offset)
+
+	return ctx
+}
+
 func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 	suite.SetupTest()
 
@@ -690,8 +700,8 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 		expectPass bool
 	}{
 		{
-			"normal incoming swap",
-			suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 400),
+			"expired incoming swap",
+			suite.getContextPlusSec(bep3.DefaultSwapTimeSpan + 1),
 			args{
 				swapID:    []byte{},
 				direction: types.Incoming,
@@ -700,7 +710,7 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 		},
 		{
 			"normal outgoing swap",
-			suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 400),
+			suite.getContextPlusSec(bep3.DefaultSwapTimeSpan + 1),
 			args{
 				swapID:    []byte{},
 				direction: types.Outgoing,
