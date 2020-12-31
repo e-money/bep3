@@ -199,7 +199,7 @@ func (k Keeper) ClaimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []b
 	atomicSwap.ClosedBlock = ctx.BlockHeight()
 	k.SetAtomicSwap(ctx, atomicSwap)
 
-	// Remove from byBlock index and transition to longterm storage
+	// Remove from byTimestamp key and transition to long term storage
 	k.RemoveFromByTimestamp(ctx, atomicSwap)
 	k.InsertIntoLongtermStorage(ctx, atomicSwap)
 
