@@ -11,6 +11,7 @@ import (
 
 const (
 	bech32MainPrefix = "kava"
+	ThreeDaySeconds  = 60 * 60 * 24 * 3
 )
 
 // Parameter keys
@@ -201,7 +202,7 @@ func validateAssetParams(i interface{}) error {
 			return fmt.Errorf("asset %s cannot have a negative fixed fee %s", asset.Denom, asset.FixedFee)
 		}
 
-		if asset.SwapTimeSpan < 60 || asset.SwapTimeSpan >= 3*24*3600 {
+		if asset.SwapTimeSpan < 60 || asset.SwapTimeSpan > ThreeDaySeconds {
 			return fmt.Errorf("asset %s swap time span be within [60, 3 days in seconds] %d", asset.Denom, asset.SwapTimeSpan)
 		}
 

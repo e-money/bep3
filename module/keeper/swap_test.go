@@ -284,7 +284,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[6],
 				timestamp:           suite.timestamps[6],
-				timeSpan:            keeper.ThreeDaySeconds + 1,
+				timeSpan:            types.ThreeDaySeconds + 1,
 				sender:              suite.addrs[6],
 				recipient:           suite.deputy,
 				senderOtherChain:    TestSenderOtherChain,
