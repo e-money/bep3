@@ -272,7 +272,6 @@ func (k Keeper) RefundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []
 // UpdateExpiredAtomicSwaps finds all AtomicSwaps that are past (or at) their ending times and expires them.
 func (k Keeper) UpdateExpiredAtomicSwaps(ctx sdk.Context) {
 	var expiredSwapIDs []string
-	k.IterateAtomicSwapsByBlock(ctx, uint64(ctx.BlockHeight()), func(id []byte) bool {
 	k.IterateAtomicSwapsByBlock(ctx, uint64(ctx.BlockTime().Unix()), func(id []byte) bool {
 		atomicSwap, found := k.GetAtomicSwap(ctx, id)
 		if !found {

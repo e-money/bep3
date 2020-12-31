@@ -114,7 +114,7 @@ func atomicSwap(ctx sdk.Context, index int) types.AtomicSwap {
 	randomNumberHash := types.CalculateRandomHash(randomNumber[:], timestamp)
 
 	return types.NewAtomicSwap(cs(c("bnb", 50000)), randomNumberHash,
-		uint64(ctx.BlockHeight())+expireOffset, timestamp, TestUser1, TestUser2,
+		uint64(ctx.BlockTime().Unix())+expireOffset, timestamp, TestUser1, TestUser2,
 		TestSenderOtherChain, TestRecipientOtherChain, 0, types.Open, true,
 		types.Incoming)
 }
