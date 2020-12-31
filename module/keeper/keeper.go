@@ -161,14 +161,14 @@ func (k Keeper) InsertIntoLongtermStorage(ctx sdk.Context, atomicSwap types.Atom
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapLongtermStoragePrefix)
 
 	deletionHeight := uint64(atomicSwap.ClosedBlock) + types.DefaultLongtermStorageDuration
-	store.Set(types.GetAtomicSwapByTimestampKey(deletionHeight, atomicSwap.GetSwapID()), atomicSwap.GetSwapID())
+	store.Set(types.GetAtomicSwapByHeightKey(deletionHeight, atomicSwap.GetSwapID()), atomicSwap.GetSwapID())
 }
 
 // RemoveFromLongtermStorage removes a swap from the into the longterm storage index
 func (k Keeper) RemoveFromLongtermStorage(ctx sdk.Context, atomicSwap types.AtomicSwap) {
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapLongtermStoragePrefix)
 	deletionHeight := uint64(atomicSwap.ClosedBlock) + types.DefaultLongtermStorageDuration
-	store.Delete(types.GetAtomicSwapByTimestampKey(deletionHeight, atomicSwap.GetSwapID()))
+	store.Delete(types.GetAtomicSwapByHeightKey(deletionHeight, atomicSwap.GetSwapID()))
 }
 
 // IterateAtomicSwapsLongtermStorage provides an iterator over AtomicSwaps ordered by deletion height.
