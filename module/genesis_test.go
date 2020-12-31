@@ -243,7 +243,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			name: "time lock cannot be < 1 minute",
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
-				gs.Params.AssetParams[0].SwapTimestamp = 59
+				gs.Params.AssetParams[0].SwapTimeSpan = 59
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
 			},
 			expectPass: false,
@@ -252,7 +252,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			name: "time lock cannot be > 1 week",
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
-				gs.Params.AssetParams[0].SwapTimestamp = (3600 * 24 * 7) + 1 // 1 week + 1 seconds
+				gs.Params.AssetParams[0].SwapTimeSpan = (3600 * 24 * 7) + 1 // 1 week + 1 seconds
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
 			},
 			expectPass: false,
