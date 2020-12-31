@@ -129,15 +129,15 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 			expectedErr: "",
 		},
 		{
-			name: "min block lock greater max block lock",
+			name: "Swap time span < acceptable minimum value",
 			args: args{
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					244, 243)},
+					244, types.DefaultSwapTimeSpan-1)},
 			},
 			expectPass:  false,
-			expectedErr: "minimum block lock > maximum block lock",
+			expectedErr: "asset bnb swap time span be within [60, 3 days in seconds] 59",
 		},
 		{
 			name: "min swap not positive",

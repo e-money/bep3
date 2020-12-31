@@ -49,7 +49,6 @@ func (suite *ABCITestSuite) ResetKeeper() {
 	var randomNumbers []tmbytes.HexBytes
 	for i := 0; i < 10; i++ {
 		// Set up atomic swap variables
-		expireTime := bep3.DefaultSwapTimeSpan
 		amount := cs(c("bnb", int64(10000)))
 		timestamp := ts(i)
 		swapTimeSpan := bep3.DefaultSwapTimeSpan
