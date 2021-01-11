@@ -45,7 +45,7 @@ type MsgCreateAtomicSwap struct {
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
 	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
 	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
-	TimeSpan            uint64           `json:"height_span"  yaml:"height_span"`
+	TimeSpan            uint64           `json:"time_span"  yaml:"time_span"`
 }
 
 // NewMsgCreateAtomicSwap initializes a new MsgCreateAtomicSwap
@@ -121,6 +121,9 @@ func (msg MsgCreateAtomicSwap) ValidateBasic() error {
 	}
 	if !msg.Amount.IsValid() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
+	}
+	if msg.Amount.IsAnyNegative() {
+		return fmt.Errorf("the swapped out coin must be positive")
 	}
 	if msg.TimeSpan <= 0 {
 		return errors.New("height span must be positive")
