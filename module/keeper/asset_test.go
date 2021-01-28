@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	bep3 "github.com/e-money/bep3/module"
 	"strings"
 	"testing"
 	"time"
@@ -634,8 +635,8 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						MinBlockLock:  types.DefaultMinBlockLock,
-						MaxBlockLock:  types.DefaultMaxBlockLock,
+						SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 					types.AssetParam{
 						Denom:  "inc",
@@ -651,8 +652,8 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						MinBlockLock:  types.DefaultMinBlockLock,
-						MaxBlockLock:  types.DefaultMaxBlockLock,
+						SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 					types.AssetParam{
 						Denom:  "lol",
@@ -668,8 +669,8 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						MinBlockLock:  types.DefaultMinBlockLock,
-						MaxBlockLock:  types.DefaultMaxBlockLock,
+						SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 				},
 			}

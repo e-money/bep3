@@ -62,7 +62,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  true,
 			expectedErr: "",
@@ -73,7 +73,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[1], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  true,
 			expectedErr: "",
@@ -85,11 +85,11 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 					types.NewAssetParam(
 						"bnb", 714, suite.supply[0], true,
 						suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-						types.DefaultMinBlockLock, types.DefaultMaxBlockLock),
+						types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan),
 					types.NewAssetParam(
 						"btcb", 0, suite.supply[1], true,
 						suite.addr, sdk.NewInt(1000), sdk.NewInt(10000000), sdk.NewInt(100000000000),
-						types.DefaultMinBlockLock, types.DefaultMaxBlockLock),
+						types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan),
 				},
 			},
 			expectPass:  true,
@@ -101,7 +101,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "denom invalid",
@@ -112,7 +112,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"BNB", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "denom invalid",
@@ -129,15 +129,15 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 			expectedErr: "",
 		},
 		{
-			name: "min block lock greater max block lock",
+			name: "Swap time span < acceptable minimum value",
 			args: args{
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					244, 243)},
+					244, types.DefaultSwapTimeSpan-1)},
 			},
 			expectPass:  false,
-			expectedErr: "minimum block lock > maximum block lock",
+			expectedErr: "asset bnb swap time span be within [60, 3 days in seconds] 59",
 		},
 		{
 			name: "min swap not positive",
@@ -145,7 +145,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(0), sdk.NewInt(10000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "must have a positive minimum swap",
@@ -156,7 +156,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(10000), sdk.NewInt(0),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "must have a positive maximum swap",
@@ -167,7 +167,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000000), sdk.NewInt(10000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "minimum swap amount > maximum swap amount",
@@ -178,7 +178,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", -714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "coin id must be a non negative",
@@ -190,7 +190,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 					"bnb", 714,
 					types.SupplyLimit{sdk.NewInt(-10000000000000), false, time.Hour, sdk.ZeroInt()}, true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "invalid (negative) supply limit",
@@ -202,7 +202,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 					"bnb", 714,
 					types.SupplyLimit{sdk.NewInt(10000000000000), false, time.Hour, sdk.NewInt(-10000000000000)}, true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "invalid (negative) supply time limit",
@@ -215,7 +215,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 					types.SupplyLimit{sdk.NewInt(10000000000000), true, time.Hour, sdk.NewInt(100000000000000)},
 					true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					types.DefaultMinBlockLock, types.DefaultMaxBlockLock)},
+					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
 			expectPass:  false,
 			expectedErr: "supply time limit > supply limit",
@@ -227,11 +227,11 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 					types.NewAssetParam(
 						"bnb", 714, suite.supply[0], true,
 						suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-						types.DefaultMinBlockLock, types.DefaultMaxBlockLock),
+						types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan),
 					types.NewAssetParam(
 						"bnb", 0, suite.supply[0], true,
 						suite.addr, sdk.NewInt(1000), sdk.NewInt(10000000), sdk.NewInt(100000000000),
-						types.DefaultMinBlockLock, types.DefaultMaxBlockLock),
+						types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan),
 				},
 			},
 			expectPass:  false,

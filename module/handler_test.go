@@ -2,6 +2,7 @@ package bep3_test
 
 import (
 	"testing"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bep3 "github.com/e-money/bep3/module"
@@ -28,7 +29,9 @@ func (suite *HandlerTestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		account.SetCoins(coins)
+		if err := account.SetCoins(coins); err != nil {
+			panic(err)
+		}
 		accountKeeper.SetAccount(ctx, account)
 	}
 
@@ -41,14 +44,14 @@ func (suite *HandlerTestSuite) SetupTest() {
 }
 
 func (suite *HandlerTestSuite) AddAtomicSwap() (tmbytes.HexBytes, tmbytes.HexBytes) {
-	expireHeight := bep3.DefaultMinBlockLock
+	expireTimeSpan := bep3.DefaultSwapTimeSpan
 	amount := cs(c("bnb", int64(50000)))
 	timestamp := ts(0)
 	randomNumber, _ := bep3.GenerateSecureRandomNumber()
 	randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 
 	// Create atomic swap and check err to confirm creation
-	err := suite.keeper.CreateAtomicSwap(suite.ctx, randomNumberHash, timestamp, expireHeight,
+	err := suite.keeper.CreateAtomicSwap(suite.ctx, randomNumberHash, timestamp, expireTimeSpan,
 		suite.addrs[0], suite.addrs[1], TestSenderOtherChain, TestRecipientOtherChain,
 		amount, true)
 	suite.Nil(err)
@@ -66,7 +69,7 @@ func (suite *HandlerTestSuite) TestMsgCreateAtomicSwap() {
 	msg := bep3.NewMsgCreateAtomicSwap(
 		suite.addrs[0], suite.addrs[2], TestRecipientOtherChain,
 		TestSenderOtherChain, randomNumberHash, timestamp, amount,
-		bep3.DefaultMinBlockLock)
+		bep3.DefaultSwapTimeSpan)
 
 	res, err := suite.handler(suite.ctx, msg)
 	suite.Require().NoError(err)
@@ -91,6 +94,16 @@ func (suite *HandlerTestSuite) TestMsgClaimAtomicSwap() {
 	suite.Require().NotNil(res)
 }
 
+// getContextPlusSec returns a context forward or backward in time and block
+// index. Assuming 1 second finality.
+func (suite *HandlerTestSuite) getContextPlusSec(plusSeconds uint64) sdk.Context {
+	offset := int64(plusSeconds)
+	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Second))
+	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + offset)
+
+	return ctx
+}
+
 func (suite *HandlerTestSuite) TestMsgRefundAtomicSwap() {
 	// Attempt refund msg on fake atomic swap
 	badRandomNumber, _ := bep3.GenerateSecureRandomNumber()
@@ -111,7 +124,7 @@ func (suite *HandlerTestSuite) TestMsgRefundAtomicSwap() {
 	suite.Require().Nil(res1)
 
 	// Expire the atomic swap with begin blocker and attempt refund
-	laterCtx := suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 400)
+	laterCtx := suite.getContextPlusSec(bep3.DefaultSwapTimeSpan)
 	bep3.BeginBlocker(laterCtx, suite.keeper)
 	res2, err := suite.handler(laterCtx, msg)
 	suite.Require().NoError(err)

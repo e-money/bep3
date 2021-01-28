@@ -3,6 +3,7 @@ package simulation
 import (
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -162,12 +163,9 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, k keeper.Keeper) simula
 		}
 		coins := sdk.NewCoins(sdk.NewCoin(asset.Denom, amount))
 
-		// We're assuming that sims are run with -NumBlocks=100
-		heightSpan := uint64(simulation.RandIntBetween(r, int(asset.MinBlockLock), int(asset.MaxBlockLock)))
-
 		msg := types.NewMsgCreateAtomicSwap(
 			sender.Address, recipient.Address, recipientOtherChain, senderOtherChain,
-			randomNumberHash, timestamp, coins, heightSpan,
+			randomNumberHash, timestamp, coins, asset.SwapTimeSpan,
 		)
 
 		tx := helpers.GenTx(
@@ -189,20 +187,20 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, k keeper.Keeper) simula
 		var futureOp simulation.FutureOperation
 		swapID := types.CalculateSwapID(msg.RandomNumberHash, msg.From, msg.SenderOtherChain)
 		if r.Intn(100) < 50 {
-			// Claim future operation - choose between next block and the block before height span
-			executionBlock := uint64(
-				int(ctx.BlockHeight()+1) + r.Intn(int(heightSpan-1)))
+			// Claim future operation - choose between next block and the block before time span
+			executionTime :=
+				time.Unix(ctx.BlockTime().Unix()+1+int64(r.Intn(int(asset.SwapTimeSpan-1))), 0)
 
 			futureOp = simulation.FutureOperation{
-				BlockHeight: int(executionBlock),
-				Op:          operationClaimAtomicSwap(ak, k, swapID, randomNumber),
+				BlockTime: executionTime,
+				Op:        operationClaimAtomicSwap(ak, k, swapID, randomNumber),
 			}
 		} else {
 			// Refund future operation
-			executionBlock := uint64(ctx.BlockHeight()) + msg.HeightSpan
+			executionTime := time.Unix(ctx.BlockTime().Unix()+int64(msg.TimeSpan), 0)
 			futureOp = simulation.FutureOperation{
-				BlockHeight: int(executionBlock),
-				Op:          operationRefundAtomicSwap(ak, k, swapID),
+				BlockTime: executionTime,
+				Op:        operationRefundAtomicSwap(ak, k, swapID),
 			}
 		}
 

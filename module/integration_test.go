@@ -39,6 +39,7 @@ func NewBep3GenStateMulti(deputy sdk.AccAddress) app.GenesisState {
 }
 
 func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
+	_ = &bep3.MsgCreateAtomicSwap{}
 	bep3Genesis := bep3.GenesisState{
 		Params: bep3.Params{
 			AssetParams: bep3.AssetParams{
@@ -56,8 +57,8 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
-					MinBlockLock:  bep3.DefaultMinBlockLock,
-					MaxBlockLock:  bep3.DefaultMaxBlockLock,
+					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 				bep3.AssetParam{
 					Denom:  "inc",
@@ -73,8 +74,8 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
-					MinBlockLock:  bep3.DefaultMinBlockLock,
-					MaxBlockLock:  bep3.DefaultMaxBlockLock,
+					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 			},
 		},
@@ -101,8 +102,8 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 
 func loadSwapAndSupply(addr sdk.AccAddress, index int) (bep3.AtomicSwap, bep3.AssetSupply) {
 	coin := c(DenomMap[index], 50000)
-	expireOffset := bep3.DefaultMinBlockLock // Default expire height + offet to match timestamp
-	timestamp := ts(index)                   // One minute apart
+	expireOffset := bep3.DefaultSwapBlockTimestamp + bep3.DefaultSwapTimeSpan // Default expiration seconds + offset to match timestamp
+	timestamp := ts(index)                                                    // One minute apart
 	randomNumber, _ := bep3.GenerateSecureRandomNumber()
 	randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 	swap := bep3.NewAtomicSwap(cs(coin), randomNumberHash,

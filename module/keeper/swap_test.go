@@ -99,7 +99,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 	type args struct {
 		randomNumberHash    []byte
 		timestamp           int64
-		heightSpan          uint64
+		timeSpan            uint64
 		sender              sdk.AccAddress
 		recipient           sdk.AccAddress
 		senderOtherChain    string
@@ -121,7 +121,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[0],
 				timestamp:           suite.timestamps[0],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[1],
 				senderOtherChain:    TestSenderOtherChain,
@@ -139,7 +139,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[12],
 				timestamp:           suite.timestamps[12],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[1],
 				senderOtherChain:    TestSenderOtherChain,
@@ -157,7 +157,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[13],
 				timestamp:           suite.timestamps[13],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[1],
 				senderOtherChain:    TestSenderOtherChain,
@@ -175,7 +175,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[0],
 				timestamp:           suite.timestamps[0],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.addrs[1],
 				recipient:           suite.deputy,
 				senderOtherChain:    TestSenderOtherChain,
@@ -194,7 +194,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[1],
 				timestamp:           suite.timestamps[1],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.addrs[1],
 				recipient:           suite.addrs[2],
 				senderOtherChain:    TestSenderOtherChain,
@@ -212,7 +212,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[2],
 				timestamp:           suite.timestamps[2],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[2],
 				senderOtherChain:    TestSenderOtherChain,
@@ -230,7 +230,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[3],
 				timestamp:           suite.timestamps[3] - 2000,
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[3],
 				senderOtherChain:    TestSenderOtherChain,
@@ -248,7 +248,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[4],
 				timestamp:           suite.timestamps[4] + 5000,
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[4],
 				senderOtherChain:    TestSenderOtherChain,
@@ -261,12 +261,12 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			false,
 		},
 		{
-			"small height span on outgoing swap",
+			"small time span on outgoing swap",
 			currentTmTime,
 			args{
 				randomNumberHash:    suite.randomNumberHashes[5],
 				timestamp:           suite.timestamps[5],
-				heightSpan:          uint64(100),
+				timeSpan:            types.DefaultSwapTimeSpan - 1,
 				sender:              suite.addrs[5],
 				recipient:           suite.deputy,
 				senderOtherChain:    TestSenderOtherChain,
@@ -284,7 +284,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[6],
 				timestamp:           suite.timestamps[6],
-				heightSpan:          uint64(300),
+				timeSpan:            types.ThreeDaySeconds + 1,
 				sender:              suite.addrs[6],
 				recipient:           suite.deputy,
 				senderOtherChain:    TestSenderOtherChain,
@@ -302,7 +302,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[7],
 				timestamp:           suite.timestamps[7],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[7],
 				senderOtherChain:    TestSenderOtherChain,
@@ -320,7 +320,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[0],
 				timestamp:           suite.timestamps[0],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[1],
 				senderOtherChain:    TestSenderOtherChain,
@@ -338,7 +338,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[8],
 				timestamp:           suite.timestamps[8],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.randMacc,
 				senderOtherChain:    TestSenderOtherChain,
@@ -356,7 +356,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[10],
 				timestamp:           suite.timestamps[10],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[4],
 				senderOtherChain:    TestSenderOtherChain,
@@ -374,7 +374,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[11],
 				timestamp:           suite.timestamps[11],
-				heightSpan:          types.DefaultMinBlockLock,
+				timeSpan:            types.DefaultSwapTimeSpan,
 				sender:              suite.deputy,
 				recipient:           suite.addrs[5],
 				senderOtherChain:    TestSenderOtherChain,
@@ -413,7 +413,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 
 			// Create atomic swap
 			err := suite.keeper.CreateAtomicSwap(suite.ctx, tc.args.randomNumberHash, tc.args.timestamp,
-				tc.args.heightSpan, tc.args.sender, tc.args.recipient, tc.args.senderOtherChain,
+				tc.args.timeSpan, tc.args.sender, tc.args.recipient, tc.args.senderOtherChain,
 				tc.args.recipientOtherChain, tc.args.coins, tc.args.crossChain)
 
 			// Load sender's account after swap creation
@@ -449,7 +449,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 					types.AtomicSwap{
 						Amount:              tc.args.coins,
 						RandomNumberHash:    tc.args.randomNumberHash,
-						ExpireHeight:        uint64(suite.ctx.BlockHeight()) + tc.args.heightSpan,
+						ExpireTimestamp:     uint64(suite.ctx.BlockTime().Unix()) + tc.args.timeSpan,
 						Timestamp:           tc.args.timestamp,
 						Sender:              tc.args.sender,
 						Recipient:           tc.args.recipient,
@@ -517,7 +517,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 		},
 		{
 			"normal incoming swap rate-limited",
-			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute * 10)),
+			suite.ctx.WithBlockTime(currentTmTime.Add(time.Second * 10)),
 			args{
 				coins:        cs(c(OTHER_DENOM, 50000)),
 				swapID:       []byte{},
@@ -561,7 +561,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 		},
 		{
 			"past expiration",
-			suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 2000),
+			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute * 10)),
 			args{
 				coins:        cs(c(BNB_DENOM, 50000)),
 				swapID:       []byte{},
@@ -588,7 +588,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 
 			// Create atomic swap
 			err := suite.keeper.CreateAtomicSwap(suite.ctx, suite.randomNumberHashes[i], suite.timestamps[i],
-				types.DefaultMinBlockLock, sender, expectedRecipient, TestSenderOtherChain, TestRecipientOtherChain,
+				types.DefaultSwapTimeSpan, sender, expectedRecipient, TestSenderOtherChain, TestRecipientOtherChain,
 				tc.args.coins, true)
 			suite.NoError(err)
 
@@ -676,6 +676,16 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 	}
 }
 
+// getContextPlusSec returns a context forward or backward in time and block
+// index. Assuming 1 second finality.
+func (suite *AtomicSwapTestSuite) getContextPlusSec(plusSeconds uint64) sdk.Context {
+	offset := int64(plusSeconds)
+	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Second))
+	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + offset)
+
+	return ctx
+}
+
 func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 	suite.SetupTest()
 
@@ -690,8 +700,8 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 		expectPass bool
 	}{
 		{
-			"normal incoming swap",
-			suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 400),
+			"expired incoming swap",
+			suite.getContextPlusSec(bep3.DefaultSwapTimeSpan + 1),
 			args{
 				swapID:    []byte{},
 				direction: types.Incoming,
@@ -700,7 +710,7 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 		},
 		{
 			"normal outgoing swap",
-			suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 400),
+			suite.getContextPlusSec(bep3.DefaultSwapTimeSpan + 1),
 			args{
 				swapID:    []byte{},
 				direction: types.Outgoing,
@@ -744,7 +754,7 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 			}
 
 			err := suite.keeper.CreateAtomicSwap(suite.ctx, suite.randomNumberHashes[i], suite.timestamps[i],
-				types.DefaultMinBlockLock, sender, expectedRecipient, TestSenderOtherChain, TestRecipientOtherChain,
+				types.DefaultSwapTimeSpan, sender, expectedRecipient, TestSenderOtherChain, TestRecipientOtherChain,
 				expectedRefundAmount, true)
 			suite.NoError(err)
 

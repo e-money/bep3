@@ -119,16 +119,16 @@ func (k Keeper) GetAllAtomicSwaps(ctx sdk.Context) (atomicSwaps types.AtomicSwap
 //			Atomic Swap Block Index
 // ------------------------------------------
 
-// InsertIntoByBlockIndex adds a swap ID and expiration time into the byBlock index.
-func (k Keeper) InsertIntoByBlockIndex(ctx sdk.Context, atomicSwap types.AtomicSwap) {
+// InsertIntoByTimestamp adds a swap ID and expiration time into the byTimestamp index.
+func (k Keeper) InsertIntoByTimestamp(ctx sdk.Context, atomicSwap types.AtomicSwap) {
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapByBlockPrefix)
-	store.Set(types.GetAtomicSwapByHeightKey(atomicSwap.ExpireHeight, atomicSwap.GetSwapID()), atomicSwap.GetSwapID())
+	store.Set(types.GetAtomicSwapByTimestampKey(atomicSwap.ExpireTimestamp, atomicSwap.GetSwapID()), atomicSwap.GetSwapID())
 }
 
-// RemoveFromByBlockIndex removes an AtomicSwap from the byBlock index.
-func (k Keeper) RemoveFromByBlockIndex(ctx sdk.Context, atomicSwap types.AtomicSwap) {
+// RemoveFromByTimestamp removes an AtomicSwap from the byTimestamp index.
+func (k Keeper) RemoveFromByTimestamp(ctx sdk.Context, atomicSwap types.AtomicSwap) {
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapByBlockPrefix)
-	store.Delete(types.GetAtomicSwapByHeightKey(atomicSwap.ExpireHeight, atomicSwap.GetSwapID()))
+	store.Delete(types.GetAtomicSwapByTimestampKey(atomicSwap.ExpireTimestamp, atomicSwap.GetSwapID()))
 }
 
 // IterateAtomicSwapsByBlock provides an iterator over AtomicSwaps ordered by AtomicSwap expiration block
@@ -137,7 +137,7 @@ func (k Keeper) IterateAtomicSwapsByBlock(ctx sdk.Context, inclusiveCutoffTime u
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapByBlockPrefix)
 	iterator := store.Iterator(
 		nil, // start at the very start of the prefix store
-		sdk.PrefixEndBytes(sdk.Uint64ToBigEndian(inclusiveCutoffTime)), // end of range
+		sdk.PrefixEndBytes(types.GetTimestampSortableKey(inclusiveCutoffTime)), // end of range
 	)
 
 	defer iterator.Close()
@@ -159,6 +159,7 @@ func (k Keeper) IterateAtomicSwapsByBlock(ctx sdk.Context, inclusiveCutoffTime u
 // Completed swaps are stored for 1 week.
 func (k Keeper) InsertIntoLongtermStorage(ctx sdk.Context, atomicSwap types.AtomicSwap) {
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapLongtermStoragePrefix)
+
 	deletionHeight := uint64(atomicSwap.ClosedBlock) + types.DefaultLongtermStorageDuration
 	store.Set(types.GetAtomicSwapByHeightKey(deletionHeight, atomicSwap.GetSwapID()), atomicSwap.GetSwapID())
 }
