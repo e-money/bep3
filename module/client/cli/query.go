@@ -222,11 +222,11 @@ func QueryGetAtomicSwapsCmd(queryRoute string, cdc *codec.Codec) *cobra.Command 
 		Short: "query atomic swaps with optional filters",
 		Long: strings.TrimSpace(`Query for all paginated atomic swaps that match optional filters:
 Example:
-$ kvcli q bep3 swaps --involve=kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny
-$ kvcli q bep3 swaps --expiration=280
-$ kvcli q bep3 swaps --status=(Open|Completed|Expired)
-$ kvcli q bep3 swaps --direction=(Incoming|Outgoing)
-$ kvcli q bep3 swaps --page=2 --limit=100
+$ emcli q bep3 swaps --involve=emoneyl0xsq2z7gqd7yly0g40y5836g0appumark77ny
+$ emcli q bep3 swaps --expiration=280
+$ emcli q bep3 swaps --status=(Open|Completed|Expired)
+$ emcli q bep3 swaps --direction=(Incoming|Outgoing)
+$ emcli q bep3 swaps --page=2 --limit=100
 `,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
