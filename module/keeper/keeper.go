@@ -116,7 +116,7 @@ func (k Keeper) GetAllAtomicSwaps(ctx sdk.Context) (atomicSwaps types.AtomicSwap
 }
 
 // ------------------------------------------
-//			Atomic Swap Block Index
+//			Atomic Swap Block Timestamp
 // ------------------------------------------
 
 // InsertIntoByTimestamp adds a swap ID and expiration time into the byTimestamp index.
