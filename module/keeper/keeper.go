@@ -133,7 +133,7 @@ func (k Keeper) RemoveFromByTimestamp(ctx sdk.Context, atomicSwap types.AtomicSw
 
 // IterateAtomicSwapsByBlock provides an iterator over AtomicSwaps ordered by AtomicSwap expiration block
 // For each AtomicSwap cb will be called. If cb returns true the iterator will close and stop.
-func (k Keeper) IterateAtomicSwapsByBlock(ctx sdk.Context, inclusiveCutoffTime uint64, cb func(swapID []byte) (stop bool)) {
+func (k Keeper) IterateAtomicSwapsByBlock(ctx sdk.Context, inclusiveCutoffTime int64, cb func(swapID []byte) (stop bool)) {
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapByBlockPrefix)
 	iterator := store.Iterator(
 		nil, // start at the very start of the prefix store

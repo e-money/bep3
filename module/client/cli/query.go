@@ -238,7 +238,7 @@ $ emcli q bep3 swaps --page=2 --limit=100
 			limit := viper.GetInt(flags.FlagLimit)
 
 			var involveAddr sdk.AccAddress
-			var expiration uint64
+			var expiration int64
 			var swapStatus types.SwapStatus
 			var swapDirection types.SwapDirection
 
@@ -253,7 +253,7 @@ $ emcli q bep3 swaps --page=2 --limit=100
 			}
 
 			if len(strExpiration) != 0 {
-				expiration, err := strconv.ParseUint(strExpiration, 10, 64)
+				expiration, err := strconv.ParseInt(strExpiration, 10, 64)
 				if err != nil {
 					return err
 				}

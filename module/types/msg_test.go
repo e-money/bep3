@@ -36,7 +36,7 @@ func TestMsgCreateAtomicSwap(t *testing.T) {
 		randomNumberHash    tmbytes.HexBytes
 		timestamp           int64
 		amount              sdk.Coins
-		heightSpan          uint64
+		timeSpan            int64
 		expectPass          bool
 	}{
 		{"normal cross-chain", binanceAddrs[0], kavaAddrs[0], kavaAddrs[0].String(), binanceAddrs[0].String(), randomNumberHash, timestampInt64, coinsSingle, 500, true},
@@ -53,7 +53,7 @@ func TestMsgCreateAtomicSwap(t *testing.T) {
 			tc.randomNumberHash,
 			tc.timestamp,
 			tc.amount,
-			tc.heightSpan,
+			tc.timeSpan,
 		)
 		if tc.expectPass {
 			require.NoError(t, msg.ValidateBasic(), "test: %v", i)

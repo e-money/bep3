@@ -1,12 +1,12 @@
 package keeper_test
 
 import (
-	bep3 "github.com/e-money/bep3/module"
 	"strings"
 	"testing"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"

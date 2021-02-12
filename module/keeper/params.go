@@ -90,19 +90,19 @@ func (k Keeper) GetMaxSwapAmount(ctx sdk.Context, denom string) (sdk.Int, error)
 }
 
 // GetSwapTime returns the swap creation block Unix seconds timestamp
-func (k Keeper) GetSwapTime(ctx sdk.Context, denom string) (uint64, error) {
+func (k Keeper) GetSwapTime(ctx sdk.Context, denom string) (int64, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
-		return uint64(0), err
+		return int64(0), err
 	}
 	return asset.SwapTimestamp, nil
 }
 
 // GetTimeSpan returns the swap seconds allowance
-func (k Keeper) GetTimeSpan(ctx sdk.Context, denom string) (uint64, error) {
+func (k Keeper) GetTimeSpan(ctx sdk.Context, denom string) (int64, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
-		return uint64(0), err
+		return int64(0), err
 	}
 	return asset.SwapTimeSpan, nil
 }

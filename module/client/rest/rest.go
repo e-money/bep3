@@ -33,7 +33,7 @@ type PostCreateSwapReq struct {
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash" yaml:"random_number_hash"`
 	Timestamp           int64            `json:"timestamp" yaml:"timestamp"`
 	Amount              sdk.Coins        `json:"amount" yaml:"amount"`
-	TimeSpan            uint64           `json:"time_span" yaml:"time_span"`
+	TimeSpan            int64            `json:"time_span" yaml:"time_span"`
 	CrossChain          bool             `json:"cross_chain" yaml:"cross_chain"`
 }
 

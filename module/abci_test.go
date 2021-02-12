@@ -72,7 +72,7 @@ func (suite *ABCITestSuite) ResetKeeper() {
 
 // getContextPlusSec returns a context forward or backward in time and block
 // index. Assuming 1 second finality.
-func (suite *ABCITestSuite) getContextPlusSec(plusSeconds uint64) sdk.Context {
+func (suite *ABCITestSuite) getContextPlusSec(plusSeconds int64) sdk.Context {
 	offset := int64(plusSeconds)
 	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Second))
 	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + offset)
@@ -112,7 +112,7 @@ func (suite *ABCITestSuite) TestBeginBlocker_UpdateExpiredAtomicSwaps() {
 		{
 			name:            "after deletion",
 			firstCtx:        suite.getContextPlusSec(bep3.DefaultSwapTimeSpan),
-			secondCtx:       suite.getContextPlusSec(bep3.DefaultSwapTimeSpan + bep3.DefaultLongtermStorageDuration),
+			secondCtx:       suite.getContextPlusSec(bep3.DefaultSwapTimeSpan + int64(bep3.DefaultLongtermStorageDuration)),
 			expectedStatus:  bep3.NULL,
 			expectInStorage: false,
 		},

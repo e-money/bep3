@@ -45,13 +45,12 @@ type MsgCreateAtomicSwap struct {
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
 	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
 	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
-	TimeSpan            uint64           `json:"time_span"  yaml:"time_span"`
+	TimeSpan            int64            `json:"time_span"  yaml:"time_span"`
 }
 
 // NewMsgCreateAtomicSwap initializes a new MsgCreateAtomicSwap
-func NewMsgCreateAtomicSwap(from sdk.AccAddress, to sdk.AccAddress, recipientOtherChain,
-	senderOtherChain string, randomNumberHash tmbytes.HexBytes, timestamp int64,
-	amount sdk.Coins, timeSpan uint64) MsgCreateAtomicSwap {
+func NewMsgCreateAtomicSwap(from, to sdk.AccAddress, recipientOtherChain, senderOtherChain string,
+	randomNumberHash tmbytes.HexBytes, timestamp int64, amount sdk.Coins, timeSpan int64) MsgCreateAtomicSwap {
 	return MsgCreateAtomicSwap{
 		From:                from,
 		To:                  to,

@@ -43,13 +43,13 @@ func GetAtomicSwapByHeightKey(height uint64, swapID []byte) []byte {
 	return append(sdk.Uint64ToBigEndian(height), swapID...)
 }
 
-func GetTimestampSortableKey(timestamp uint64) []byte {
-	t := time.Unix(int64(timestamp), 0).UTC()
+func GetTimestampSortableKey(timestamp int64) []byte {
+	t := time.Unix(timestamp, 0).UTC()
 	return sdk.FormatTimeBytes(t)
 }
 
 // GetAtomicSwapByTimestampKey is used by the AtomicSwapByTimestamp and
 // AtomicSwapLongTermStorage index to generate sortable timestamp keys.
-func GetAtomicSwapByTimestampKey(timestamp uint64, swapID []byte) []byte {
+func GetAtomicSwapByTimestampKey(timestamp int64, swapID []byte) []byte {
 	return append(GetTimestampSortableKey(timestamp), swapID...)
 }

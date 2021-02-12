@@ -99,7 +99,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 	type args struct {
 		randomNumberHash    []byte
 		timestamp           int64
-		timeSpan            uint64
+		timeSpan            int64
 		sender              sdk.AccAddress
 		recipient           sdk.AccAddress
 		senderOtherChain    string
@@ -449,7 +449,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 					types.AtomicSwap{
 						Amount:              tc.args.coins,
 						RandomNumberHash:    tc.args.randomNumberHash,
-						ExpireTimestamp:     uint64(suite.ctx.BlockTime().Unix()) + tc.args.timeSpan,
+						ExpireTimestamp:     suite.ctx.BlockTime().Unix() + tc.args.timeSpan,
 						Timestamp:           tc.args.timestamp,
 						Sender:              tc.args.sender,
 						Recipient:           tc.args.recipient,
@@ -678,7 +678,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 
 // getContextPlusSec returns a context forward or backward in time and block
 // index. Assuming 1 second finality.
-func (suite *AtomicSwapTestSuite) getContextPlusSec(plusSeconds uint64) sdk.Context {
+func (suite *AtomicSwapTestSuite) getContextPlusSec(plusSeconds int64) sdk.Context {
 	offset := int64(plusSeconds)
 	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Second))
 	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + offset)

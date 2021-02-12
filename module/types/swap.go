@@ -16,7 +16,7 @@ import (
 type AtomicSwap struct {
 	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
-	ExpireTimestamp     uint64           `json:"expire_timestamp"  yaml:"expire_timestamp"`
+	ExpireTimestamp     int64            `json:"expire_timestamp"  yaml:"expire_timestamp"`
 	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
 	Sender              sdk.AccAddress   `json:"sender"  yaml:"sender"`
 	Recipient           sdk.AccAddress   `json:"recipient"  yaml:"recipient"`
@@ -29,8 +29,8 @@ type AtomicSwap struct {
 }
 
 // NewAtomicSwap returns a new AtomicSwap
-func NewAtomicSwap(amount sdk.Coins, randomNumberHash tmbytes.HexBytes, expireTimestamp uint64, timestamp int64,
-	sender, recipient sdk.AccAddress, senderOtherChain string, recipientOtherChain string, closedBlock int64,
+func NewAtomicSwap(amount sdk.Coins, randomNumberHash tmbytes.HexBytes, expireTimestamp, timestamp int64,
+	sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, closedBlock int64,
 	status SwapStatus, crossChain bool, direction SwapDirection) AtomicSwap {
 	return AtomicSwap{
 		Amount:              amount,
@@ -271,7 +271,7 @@ type AugmentedAtomicSwap struct {
 	// This prevents breaking changes for clients using REST API
 	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
-	ExpireTimestamp     uint64           `json:"expire_timestamp"  yaml:"expire_timestamp"`
+	ExpireTimestamp     int64            `json:"expire_timestamp"  yaml:"expire_timestamp"`
 	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
 	Sender              sdk.AccAddress   `json:"sender"  yaml:"sender"`
 	Recipient           sdk.AccAddress   `json:"recipient"  yaml:"recipient"`
