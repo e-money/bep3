@@ -1,0 +1,32 @@
+syntax = "proto3";
+package em.bep3;
+
+option go_package = "github.com/e-money/bep3/x/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+message MsgCreateAtomicSwap {
+  string From = 1;
+  string To = 2;
+  string RecipientOtherChain = 3;
+  string SenderOtherChain = 4;
+  string RandomNumberHash = 5;
+  int64 Timestamp = 6;
+  cosmos.base.v1beta1.Coin Amount = 7 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false
+  ];
+  int64 TimeSpan = 8;
+}
+
+message MsgClaimAtomicSwap {
+  string From = 1;
+  string SwapID = 2;
+  string RandomNumber = 3;
+}
+
+message MsgRefundAtomicSwap {
+  string From = 1;
+  string SwapID = 2;
+}

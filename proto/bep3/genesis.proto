@@ -1,0 +1,10 @@
+syntax = "proto3";
+package em.bep3;
+
+import "bep3/swap.proto";
+
+option go_package = "github.com/e-money/bep3/x/types";
+
+message GenesisState {
+		repeated MsgCreateAtomicSwap MsgCreateAtomicSwapList = 1;
+}
