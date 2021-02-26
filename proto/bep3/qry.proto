@@ -1,0 +1,57 @@
+syntax = "proto3";
+package bep3;
+
+option go_package = "github.com/e-money/bep3/module/types";
+
+import "gogoproto/gogo.proto";
+
+/* type QueryAssetSupply struct {
+	Denom string `json:"denom" yaml:"denom"`
+}*/
+// QueryAssetSupply contains the params for query 'custom/bep3/supply'
+message QueryAssetSupply {
+  string denom = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
+}
+
+/*
+type QueryAtomicSwapByID struct {
+	SwapID tmbytes.HexBytes `json:"swap_id" yaml:"swap_id"`
+}
+*/
+
+// QueryAtomicSwapByID contains the params for query 'custom/bep3/swap'
+message QueryAtomicSwapByID {
+  bytes swap_id = 1 [
+    (gogoproto.customname) = "SwapID",
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
+    (gogoproto.moretags) = "yaml:\"swap_id\""
+  ];
+}
+
+/*
+type QueryAtomicSwaps struct {
+	Page       int            `json:"page" yaml:"page"`
+	Limit      int            `json:"limit" yaml:"limit"`
+	Involve    sdk.AccAddress `json:"involve" yaml:"involve"`
+	Expiration int64          `json:"expiration" yaml:"expiration"`
+	Status     SwapStatus     `json:"status" yaml:"status"`
+	Direction  SwapDirection  `json:"direction" yaml:"direction"`
+}
+ */
+
+// QueryAtomicSwaps contains the params for an AtomicSwaps query
+message QueryAtomicSwaps {
+  int64 page = 1 [(gogoproto.moretags) = "yaml:\"page\""];
+  int64 limit = 2 [(gogoproto.moretags) = "yaml:\"limit\""];
+  string involve = 3 [(gogoproto.moretags) = "yaml:\"involve\""];
+  int64 expiration = 4 [(gogoproto.moretags) = "yaml:\"involve\""];
+  uint32 status = 5 [
+    (gogoproto.casttype) = "SwapStatus",
+    (gogoproto.moretags) = "yaml:\"status\""
+  ];
+  uint32 direction = 6 [
+    (gogoproto.casttype) = "SwapDirection",
+    (gogoproto.moretags) = "yaml:\"direction\""
+  ];
+}
+

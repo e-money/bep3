@@ -1,32 +1,115 @@
 syntax = "proto3";
-package em.bep3;
+package bep3;
 
-option go_package = "github.com/e-money/bep3/x/types";
+option go_package = "github.com/e-money/bep3/module/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
+// AtomicSwap contains the information for an atomic swap
+// type AtomicSwap struct {
+//	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
+//	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
+//	ExpireTimestamp     int64            `json:"expire_timestamp"  yaml:"expire_timestamp"`
+//	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
+//	Sender              sdk.AccAddress   `json:"sender"  yaml:"sender"`
+//	Recipient           sdk.AccAddress   `json:"recipient"  yaml:"recipient"`
+//	SenderOtherChain    string           `json:"sender_other_chain"  yaml:"sender_other_chain"`
+//	RecipientOtherChain string           `json:"recipient_other_chain"  yaml:"recipient_other_chain"`
+//	ClosedBlock         int64            `json:"closed_block"  yaml:"closed_block"`
+//	Status              SwapStatus       `json:"status"  yaml:"status"`
+//	CrossChain          bool             `json:"cross_chain"  yaml:"cross_chain"`
+//	Direction           SwapDirection    `json:"direction"  yaml:"direction"`
+//}
+message AtomicSwap {
+  option (gogoproto.goproto_stringer) = false;
+
+  cosmos.base.v1beta1.Coin amount = 1 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false
+  ];
+  bytes random_number_hash = 2 [
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
+    (gogoproto.moretags) = "yaml:\"random_number_hash\""
+  ];
+  int64 expire_timestamp = 3 [(gogoproto.moretags) = "yaml:\"expire_timestamp\""];
+  int64 timestamp = 4 [(gogoproto.moretags) = "yaml:\"timestamp\""];
+  string sender = 5 [(gogoproto.moretags) = "yaml:\"sender\""];
+  string recipient = 6 [(gogoproto.moretags) = "yaml:\"recipient\""];
+  string sender_other_chain = 7 [(gogoproto.moretags) = "yaml:\"sender_other_chain\""];
+  string recipient_other_chain = 8 [(gogoproto.moretags) = "yaml:\"recipient_other_chain\""];
+  int64 closed_block = 9 [(gogoproto.moretags) = "yaml:\"closed_block\""];
+  uint32 status = 10 [(gogoproto.casttype) = "SwapStatus",(gogoproto.moretags) = "yaml:\"status\""];
+  bool cross_chain = 11 [(gogoproto.moretags) = "yaml:\"cross_chain\""];
+  uint32 direction = 12 [
+    (gogoproto.casttype) = "SwapDirection",
+    (gogoproto.moretags) = "yaml:\"direction\""
+  ];
+}
+
+// MsgCreateAtomicSwap contains an AtomicSwap struct
+// type MsgCreateAtomicSwap struct {
+//	From                sdk.AccAddress   `json:"from"  yaml:"from"`
+//	To                  sdk.AccAddress   `json:"to"  yaml:"to"`
+//	RecipientOtherChain string           `json:"recipient_other_chain"  yaml:"recipient_other_chain"`
+//	SenderOtherChain    string           `json:"sender_other_chain"  yaml:"sender_other_chain"`
+//	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
+//	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
+//	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
+//	TimeSpan            int64            `json:"time_span"  yaml:"time_span"`
+//}
 message MsgCreateAtomicSwap {
-  string From = 1;
-  string To = 2;
-  string RecipientOtherChain = 3;
-  string SenderOtherChain = 4;
-  string RandomNumberHash = 5;
-  int64 Timestamp = 6;
+  option (gogoproto.goproto_stringer) = false;
+
+  string from = 1 [(gogoproto.moretags) = "yaml:\"from\""];
+  string to = 2 [(gogoproto.moretags) = "yaml:\"to\""];
+  string recipient_other_chain = 3 [(gogoproto.moretags) = "yaml:\"recipient_other_chain\""];
+  string sender_other_chain = 4 [(gogoproto.moretags) = "yaml:\"sender_other_chain\""];
+  bytes random_number_hash = 5 [
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
+    (gogoproto.moretags) = "yaml:\"random_number_hash\""
+  ];
+  int64 timestamp = 6 [(gogoproto.moretags) = "yaml:\"timestamp\""];
   cosmos.base.v1beta1.Coin Amount = 7 [
     (gogoproto.moretags) = "yaml:\"amount\"",
     (gogoproto.nullable) = false
   ];
-  int64 TimeSpan = 8;
+  int64 time_span = 8[(gogoproto.moretags) = "yaml:\"time_span\""];
 }
 
+// MsgClaimAtomicSwap defines a AtomicSwap claim
+// type MsgClaimAtomicSwap struct {
+//	From         sdk.AccAddress   `json:"from"  yaml:"from"`
+//	SwapID       tmbytes.HexBytes `json:"swap_id"  yaml:"swap_id"`
+//	RandomNumber tmbytes.HexBytes `json:"random_number"  yaml:"random_number"`
+//}
 message MsgClaimAtomicSwap {
-  string From = 1;
-  string SwapID = 2;
-  string RandomNumber = 3;
+  option (gogoproto.goproto_stringer) = false;
+
+  string from = 1 [(gogoproto.moretags) = "yaml:\"from\""];
+  bytes swap_id = 2 [
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
+    (gogoproto.moretags) = "yaml:\"swap_id\"",
+    (gogoproto.customname) = "SwapID"
+  ];
+  bytes random_number = 3 [
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
+    (gogoproto.moretags) = "yaml:\"random_number\""
+  ];
 }
 
+// MsgRefundAtomicSwap defines a refund msg
+// type MsgRefundAtomicSwap struct {
+//	From   sdk.AccAddress   `json:"from" yaml:"from"`
+//	SwapID tmbytes.HexBytes `json:"swap_id" yaml:"swap_id"`
+//}
 message MsgRefundAtomicSwap {
-  string From = 1;
-  string SwapID = 2;
+  option (gogoproto.goproto_stringer) = false;
+
+  string from = 1 [(gogoproto.moretags) = "yaml:\"from\""];
+  bytes swap_id = 2 [
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
+    (gogoproto.moretags) = "yaml:\"swap_id\"",
+    (gogoproto.customname) = "SwapID"
+  ];
 }

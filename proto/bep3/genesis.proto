@@ -1,10 +1,188 @@
 syntax = "proto3";
-package em.bep3;
+package bep3;
 
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "bep3/swap.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/e-money/bep3/x/types";
+option go_package = "github.com/e-money/bep3/module/types";
 
+// SupplyLimit parameters that control the absolute and time-based limits for an assets's supply
+// type SupplyLimit struct {
+//		Limit          sdk.Int       `json:"limit" yaml:"limit"`
+//		TimeLimited    bool          `json:"time_limited" yaml:"time_limited"`
+//		TimePeriod     time.Duration `json:"time_period" yaml:"time_period"`
+//		TimeBasedLimit sdk.Int       `json:"time_based_limit" yaml:"time_based_limit"`
+//}
+message SupplyLimit {
+	// the absolute supply limit for an asset
+	string limit = 1 [
+		(gogoproto.moretags) = "yaml:\"limit\"",
+		(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+		(gogoproto.nullable) = false
+	];
+	// boolean for whether the supply is limited by time
+	bool time_limited = 2 [(gogoproto.moretags) = "yaml:\"time_limited\""];
+	// the duration for which the supply time limit applies
+	google.protobuf.Duration time_period = 3 [
+		(gogoproto.nullable)    = false,
+		(gogoproto.stdduration) = true,
+		(gogoproto.moretags)    = "yaml:\"time_period\""
+	];
+	// the supply limit for an asset for each time period
+	string time_based_limit = 4 [
+		(gogoproto.moretags) = "yaml:\"time_based_limit\"",
+		(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+		(gogoproto.nullable) = false
+	];
+}
+
+// AssetParam parameters that must be specified for each bep3 asset
+// type AssetParam struct {
+//	Denom         string         `json:"denom" yaml:"denom"`                     // name of the asset
+//	CoinID        int            `json:"coin_id" yaml:"coin_id"`                 // SLIP-0044 registered coin type - see https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+//	SupplyLimit   SupplyLimit    `json:"supply_limit" yaml:"supply_limit"`       // asset supply limit
+//	Active        bool           `json:"active" yaml:"active"`                   // denotes if asset is available or paused
+//	DeputyAddress sdk.AccAddress `json:"deputy_address" yaml:"deputy_address"`   // the address of the relayer process
+//	FixedFee      sdk.Int        `json:"fixed_fee" yaml:"fixed_fee"`             // It should match the deputy config chain values. The fixed fee charged by the relayer process for outgoing swaps
+//	MinSwapAmount sdk.Int        `json:"min_swap_amount" yaml:"min_swap_amount"` // Minimum swap amount
+//	MaxSwapAmount sdk.Int        `json:"max_swap_amount" yaml:"max_swap_amount"` // Maximum swap amount
+//	SwapTimestamp int64          `json:"swap_time" yaml:"swap_time"`             // Unix seconds of swap creation block timestamp
+//	SwapTimeSpan  int64          `json:"time_span" yaml:"time_span"`             // seconds span before time expiration
+// }
+message AssetParam {
+	// name of the asset
+	string denom = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
+	// SLIP-0044 registered coin type - see https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+	int64 coin_id = 2 [
+		(gogoproto.casttype) = "int",
+		(gogoproto.customname) = "CoinID",
+		(gogoproto.moretags) = "yaml:\"coin_id\""
+	];
+	// asset supply limit
+	SupplyLimit supply_limit = 3 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"supply_limit\""];
+	// denotes if asset is available or paused
+	bool active = 4 [(gogoproto.moretags) = "yaml:\"active\""];
+	// the address of the relayer process
+	string deputy_address = 5 [(gogoproto.moretags) = "yaml:\"deputy_address\""];
+	// It should match the deputy config chain values. The fixed fee charged by the relayer process for outgoing swaps
+	string fixed_fee = 6 [
+		(gogoproto.moretags) = "yaml:\"fixed_fee\"",
+		(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+		(gogoproto.nullable) = false
+	];
+	// Minimum swap amount
+	string min_swap_amount = 7 [
+		(gogoproto.moretags) = "yaml:\"min_swap_amount\"",
+		(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+		(gogoproto.nullable) = false
+	];
+	// Maximum swap amount
+	string max_swap_amount = 8 [
+		(gogoproto.moretags) = "yaml:\"min_swap_amount\"",
+		(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+		(gogoproto.nullable) = false
+	];
+	// Unix seconds of swap creation block timestamp
+	// Original	SwapTimestamp int64 `json:"swap_time" yaml:"swap_time"`
+	int64 swap_time = 9 [
+		(gogoproto.customname) = "SwapTimestamp",
+		(gogoproto.moretags) = "yaml:\"swap_time\""
+	];
+	// seconds span before time expiration
+	// Original SwapTimeSpan int64 `json:"time_span" yaml:"time_span"`
+	int64 time_span = 10 [
+		(gogoproto.customname) = "SwapTimeSpan",
+		(gogoproto.moretags) = "yaml:\"time_span\""
+	];
+}
+
+// AssetParams array of AssetParam
+// type AssetParams []AssetParam
+message AssetParams {
+	repeated AssetParam asset_params = 1 [(gogoproto.nullable) = false];
+}
+
+// Params governance parameters for bep3 module
+// type Params struct {
+//	AssetParams AssetParams `json:"asset_params" yaml:"asset_params"`
+//}
+message Params {
+	AssetParams asset_params = 1 [
+		(gogoproto.nullable) = false,
+		(gogoproto.moretags) = "yaml:\"asset_params\""
+	];
+}
+
+// AssetSupply contains information about an asset's supply
+// type AssetSupply struct {
+//		IncomingSupply           sdk.Coin      `json:"incoming_supply"  yaml:"incoming_supply"`
+//		OutgoingSupply           sdk.Coin      `json:"outgoing_supply"  yaml:"outgoing_supply"`
+//		CurrentSupply            sdk.Coin      `json:"current_supply"  yaml:"current_supply"`
+//		TimeLimitedCurrentSupply sdk.Coin      `json:"time_limited_current_supply" yaml:"time_limited_current_supply"`
+//		TimeElapsed              time.Duration `json:"time_elapsed" yaml:"time_elapsed"`
+// }
+message AssetSupply {
+	cosmos.base.v1beta1.Coin incoming_supply = 1 [
+		(gogoproto.moretags) = "yaml:\"incoming_supply\"",
+		(gogoproto.nullable) = false
+	];
+	cosmos.base.v1beta1.Coin outgoing_supply = 2 [
+		(gogoproto.moretags) = "yaml:\"outgoing_supply\"",
+		(gogoproto.nullable) = false
+	];
+	cosmos.base.v1beta1.Coin current_supply = 3 [
+		(gogoproto.moretags) = "yaml:\"current_supply\"",
+		(gogoproto.nullable) = false
+	];
+	cosmos.base.v1beta1.Coin time_limited_current_supply = 4 [
+		(gogoproto.moretags) = "yaml:\"time_limited_current_supply\"",
+		(gogoproto.nullable) = false
+	];
+	google.protobuf.Duration time_elapsed = 5 [
+		(gogoproto.moretags) = "yaml:\"time_elapsed\"",
+		(gogoproto.nullable) = false,
+		(gogoproto.stdduration) = true
+	];
+}
+
+// AssetSupplies is a slice of AssetSupply
+// type AssetSupplies []AssetSupply
+message AssetSupplies {
+	repeated AssetSupply asset_supplies = 1 [(gogoproto.nullable) = false];
+}
+
+// AtomicSwaps is a slice of AtomicSwap
+// type AtomicSwaps []AtomicSwap
+message AtomicSwaps {
+	repeated AtomicSwap atomic_swaps = 1 [(gogoproto.nullable) = false];
+}
+
+//type GenesisState struct {
+//	Params            Params        `json:"params" yaml:"params"`
+//	AtomicSwaps       AtomicSwaps   `json:"atomic_swaps" yaml:"atomic_swaps"`
+//	Supplies          AssetSupplies `json:"supplies" yaml:"supplies"`
+//	PreviousBlockTime time.Time     `json:"previous_block_time" yaml:"previous_block_time"`
+//}
 message GenesisState {
-		repeated MsgCreateAtomicSwap MsgCreateAtomicSwapList = 1;
+		Params params = 1 [
+			(gogoproto.moretags) = "yaml:\"params\"",
+			(gogoproto.nullable) = false
+		];
+		AtomicSwaps atomic_swaps = 2 [
+			(gogoproto.moretags) = "yaml:\"atomic_swaps\"",
+			(gogoproto.nullable) = false
+		];
+		AssetSupplies supplies = 3 [
+			(gogoproto.moretags) = "yaml:\"supplies\"",
+			(gogoproto.nullable) = false
+		];
+		google.protobuf.Timestamp previous_block_time = 4 [
+			(gogoproto.moretags) = "yaml:\"previous_block_time\"",
+			(gogoproto.stdtime) = true,
+			(gogoproto.nullable) = false
+		];
 }
