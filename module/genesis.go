@@ -109,7 +109,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, supplyKeeper types.SupplyKeeper
 }
 
 // ExportGenesis writes the current store values to a genesis file, which can be imported again with InitGenesis
-func ExportGenesis(ctx sdk.Context, k Keeper) (data GenesisState) {
+func ExportGenesis(ctx sdk.Context, k Keeper) (data *GenesisState) {
 	params := k.GetParams(ctx)
 	swaps := k.GetAllAtomicSwaps(ctx)
 	supplies := k.GetAllAssetSupplies(ctx)
