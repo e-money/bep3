@@ -5,12 +5,23 @@
 ## Table of Contents
 
 - [bep3/swap.proto](#bep3/swap.proto)
-    - [MsgClaimAtomicSwap](#em.bep3.MsgClaimAtomicSwap)
-    - [MsgCreateAtomicSwap](#em.bep3.MsgCreateAtomicSwap)
-    - [MsgRefundAtomicSwap](#em.bep3.MsgRefundAtomicSwap)
+    - [AtomicSwap](#bep3.AtomicSwap)
+    - [AugmentedAtomicSwap](#bep3.AugmentedAtomicSwap)
+    - [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap)
+    - [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap)
+    - [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap)
   
 - [bep3/genesis.proto](#bep3/genesis.proto)
-    - [GenesisState](#em.bep3.GenesisState)
+    - [AssetParam](#bep3.AssetParam)
+    - [AssetSupply](#bep3.AssetSupply)
+    - [GenesisState](#bep3.GenesisState)
+    - [Params](#bep3.Params)
+    - [SupplyLimit](#bep3.SupplyLimit)
+  
+- [bep3/qry.proto](#bep3/qry.proto)
+    - [QueryAssetSupply](#bep3.QueryAssetSupply)
+    - [QueryAtomicSwapByID](#bep3.QueryAtomicSwapByID)
+    - [QueryAtomicSwaps](#bep3.QueryAtomicSwaps)
   
 - [Scalar Value Types](#scalar-value-types)
 
@@ -23,55 +34,108 @@
 
 
 
-<a name="em.bep3.MsgClaimAtomicSwap"></a>
+<a name="bep3.AtomicSwap"></a>
+
+### AtomicSwap
+AtomicSwap contains the information for an atomic swap
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `random_number_hash` | [bytes](#bytes) |  |  |
+| `expire_timestamp` | [int64](#int64) |  |  |
+| `timestamp` | [int64](#int64) |  |  |
+| `sender` | [string](#string) |  |  |
+| `recipient` | [string](#string) |  |  |
+| `sender_other_chain` | [string](#string) |  |  |
+| `recipient_other_chain` | [string](#string) |  |  |
+| `closed_block` | [int64](#int64) |  |  |
+| `status` | [uint32](#uint32) |  |  |
+| `cross_chain` | [bool](#bool) |  |  |
+| `direction` | [uint32](#uint32) |  |  |
+
+
+
+
+
+
+<a name="bep3.AugmentedAtomicSwap"></a>
+
+### AugmentedAtomicSwap
+AtomicSwap with an ID
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  |  |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `random_number_hash` | [bytes](#bytes) |  |  |
+| `expire_timestamp` | [int64](#int64) |  |  |
+| `timestamp` | [int64](#int64) |  |  |
+| `sender` | [string](#string) |  |  |
+| `recipient` | [string](#string) |  |  |
+| `sender_other_chain` | [string](#string) |  |  |
+| `recipient_other_chain` | [string](#string) |  |  |
+| `closed_block` | [int64](#int64) |  |  |
+| `status` | [uint32](#uint32) |  |  |
+| `cross_chain` | [bool](#bool) |  |  |
+| `direction` | [uint32](#uint32) |  |  |
+
+
+
+
+
+
+<a name="bep3.MsgClaimAtomicSwap"></a>
 
 ### MsgClaimAtomicSwap
-
+MsgClaimAtomicSwap defines a AtomicSwap claim
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `From` | [string](#string) |  |  |
-| `SwapID` | [string](#string) |  |  |
-| `RandomNumber` | [string](#string) |  |  |
+| `from` | [string](#string) |  |  |
+| `swap_id` | [bytes](#bytes) |  |  |
+| `random_number` | [bytes](#bytes) |  |  |
 
 
 
 
 
 
-<a name="em.bep3.MsgCreateAtomicSwap"></a>
+<a name="bep3.MsgCreateAtomicSwap"></a>
 
 ### MsgCreateAtomicSwap
-
+MsgCreateAtomicSwap contains an AtomicSwap struct
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `From` | [string](#string) |  |  |
-| `To` | [string](#string) |  |  |
-| `RecipientOtherChain` | [string](#string) |  |  |
-| `SenderOtherChain` | [string](#string) |  |  |
-| `RandomNumberHash` | [string](#string) |  |  |
-| `Timestamp` | [int64](#int64) |  |  |
-| `Amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
-| `TimeSpan` | [int64](#int64) |  |  |
+| `from` | [string](#string) |  |  |
+| `to` | [string](#string) |  |  |
+| `recipient_other_chain` | [string](#string) |  |  |
+| `sender_other_chain` | [string](#string) |  |  |
+| `random_number_hash` | [bytes](#bytes) |  |  |
+| `timestamp` | [int64](#int64) |  |  |
+| `Amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `time_span` | [int64](#int64) |  |  |
 
 
 
 
 
 
-<a name="em.bep3.MsgRefundAtomicSwap"></a>
+<a name="bep3.MsgRefundAtomicSwap"></a>
 
 ### MsgRefundAtomicSwap
-
+MsgRefundAtomicSwap defines a refund msg
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `From` | [string](#string) |  |  |
-| `SwapID` | [string](#string) |  |  |
+| `from` | [string](#string) |  |  |
+| `swap_id` | [bytes](#bytes) |  |  |
 
 
 
@@ -94,15 +158,160 @@
 
 
 
-<a name="em.bep3.GenesisState"></a>
+<a name="bep3.AssetParam"></a>
 
-### GenesisState
-
+### AssetParam
+AssetParam parameters that must be specified for each bep3 asset
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `MsgCreateAtomicSwapList` | [MsgCreateAtomicSwap](#em.bep3.MsgCreateAtomicSwap) | repeated |  |
+| `denom` | [string](#string) |  | name of the asset |
+| `coin_id` | [int64](#int64) |  | SLIP-0044 registered coin type - see https://github.com/satoshilabs/slips/blob/master/slip-0044.md |
+| `supply_limit` | [SupplyLimit](#bep3.SupplyLimit) |  | asset supply limit |
+| `active` | [bool](#bool) |  | denotes if asset is available or paused |
+| `deputy_address` | [string](#string) |  | the address of the relayer process |
+| `fixed_fee` | [string](#string) |  | It should match the deputy config chain values. The fixed fee charged by the relayer process for outgoing swaps |
+| `min_swap_amount` | [string](#string) |  | Minimum swap amount |
+| `max_swap_amount` | [string](#string) |  | Maximum swap amount |
+| `swap_time` | [int64](#int64) |  | Unix seconds of swap creation block timestamp Original	SwapTimestamp int64 `json:"swap_time" yaml:"swap_time"` |
+| `time_span` | [int64](#int64) |  | seconds span before time expiration Original SwapTimeSpan int64 `json:"time_span" yaml:"time_span"` |
+
+
+
+
+
+
+<a name="bep3.AssetSupply"></a>
+
+### AssetSupply
+AssetSupply contains information about an asset's supply
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `incoming_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `outgoing_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `current_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `time_limited_current_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `time_elapsed` | [google.protobuf.Duration](#google.protobuf.Duration) |  |  |
+
+
+
+
+
+
+<a name="bep3.GenesisState"></a>
+
+### GenesisState
+type GenesisState struct {
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#bep3.Params) |  |  |
+| `atomic_swaps` | [AtomicSwap](#bep3.AtomicSwap) | repeated |  |
+| `supplies` | [AssetSupply](#bep3.AssetSupply) | repeated |  |
+| `previous_block_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+
+<a name="bep3.Params"></a>
+
+### Params
+Params governance parameters for bep3 module
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `asset_params` | [AssetParam](#bep3.AssetParam) | repeated |  |
+
+
+
+
+
+
+<a name="bep3.SupplyLimit"></a>
+
+### SupplyLimit
+SupplyLimit parameters that control the absolute and time-based limits for an assets's supply
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `limit` | [string](#string) |  | the absolute supply limit for an asset |
+| `time_limited` | [bool](#bool) |  | boolean for whether the supply is limited by time |
+| `time_period` | [google.protobuf.Duration](#google.protobuf.Duration) |  | the duration for which the supply time limit applies |
+| `time_based_limit` | [string](#string) |  | the supply limit for an asset for each time period |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="bep3/qry.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## bep3/qry.proto
+
+
+
+<a name="bep3.QueryAssetSupply"></a>
+
+### QueryAssetSupply
+QueryAssetSupply contains the params for query 'custom/bep3/supply'
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="bep3.QueryAtomicSwapByID"></a>
+
+### QueryAtomicSwapByID
+QueryAtomicSwapByID contains the params for query 'custom/bep3/swap'
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `swap_id` | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="bep3.QueryAtomicSwaps"></a>
+
+### QueryAtomicSwaps
+QueryAtomicSwaps contains the params for an AtomicSwaps query
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `page` | [int64](#int64) |  |  |
+| `limit` | [int64](#int64) |  |  |
+| `involve` | [string](#string) |  |  |
+| `expiration` | [int64](#int64) |  |  |
+| `status` | [uint32](#uint32) |  |  |
+| `direction` | [uint32](#uint32) |  |  |
 
 
 

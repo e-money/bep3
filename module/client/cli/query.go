@@ -7,9 +7,7 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/e-money/bep3/module/types"
 	"github.com/spf13/cobra"
@@ -26,7 +24,7 @@ const (
 )
 
 // GetQueryCmd returns the cli query commands for this module
-func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetQueryCmd() *cobra.Command {
 	// Group bep3 queries under a subcommand
 	bep3QueryCmd := &cobra.Command{
 		Use:                        "bep3",
@@ -36,28 +34,31 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	bep3QueryCmd.AddCommand(flags.GetCommands(
-		QueryCalcSwapIDCmd(queryRoute, cdc),
-		QueryCalcRandomNumberHashCmd(queryRoute, cdc),
-		QueryGetAssetSupplyCmd(queryRoute, cdc),
-		QueryGetAssetSuppliesCmd(queryRoute, cdc),
-		QueryGetAtomicSwapCmd(queryRoute, cdc),
-		QueryGetAtomicSwapsCmd(queryRoute, cdc),
-		QueryParamsCmd(queryRoute, cdc),
-	)...)
+	bep3QueryCmd.AddCommand(
+		QueryCalcSwapIDCmd(),
+		QueryCalcRandomNumberHashCmd(),
+		QueryGetAssetSupplyCmd(),
+		QueryGetAssetSuppliesCmd(),
+		QueryGetAtomicSwapCmd(),
+		QueryGetAtomicSwapsCmd(),
+		QueryParamsCmd(),
+	)
 
 	return bep3QueryCmd
 }
 
 // QueryCalcRandomNumberHashCmd calculates the random number hash for a number and timestamp
-func QueryCalcRandomNumberHashCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func QueryCalcRandomNumberHashCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "calc-rnh [unix-timestamp]",
 		Short:   "calculates an example random number hash from an optional timestamp",
 		Example: "bep3 calc-rnh now",
 		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			userTimestamp := "now"
 			if len(args) > 0 {
@@ -88,20 +89,23 @@ func QueryCalcRandomNumberHashCmd(queryRoute string, cdc *codec.Codec) *cobra.Co
 			timestampStr := fmt.Sprintf("Timestamp: %d\n", timestamp)
 			randomNumberHashStr := fmt.Sprintf("Random number hash: %s", hex.EncodeToString(randomNumberHash))
 			output := []string{randomNumberStr, timestampStr, randomNumberHashStr}
-			return cliCtx.PrintOutput(strings.Join(output, ""))
+			return cliCtx.PrintString(strings.Join(output, ""))
 		},
 	}
 }
 
 // QueryCalcSwapIDCmd calculates the swapID for a random number hash, sender, and sender other chain
-func QueryCalcSwapIDCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func QueryCalcSwapIDCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "calc-swapid [random-number-hash] [sender] [sender-other-chain]",
 		Short:   "calculate swap ID for the given random number hash, sender, and sender other chain",
 		Example: "bep3 calc-swapid 0677bd8a303dd981810f34d8e5cc6507f13b391899b84d3c1be6c6045a17d747 kava1l0xsq2z7gqd7yly0g40y5836g0appumark77ny bnb1ud3q90r98l3mhd87kswv3h8cgrymzeljct8qn7",
 		Args:    cobra.MinimumNArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			// Parse query params
 			randomNumberHash, err := hex.DecodeString(args[0])
@@ -116,77 +120,95 @@ func QueryCalcSwapIDCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			// Calculate swap ID and convert to human-readable string
 			swapID := types.CalculateSwapID(randomNumberHash, sender, senderOtherChain)
-			return cliCtx.PrintOutput(hex.EncodeToString(swapID))
+			return cliCtx.PrintString(hex.EncodeToString(swapID))
 		},
 	}
 }
 
-// QueryGetAssetSupplyCmd queries as asset's current in swap supply, active, supply, and supply limit
-func QueryGetAssetSupplyCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+// QueryGetAssetSupplyCmd queries as asset's current in swap supply, active,
+// supply, and supply limit
+func QueryGetAssetSupplyCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "supply [denom]",
 		Short:   "get information about an asset's supply",
 		Example: "bep3 supply bnb",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			// Prepare query params
-			bz, err := cdc.MarshalJSON(types.NewQueryAssetSupply(args[0]))
+			bz, err := cliCtx.LegacyAmino.MarshalJSON(types.NewQueryAssetSupply(args[0]))
 			if err != nil {
 				return err
 			}
 
 			// Execute query
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryGetAssetSupply), bz)
+			res, _, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetAssetSupply), bz)
 			if err != nil {
 				return err
 			}
 
 			// Decode and print results
 			var assetSupply types.AssetSupply
-			cdc.MustUnmarshalJSON(res, &assetSupply)
-			return cliCtx.PrintOutput(assetSupply)
+			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &assetSupply)
+			return cliCtx.PrintString(assetSupply.String())
 		},
 	}
 }
 
 // QueryGetAssetSuppliesCmd queries AssetSupplies in the store
-func QueryGetAssetSuppliesCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func QueryGetAssetSuppliesCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "supplies",
 		Short:   "get a list of all asset supplies",
 		Example: "bep3 supplies",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
-			res, height, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryGetAssetSupplies), nil)
+			res, height, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetAssetSupplies), nil)
 			if err != nil {
 				return err
 			}
 
 			var assetSupplies types.AssetSupplies
-			cdc.MustUnmarshalJSON(res, &assetSupplies)
+			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &assetSupplies)
 
 			if len(assetSupplies) == 0 {
 				return fmt.Errorf("There are currently no asset supplies")
 			}
 
 			cliCtx = cliCtx.WithHeight(height)
-			return cliCtx.PrintOutput(assetSupplies)
+
+			sl := make([]string, len(assetSupplies), len(assetSupplies))
+			for i := 0; i < len(assetSupplies); i++ {
+				sl[i] = assetSupplies[i].String()
+			}
+
+			return cliCtx.PrintString(strings.Join(sl, ""))
 		},
 	}
 }
 
 // QueryGetAtomicSwapCmd queries an AtomicSwap by swapID
-func QueryGetAtomicSwapCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func QueryGetAtomicSwapCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "swap [swap-id]",
 		Short:   "get atomic swap information",
 		Example: "bep3 swap 6682c03cc3856879c8fb98c9733c6b0c30758299138166b6523fe94628b1d3af",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			// Decode swapID's hex encoded string to []byte
 			swapID, err := hex.DecodeString(args[0])
@@ -195,28 +217,29 @@ func QueryGetAtomicSwapCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Prepare query params
-			bz, err := cdc.MarshalJSON(types.NewQueryAtomicSwapByID(swapID))
+			bz, err := cliCtx.LegacyAmino.MarshalJSON(types.NewQueryAtomicSwapByID(swapID))
 			if err != nil {
 				return err
 			}
 
 			// Execute query
-			res, height, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryGetAtomicSwap), bz)
+			res, height, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetAtomicSwap), bz)
 			if err != nil {
 				return err
 			}
 
 			var atomicSwap types.AugmentedAtomicSwap
-			cdc.MustUnmarshalJSON(res, &atomicSwap)
+			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &atomicSwap)
 
 			cliCtx = cliCtx.WithHeight(height)
-			return cliCtx.PrintOutput(atomicSwap)
+			return cliCtx.PrintString(atomicSwap.String())
 		},
 	}
 }
 
 // QueryGetAtomicSwapsCmd queries AtomicSwaps in the store
-func QueryGetAtomicSwapsCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func QueryGetAtomicSwapsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "swaps",
 		Short: "query atomic swaps with optional filters",
@@ -276,27 +299,37 @@ $ emcli q bep3 swaps --page=2 --limit=100
 				params.Direction = swapDirection
 			}
 
-			bz, err := cdc.MarshalJSON(params)
+			cliCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			bz, err := cliCtx.LegacyAmino.MarshalJSON(params)
+			if err != nil {
+				return err
+			}
 
-			res, height, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryGetAtomicSwaps), bz)
+			res, height, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetAtomicSwaps), bz)
 			if err != nil {
 				return err
 			}
 
 			var matchingAtomicSwaps types.AugmentedAtomicSwaps
-			cdc.UnmarshalJSON(res, &matchingAtomicSwaps)
+			cliCtx.LegacyAmino.UnmarshalJSON(res, &matchingAtomicSwaps)
 
 			if len(matchingAtomicSwaps) == 0 {
 				return fmt.Errorf("No matching atomic swaps found")
 			}
 
 			cliCtx = cliCtx.WithHeight(height)
-			return cliCtx.PrintOutput(matchingAtomicSwaps) // nolint:errcheck
+
+			al := make([]string, len(matchingAtomicSwaps), len(matchingAtomicSwaps))
+			for i := 0; i < len(matchingAtomicSwaps); i++ {
+				al[i] = matchingAtomicSwaps[i].String()
+			}
+
+			return cliCtx.PrintString(strings.Join(al, ""))
 		},
 	}
 
@@ -311,17 +344,20 @@ $ emcli q bep3 swaps --page=2 --limit=100
 }
 
 // QueryParamsCmd queries the bep3 module parameters
-func QueryParamsCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func QueryParamsCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "params",
 		Short:   "get the bep3 module parameters",
 		Example: "bep3 params",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			// Query
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryGetParams)
+			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetParams)
 			res, _, err := cliCtx.QueryWithData(route, nil)
 			if err != nil {
 				return err
@@ -329,8 +365,8 @@ func QueryParamsCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			// Decode and print results
 			var out types.Params
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
+			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintString(out.String())
 		},
 	}
 }
