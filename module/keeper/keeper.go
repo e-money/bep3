@@ -7,8 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/params/subspace"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/e-money/bep3/module/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -16,16 +16,18 @@ import (
 // Keeper of the bep3 store
 type Keeper struct {
 	key           sdk.StoreKey
-	cdc           *codec.Codec
-	paramSubspace subspace.Subspace
-	supplyKeeper  types.SupplyKeeper
+	cdc           *codec.LegacyAmino
+	paramSubspace paramtypes.Subspace
+	// bankKeeper
+	supplyKeeper types.SupplyKeeper
+	// authKeeper
 	accountKeeper types.AccountKeeper
 	Maccs         map[string]bool
 }
 
 // NewKeeper creates a bep3 keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, sk types.SupplyKeeper, ak types.AccountKeeper,
-	paramstore subspace.Subspace, maccs map[string]bool) Keeper {
+func NewKeeper(cdc *codec.LegacyAmino, key sdk.StoreKey, sk types.SupplyKeeper, ak types.AccountKeeper,
+	paramstore paramtypes.Subspace, maccs map[string]bool) Keeper {
 	if !paramstore.HasKeyTable() {
 		paramstore = paramstore.WithKeyTable(types.ParamKeyTable())
 	}
@@ -49,7 +51,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // EnsureModuleAccountPermissions syncs the bep3 module account's permissions with those in the supply keeper.
 func (k Keeper) EnsureModuleAccountPermissions(ctx sdk.Context) error {
 	maccI := k.supplyKeeper.GetModuleAccount(ctx, types.ModuleName)
-	macc, ok := maccI.(*supply.ModuleAccount)
+	macc, ok := maccI.(*authtypes.ModuleAccount)
 	if !ok {
 		return fmt.Errorf("expected %s account to be a module account type", types.ModuleName)
 	}
