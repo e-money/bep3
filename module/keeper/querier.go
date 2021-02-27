@@ -43,7 +43,7 @@ func queryAssetSupply(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]
 	}
 
 	// Encode results
-	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, assetSupply)
+	bz, err := codec.MarshalJSONIndent(types.ModuleCdc.LegacyAmino, assetSupply)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -57,7 +57,7 @@ func queryAssetSupplies(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (
 		assets = types.AssetSupplies{}
 	}
 
-	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, assets)
+	bz, err := codec.MarshalJSONIndent(types.ModuleCdc.LegacyAmino, assets)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -82,7 +82,7 @@ func queryAtomicSwap(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]b
 	augmentedAtomicSwap := types.NewAugmentedAtomicSwap(atomicSwap)
 
 	// Encode results
-	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, augmentedAtomicSwap)
+	bz, err := codec.MarshalJSONIndent(types.ModuleCdc.LegacyAmino, augmentedAtomicSwap)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -109,7 +109,7 @@ func queryAtomicSwaps(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]
 		augmentedSwaps = append(augmentedSwaps, types.NewAugmentedAtomicSwap(swap))
 	}
 
-	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, augmentedSwaps)
+	bz, err := codec.MarshalJSONIndent(types.ModuleCdc.LegacyAmino, augmentedSwaps)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -123,7 +123,7 @@ func queryGetParams(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]by
 	params := keeper.GetParams(ctx)
 
 	// Encode results
-	bz, err := codec.MarshalJSONIndent(types.ModuleCdc, params)
+	bz, err := codec.MarshalJSONIndent(types.ModuleCdc.LegacyAmino, params)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -140,7 +140,7 @@ func filterAtomicSwaps(ctx sdk.Context, swaps types.AtomicSwaps, params types.Qu
 
 		// match involved address (if supplied)
 		if len(params.Involve) > 0 {
-			matchInvolve = s.Sender.Equals(params.Involve) || s.Recipient.Equals(params.Involve)
+			matchInvolve = s.Sender == params.Involve || s.Recipient == params.Involve
 		}
 
 		// match expiration block limit (if supplied)
@@ -163,7 +163,7 @@ func filterAtomicSwaps(ctx sdk.Context, swaps types.AtomicSwaps, params types.Qu
 		}
 	}
 
-	start, end := client.Paginate(len(filteredSwaps), params.Page, params.Limit, 100)
+	start, end := client.Paginate(len(filteredSwaps), int(params.Page), int(params.Limit), 100)
 	if start < 0 || end < 0 {
 		filteredSwaps = types.AtomicSwaps{}
 	} else {
