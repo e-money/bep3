@@ -18,11 +18,6 @@ const (
 	QueryGetParams = "parameters"
 )
 
-// QueryAssetSupply contains the params for query 'custom/bep3/supply'
-type QueryAssetSupply struct {
-	Denom string `json:"denom" yaml:"denom"`
-}
-
 // NewQueryAssetSupply creates a new QueryAssetSupply
 func NewQueryAssetSupply(denom string) QueryAssetSupply {
 	return QueryAssetSupply{
@@ -44,11 +39,6 @@ func NewQueryAssetSupplies(page int, limit int) QueryAssetSupplies {
 	}
 }
 
-// QueryAtomicSwapByID contains the params for query 'custom/bep3/swap'
-type QueryAtomicSwapByID struct {
-	SwapID tmbytes.HexBytes `json:"swap_id" yaml:"swap_id"`
-}
-
 // NewQueryAtomicSwapByID creates a new QueryAtomicSwapByID
 func NewQueryAtomicSwapByID(swapBytes tmbytes.HexBytes) QueryAtomicSwapByID {
 	return QueryAtomicSwapByID{
@@ -56,23 +46,13 @@ func NewQueryAtomicSwapByID(swapBytes tmbytes.HexBytes) QueryAtomicSwapByID {
 	}
 }
 
-// QueryAtomicSwaps contains the params for an AtomicSwaps query
-type QueryAtomicSwaps struct {
-	Page       int            `json:"page" yaml:"page"`
-	Limit      int            `json:"limit" yaml:"limit"`
-	Involve    sdk.AccAddress `json:"involve" yaml:"involve"`
-	Expiration int64          `json:"expiration" yaml:"expiration"`
-	Status     SwapStatus     `json:"status" yaml:"status"`
-	Direction  SwapDirection  `json:"direction" yaml:"direction"`
-}
-
 // NewQueryAtomicSwaps creates a new instance of QueryAtomicSwaps
-func NewQueryAtomicSwaps(page, limit int, involve sdk.AccAddress, expiration int64, status SwapStatus,
+func NewQueryAtomicSwaps(page, limit int64, involve sdk.AccAddress, expiration int64, status SwapStatus,
 	direction SwapDirection) QueryAtomicSwaps {
 	return QueryAtomicSwaps{
 		Page:       page,
 		Limit:      limit,
-		Involve:    involve,
+		Involve:    involve.String(),
 		Expiration: expiration,
 		Status:     status,
 		Direction:  direction,
