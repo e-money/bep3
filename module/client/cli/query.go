@@ -272,7 +272,7 @@ $ emcli q bep3 swaps --page=2 --limit=100
 				if err != nil {
 					return err
 				}
-				params.Involve = involveAddr
+				params.Involve = involveAddr.String()
 			}
 
 			if len(strExpiration) != 0 {

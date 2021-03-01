@@ -1,21 +1,16 @@
 package cli
 
 import (
-	"bufio"
 	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/e-money/bep3/module/types"
 	"github.com/spf13/cobra"
 	tmtime "github.com/tendermint/tendermint/types/time"
@@ -31,11 +26,11 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	bep3TxCmd.AddCommand(flags.PostCommands(
+	bep3TxCmd.AddCommand(
 		GetCmdCreateAtomicSwap(),
 		GetCmdClaimAtomicSwap(),
 		GetCmdRefundAtomicSwap(),
-	)...)
+	)
 
 	return bep3TxCmd
 }
@@ -111,7 +106,7 @@ func GetCmdCreateAtomicSwap() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(
 				cliCtx,
 				cmd.Flags(),
-				sdk.Msg{msg},
+				msg,
 			)
 		},
 	}
@@ -122,12 +117,13 @@ func GetCmdClaimAtomicSwap() *cobra.Command {
 	return &cobra.Command{
 		Use:     "claim [swap-id] [random-number]",
 		Short:   "claim coins in an atomic swap using the secret number",
-		Example: fmt.Sprintf("%s tx %s claim 6682c03cc3856879c8fb98c9733c6b0c30758299138166b6523fe94628b1d3af 56f13e6a5cd397447f8b5f8c82fdb5bbf56127db75269f5cc14e50acd8ac9a4c --from accA", version.ClientName, types.ModuleName),
+		Example: fmt.Sprintf("%s tx %s claim 6682c03cc3856879c8fb98c9733c6b0c30758299138166b6523fe94628b1d3af 56f13e6a5cd397447f8b5f8c82fdb5bbf56127db75269f5cc14e50acd8ac9a4c --from accA", version.Name, types.ModuleName),
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			from := cliCtx.GetFromAddress()
 
@@ -151,7 +147,7 @@ func GetCmdClaimAtomicSwap() *cobra.Command {
 				return err
 			}
 
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			return tx.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), msg)
 		},
 	}
 }
@@ -161,12 +157,13 @@ func GetCmdRefundAtomicSwap() *cobra.Command {
 	return &cobra.Command{
 		Use:     "refund [swap-id]",
 		Short:   "refund the coins in an atomic swap",
-		Example: fmt.Sprintf("%s tx %s refund 6682c03cc3856879c8fb98c9733c6b0c30758299138166b6523fe94628b1d3af --from accA", version.ClientName, types.ModuleName),
+		Example: fmt.Sprintf("%s tx %s refund 6682c03cc3856879c8fb98c9733c6b0c30758299138166b6523fe94628b1d3af --from accA", version.Name, types.ModuleName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			from := cliCtx.GetFromAddress()
 
@@ -182,7 +179,7 @@ func GetCmdRefundAtomicSwap() *cobra.Command {
 				return err
 			}
 
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			return tx.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), msg)
 		},
 	}
 }

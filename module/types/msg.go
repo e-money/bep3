@@ -37,8 +37,8 @@ var (
 
 // NewMsgCreateAtomicSwap initializes a new MsgCreateAtomicSwap
 func NewMsgCreateAtomicSwap(from, to sdk.AccAddress, recipientOtherChain, senderOtherChain string,
-	randomNumberHash tmbytes.HexBytes, timestamp int64, amount sdk.Coins, timeSpan int64) MsgCreateAtomicSwap {
-	return MsgCreateAtomicSwap{
+	randomNumberHash tmbytes.HexBytes, timestamp int64, amount sdk.Coins, timeSpan int64) *MsgCreateAtomicSwap {
+	return &MsgCreateAtomicSwap{
 		From:                from.String(),
 		To:                  to.String(),
 		RecipientOtherChain: recipientOtherChain,
@@ -128,8 +128,8 @@ func (msg MsgCreateAtomicSwap) GetSignBytes() []byte {
 }
 
 // NewMsgClaimAtomicSwap initializes a new MsgClaimAtomicSwap
-func NewMsgClaimAtomicSwap(from sdk.AccAddress, swapID, randomNumber []byte) MsgClaimAtomicSwap {
-	return MsgClaimAtomicSwap{
+func NewMsgClaimAtomicSwap(from sdk.AccAddress, swapID, randomNumber []byte) *MsgClaimAtomicSwap {
+	return &MsgClaimAtomicSwap{
 		From:         from.String(),
 		SwapID:       swapID,
 		RandomNumber: randomNumber,
@@ -186,8 +186,8 @@ func (msg MsgClaimAtomicSwap) GetSignBytes() []byte {
 }
 
 // NewMsgRefundAtomicSwap initializes a new MsgRefundAtomicSwap
-func NewMsgRefundAtomicSwap(from sdk.AccAddress, swapID []byte) MsgRefundAtomicSwap {
-	return MsgRefundAtomicSwap{
+func NewMsgRefundAtomicSwap(from sdk.AccAddress, swapID []byte) *MsgRefundAtomicSwap {
+	return &MsgRefundAtomicSwap{
 		From:   from.String(),
 		SwapID: swapID,
 	}
