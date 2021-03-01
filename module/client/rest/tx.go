@@ -4,25 +4,25 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/e-money/bep3/module/types"
 	"github.com/gorilla/mux"
 )
 
-func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/%s/swap/create", types.ModuleName), postCreateHandlerFn(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/swap/claim", types.ModuleName), postClaimHandlerFn(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/swap/refund", types.ModuleName), postRefundHandlerFn(cliCtx)).Methods("POST")
 }
 
-func postCreateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func postCreateHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Decode PUT request body
 		var req PostCreateSwapReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 		req.BaseReq = req.BaseReq.Sanitize()
@@ -45,15 +45,15 @@ func postCreateHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 	}
 }
 
-func postClaimHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func postClaimHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Decode PUT request body
 		var req PostClaimSwapReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 		req.BaseReq = req.BaseReq.Sanitize()
@@ -71,15 +71,15 @@ func postClaimHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 	}
 }
 
-func postRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func postRefundHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Decode PUT request body
 		var req PostRefundSwapReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 		req.BaseReq = req.BaseReq.Sanitize()
@@ -102,6 +102,6 @@ func postRefundHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 	}
 }
