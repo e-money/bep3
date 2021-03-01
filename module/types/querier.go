@@ -47,7 +47,7 @@ func NewQueryAtomicSwapByID(swapBytes tmbytes.HexBytes) QueryAtomicSwapByID {
 }
 
 // NewQueryAtomicSwaps creates a new instance of QueryAtomicSwaps
-func NewQueryAtomicSwaps(page, limit int64, involve sdk.AccAddress, expiration int64, status SwapStatus,
+func NewQueryAtomicSwaps(page, limit int, involve sdk.AccAddress, expiration int64, status SwapStatus,
 	direction SwapDirection) QueryAtomicSwaps {
 	return QueryAtomicSwaps{
 		Page:       page,

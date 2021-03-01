@@ -18,7 +18,7 @@
     - [Params](#bep3.Params)
     - [SupplyLimit](#bep3.SupplyLimit)
   
-- [bep3/qry.proto](#bep3/qry.proto)
+- [bep3/query.proto](#bep3/query.proto)
     - [QueryAssetSupply](#bep3.QueryAssetSupply)
     - [QueryAtomicSwapByID](#bep3.QueryAtomicSwapByID)
     - [QueryAtomicSwaps](#bep3.QueryAtomicSwaps)
@@ -261,10 +261,10 @@ SupplyLimit parameters that control the absolute and time-based limits for an as
 
 
 
-<a name="bep3/qry.proto"></a>
+<a name="bep3/query.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## bep3/qry.proto
+## bep3/query.proto
 
 
 

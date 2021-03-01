@@ -41,8 +41,14 @@ type QueryAtomicSwaps struct {
 
 // QueryAtomicSwaps contains the params for an AtomicSwaps query
 message QueryAtomicSwaps {
-  int64 page = 1 [(gogoproto.moretags) = "yaml:\"page\""];
-  int64 limit = 2 [(gogoproto.moretags) = "yaml:\"limit\""];
+  int64 page = 1 [
+    (gogoproto.moretags) = "yaml:\"page\"",
+    (gogoproto.casttype) = "int"
+  ];
+  int64 limit = 2 [
+    (gogoproto.moretags) = "yaml:\"limit\"",
+    (gogoproto.casttype) = "int"
+  ];
   string involve = 3 [(gogoproto.moretags) = "yaml:\"involve\""];
   int64 expiration = 4 [(gogoproto.moretags) = "yaml:\"involve\""];
   uint32 status = 5 [
@@ -54,4 +60,3 @@ message QueryAtomicSwaps {
     (gogoproto.moretags) = "yaml:\"direction\""
   ];
 }
-
