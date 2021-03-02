@@ -200,8 +200,7 @@ func (ab AppModuleBasic) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
 	sdr[StoreKey] = simulation.NewDecodeStore(ab.cdc)
 }
 
-// TODO
 // WeightedOperations returns the all the bep3 module operations with their respective weights.
-//func (am AppModule) WeightedOperations(simState module.SimulationState) []sim.WeightedOperation {
-//	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, am.accountKeeper, am.keeper)
-//}
+func (am AppModule) WeightedOperations(simState module.SimulationState) sdksim.WeightedOperations {
+	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, am.accountKeeper, am.bankKeeper, am.keeper)
+}
