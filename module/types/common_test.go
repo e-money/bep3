@@ -23,13 +23,15 @@ func atomicSwaps(count int) types.AtomicSwaps {
 }
 
 func atomicSwap(index int) types.AtomicSwap {
-	expireOffset := uint64((index * 15) + 360) // Default expire height + offet to match timestamp
-	timestamp := ts(index)                     // One minute apart
+	timestamp := ts(index) // One minute apart
+	expireTimestamp := time.Unix(timestamp, 0).
+		Add(time.Duration(index*15)*time.Minute + 360).Unix() // 375 minutes apart
 	randomNumber, _ := types.GenerateSecureRandomNumber()
 	randomNumberHash := types.CalculateRandomHash(randomNumber[:], timestamp)
 
-	swap := types.NewAtomicSwap(cs(c("bnb", 50000)), randomNumberHash, expireOffset, timestamp, kavaAddrs[0],
-		kavaAddrs[1], binanceAddrs[0].String(), binanceAddrs[1].String(), 1, types.Open, true, types.Incoming)
+	swap := types.NewAtomicSwap(cs(c("bnb", 50000)), randomNumberHash, expireTimestamp, timestamp,
+		kavaAddrs[0], kavaAddrs[1], binanceAddrs[0].String(), binanceAddrs[1].String(), 1, types.Open,
+		true, types.Incoming)
 
 	return swap
 }

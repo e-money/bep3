@@ -16,9 +16,9 @@ const (
 )
 
 // CreateAtomicSwap creates a new atomic swap.
-func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp int64, swapTimeSpan uint64,
-	sender sdk.AccAddress, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string,
-	amount sdk.Coins, crossChain bool) error {
+func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
+	sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, amount sdk.Coins,
+	crossChain bool) error {
 	// Confirm that this is not a duplicate swap
 	swapID := types.CalculateSwapID(randomNumberHash, sender, senderOtherChain)
 	_, found := k.GetAtomicSwap(ctx, swapID)
@@ -82,7 +82,7 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 		err = k.IncrementIncomingAssetSupply(ctx, amount[0])
 	case types.Outgoing:
 
-		// Outgoing swaps must have a seconds time span within [60, 1 week]
+		// Outgoing swaps must have a seconds time span within [60, 3 days]
 		if swapTimeSpan < sixtySeconds || swapTimeSpan > types.ThreeDaySeconds {
 			return sdkerrors.Wrapf(types.ErrInvalidTimeSpan,
 				"seconds span %d outside range of 1 min...1 day[%d, %d]",
@@ -107,8 +107,8 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 
 	// Store the details of the swap
 	expireTime := ctx.BlockTime().Add(time.Duration(swapTimeSpan) * time.Second)
-	atomicSwap := types.NewAtomicSwap(amount, randomNumberHash, uint64(expireTime.Unix()), timestamp, sender,
-		recipient, senderOtherChain, recipientOtherChain, 0, types.Open, crossChain, direction)
+	atomicSwap := types.NewAtomicSwap(amount, randomNumberHash, expireTime.Unix(), timestamp, sender, recipient,
+		senderOtherChain, recipientOtherChain, 0, types.Open, crossChain, direction)
 
 	// Insert the atomic swap under both keys
 	k.SetAtomicSwap(ctx, atomicSwap)
@@ -272,7 +272,7 @@ func (k Keeper) RefundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []
 // UpdateExpiredAtomicSwaps finds all AtomicSwaps that are past (or at) their ending times and expires them.
 func (k Keeper) UpdateExpiredAtomicSwaps(ctx sdk.Context) {
 	var expiredSwapIDs []string
-	k.IterateAtomicSwapsByBlock(ctx, uint64(ctx.BlockTime().Unix()), func(id []byte) bool {
+	k.IterateAtomicSwapsByBlock(ctx, ctx.BlockTime().Unix(), func(id []byte) bool {
 		atomicSwap, found := k.GetAtomicSwap(ctx, id)
 		if !found {
 			// NOTE: shouldn't happen. Continue to next item.

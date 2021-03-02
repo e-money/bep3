@@ -88,7 +88,7 @@ func queryAtomicSwapsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		var (
 			involveAddr   sdk.AccAddress
-			expiration    uint64
+			expiration    int64
 			swapStatus    types.SwapStatus
 			swapDirection types.SwapDirection
 		)
@@ -102,7 +102,7 @@ func queryAtomicSwapsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		if x := r.URL.Query().Get(RestExpiration); len(x) != 0 {
-			expiration, err = strconv.ParseUint(x, 10, 64)
+			expiration, err = strconv.ParseInt(x, 10, 64)
 			if err != nil {
 				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return

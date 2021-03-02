@@ -61,14 +61,14 @@ type QueryAtomicSwaps struct {
 	Page       int            `json:"page" yaml:"page"`
 	Limit      int            `json:"limit" yaml:"limit"`
 	Involve    sdk.AccAddress `json:"involve" yaml:"involve"`
-	Expiration uint64         `json:"expiration" yaml:"expiration"`
+	Expiration int64          `json:"expiration" yaml:"expiration"`
 	Status     SwapStatus     `json:"status" yaml:"status"`
 	Direction  SwapDirection  `json:"direction" yaml:"direction"`
 }
 
 // NewQueryAtomicSwaps creates a new instance of QueryAtomicSwaps
-func NewQueryAtomicSwaps(page, limit int, involve sdk.AccAddress, expiration uint64,
-	status SwapStatus, direction SwapDirection) QueryAtomicSwaps {
+func NewQueryAtomicSwaps(page, limit int, involve sdk.AccAddress, expiration int64, status SwapStatus,
+	direction SwapDirection) QueryAtomicSwaps {
 	return QueryAtomicSwaps{
 		Page:       page,
 		Limit:      limit,

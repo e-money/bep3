@@ -96,10 +96,10 @@ func (suite *HandlerTestSuite) TestMsgClaimAtomicSwap() {
 
 // getContextPlusSec returns a context forward or backward in time and block
 // index. Assuming 1 second finality.
-func (suite *HandlerTestSuite) getContextPlusSec(plusSeconds uint64) sdk.Context {
-	offset := int64(plusSeconds)
+func (suite *HandlerTestSuite) getContextPlusSec(plusSeconds int64) sdk.Context {
+	offset := plusSeconds
 	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Second))
-	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + offset)
+	ctx = ctx.WithBlockTime(time.Unix(ctx.BlockTime().Unix()+offset, 0))
 
 	return ctx
 }

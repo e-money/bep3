@@ -22,8 +22,8 @@ var (
 	DefaultMinAmount          sdk.Int = sdk.ZeroInt()
 	DefaultMaxAmount          sdk.Int = sdk.NewInt(1000000000000) // 10,000 BNB
 	DefaultPreviousBlockTime          = tmtime.Canonical(time.Unix(0, 0))
-	DefaultSwapBlockTimestamp uint64  = 10 // At 10th second.
-	DefaultSwapTimeSpan       uint64  = 60 // 1 minute
+	DefaultSwapBlockTimestamp int64   = 10 // At 10th second.
+	DefaultSwapTimeSpan       int64   = 60 // 1 minute
 )
 
 // Params governance parameters for bep3 module
@@ -58,19 +58,17 @@ type AssetParam struct {
 	SupplyLimit   SupplyLimit    `json:"supply_limit" yaml:"supply_limit"`       // asset supply limit
 	Active        bool           `json:"active" yaml:"active"`                   // denotes if asset is available or paused
 	DeputyAddress sdk.AccAddress `json:"deputy_address" yaml:"deputy_address"`   // the address of the relayer process
-	FixedFee      sdk.Int        `json:"fixed_fee" yaml:"fixed_fee"`             // the fixed fee charged by the relayer process for outgoing swaps
+	FixedFee      sdk.Int        `json:"fixed_fee" yaml:"fixed_fee"`             // It should match the deputy config chain values. The fixed fee charged by the relayer process for outgoing swaps
 	MinSwapAmount sdk.Int        `json:"min_swap_amount" yaml:"min_swap_amount"` // Minimum swap amount
 	MaxSwapAmount sdk.Int        `json:"max_swap_amount" yaml:"max_swap_amount"` // Maximum swap amount
-	SwapTimestamp uint64         `json:"swap_time" yaml:"swap_time"`             // Unix seconds of swap creation block timestamp
-	SwapTimeSpan  uint64         `json:"time_span" yaml:"time_span"`             // seconds span before time expiration
+	SwapTimestamp int64          `json:"swap_time" yaml:"swap_time"`             // Unix seconds of swap creation block timestamp
+	SwapTimeSpan  int64          `json:"time_span" yaml:"time_span"`             // seconds span before time expiration
 }
 
 // NewAssetParam returns a new AssetParam
-func NewAssetParam(
-	denom string, coinID int, limit SupplyLimit, active bool,
-	deputyAddr sdk.AccAddress, fixedFee sdk.Int, minSwapAmount sdk.Int,
-	maxSwapAmount sdk.Int, swapTimestamp uint64, timeSpan uint64,
-) AssetParam {
+func NewAssetParam(denom string, coinID int, limit SupplyLimit, active bool,
+	deputyAddr sdk.AccAddress, fixedFee sdk.Int, minSwapAmount sdk.Int, maxSwapAmount sdk.Int,
+	swapTimestamp int64, timeSpan int64) AssetParam {
 	return AssetParam{
 		Denom:         denom,
 		CoinID:        coinID,

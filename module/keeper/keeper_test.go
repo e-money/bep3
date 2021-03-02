@@ -199,8 +199,8 @@ func (suite *KeeperTestSuite) TestIterateAtomicSwapsByBlock() {
 
 	var testCases []args
 	for i := 0; i < 8; i++ {
-		// Set up context 100 blocks apart
-		blockCtx := suite.ctx.WithBlockHeight(int64(i) * 100)
+		// Set up context 100 minutes apart
+		blockCtx := suite.ctx.WithBlockTime(tmtime.Now().Add(time.Duration(i) * (100 * time.Minute)))
 
 		// Initialize a new atomic swap (different randomNumberHash = different swap IDs)
 		timestamp := tmtime.Now().Add(time.Duration(i) * time.Minute).Unix()
@@ -208,7 +208,7 @@ func (suite *KeeperTestSuite) TestIterateAtomicSwapsByBlock() {
 		randomNumberHash := types.CalculateRandomHash(randomNumber[:], timestamp)
 
 		atomicSwap := types.NewAtomicSwap(cs(c("bnb", 50000)), randomNumberHash,
-			uint64(blockCtx.BlockHeight()), timestamp, TestUser1, TestUser2,
+			blockCtx.BlockTime().Unix(), timestamp, TestUser1, TestUser2,
 			TestSenderOtherChain, TestRecipientOtherChain, 0, types.Open,
 			true, types.Incoming)
 
@@ -219,17 +219,17 @@ func (suite *KeeperTestSuite) TestIterateAtomicSwapsByBlock() {
 	}
 
 	// Set up the expected swap IDs for a given cutoff block
-	cutoffBlock := int64(450)
+	cutoffTimestamp := tmtime.Now().Add(450 * time.Minute).Unix()
 	var expectedSwapIDs [][]byte
 	for _, tc := range testCases {
-		if tc.blockCtx.BlockHeight() < cutoffBlock || tc.blockCtx.BlockHeight() == cutoffBlock {
+		if tc.blockCtx.BlockTime().Unix() <= cutoffTimestamp {
 			expectedSwapIDs = append(expectedSwapIDs, tc.swap.GetSwapID())
 		}
 	}
 
 	// Read the swap IDs from store for a given cutoff block
 	var readSwapIDs [][]byte
-	suite.keeper.IterateAtomicSwapsByBlock(suite.ctx, uint64(cutoffBlock), func(id []byte) bool {
+	suite.keeper.IterateAtomicSwapsByBlock(suite.ctx, cutoffTimestamp, func(id []byte) bool {
 		readSwapIDs = append(readSwapIDs, id)
 		return false
 	})
@@ -308,7 +308,7 @@ func (suite *KeeperTestSuite) TestIterateAtomicSwapsLongtermStorage() {
 		randomNumberHash := types.CalculateRandomHash(randomNumber[:], timestamp)
 
 		atomicSwap := types.NewAtomicSwap(cs(c("bnb", 50000)), randomNumberHash,
-			uint64(suite.ctx.BlockHeight()), timestamp, TestUser1, TestUser2,
+			suite.ctx.BlockTime().Unix(), timestamp, TestUser1, TestUser2,
 			TestSenderOtherChain, TestRecipientOtherChain, 100, types.Open,
 			true, types.Incoming)
 

@@ -90,14 +90,14 @@ func GetCmdCreateAtomicSwap(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			heightSpan, err := strconv.ParseUint(args[5], 10, 64)
+			timeSpan, err := strconv.ParseInt(args[5], 10, 64)
 			if err != nil {
 				return err
 			}
 
 			msg := types.NewMsgCreateAtomicSwap(
 				from, to, recipientOtherChain, senderOtherChain,
-				randomNumberHash, timestamp, coins, heightSpan,
+				randomNumberHash, timestamp, coins, timeSpan,
 			)
 
 			err = msg.ValidateBasic()
