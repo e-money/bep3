@@ -6,13 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
-	"github.com/cosmos/cosmos-sdk/x/simulation"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/cosmos/cosmos-sdk/types/simulation"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/e-money/bep3/module/types"
 )
 
@@ -113,7 +111,7 @@ func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
 			TimeBasedLimit: timeBasedLimit,
 		},
 		Active:        true,
-		DeputyAddress: GenRandBnbDeputy(r).Address,
+		DeputyAddress: GenRandBnbDeputy(r).Address.String(),
 		FixedFee:      GenRandFixedFee(r),
 		MinSwapAmount: minSwapAmount,
 		MaxSwapAmount: GenMaxSwapAmount(r, minSwapAmount, limit),
@@ -123,24 +121,23 @@ func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
 }
 
 // RandomizedGenState generates a random GenesisState
+// https://github.com/cosmos/cosmos-sdk/blob/1c6e2679641d0892a3f35d778d7c2316a2937a7c/x/bank/simulation/genesis.go#L54
 func RandomizedGenState(simState *module.SimulationState) {
 	accs = simState.Accounts
 
 	bep3Genesis := loadRandomBep3GenState(simState)
-	fmt.Printf("Selected randomly generated %s parameters:\n%s\n", types.ModuleName, codec.MustMarshalJSONIndent(simState.Cdc, bep3Genesis))
-	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(bep3Genesis)
+	fmt.Printf("Selected randomly generated %s parameters:\n%s\n", types.ModuleName,
+		mustMarshalJSONIndent(bep3Genesis))
+	simState.GenState[types.ModuleName] = mustMarshalJSONIndent(bep3Genesis)
 
-	authGenesis, totalCoins := loadAuthGenState(simState, bep3Genesis)
-	simState.GenState[auth.ModuleName] = simState.Cdc.MustMarshalJSON(authGenesis)
-
-	// Update supply to match amount of coins in auth
-	var supplyGenesis supply.GenesisState
-	simState.Cdc.MustUnmarshalJSON(simState.GenState[supply.ModuleName], &supplyGenesis)
+	// Update bank supply to match amount of coins in auth
+	bankGenesis, totalCoins := loadBankGenState(simState, bep3Genesis)
 
 	for _, deputyCoin := range totalCoins {
-		supplyGenesis.Supply = supplyGenesis.Supply.Add(deputyCoin...)
+		bankGenesis.Supply = bankGenesis.Supply.Add(deputyCoin...)
 	}
-	simState.GenState[supply.ModuleName] = simState.Cdc.MustMarshalJSON(supplyGenesis)
+
+	simState.GenState[banktypes.ModuleName] = mustMarshalJSONIndent(bankGenesis)
 }
 
 func loadRandomBep3GenState(simState *module.SimulationState) types.GenesisState {
@@ -162,29 +159,72 @@ func loadRandomBep3GenState(simState *module.SimulationState) types.GenesisState
 	return bep3Genesis
 }
 
-func loadAuthGenState(simState *module.SimulationState, bep3Genesis types.GenesisState) (auth.GenesisState, []sdk.Coins) {
-	var authGenesis auth.GenesisState
-	simState.Cdc.MustUnmarshalJSON(simState.GenState[auth.ModuleName], &authGenesis)
+func loadAuthGenState(simState *module.SimulationState, bep3Genesis types.GenesisState) (authtypes.GenesisState, []sdk.Coins) {
+	var authGenesis authtypes.GenesisState
+	simState.Cdc.MustUnmarshalJSON(simState.GenState[authtypes.ModuleName], &authGenesis)
 	// Load total limit of each supported asset to deputy's account
 	var totalCoins []sdk.Coins
+
+	authGenesisAccounts, err := UnpackAccounts(authGenesis.Accounts)
+	if err != nil {
+		panic(err)
+	}
+
 	for _, asset := range bep3Genesis.Params.AssetParams {
-		deputy, found := getAccount(authGenesis.Accounts, asset.DeputyAddress)
+		deputyAddress, err := sdk.AccAddressFromBech32(asset.DeputyAddress)
+		if err != nil {
+			panic(err)
+		}
+		deputy, found := getAccount(authGenesisAccounts, deputyAddress)
 		if !found {
 			panic("deputy address not found in available accounts")
 		}
 		assetCoin := sdk.NewCoins(sdk.NewCoin(asset.Denom, asset.SupplyLimit.Limit))
-		if err := deputy.SetCoins(deputy.GetCoins().Add(assetCoin...)); err != nil {
+		// Balances moved to bank module
+		// if err := deputy.SetCoins(deputy.GetCoins().Add(assetCoin...)); err != nil {
+		//	panic(err)
+		// }
+		totalCoins = append(totalCoins, assetCoin)
+
+		authUpdGenesisAccounts := replaceOrAppendAccount(authGenesisAccounts, deputy)
+
+		authGenesis.Accounts, err = PackAccounts(authUpdGenesisAccounts)
+		if err != nil {
 			panic(err)
 		}
-		totalCoins = append(totalCoins, assetCoin)
-		authGenesis.Accounts = replaceOrAppendAccount(authGenesis.Accounts, deputy)
 	}
 
 	return authGenesis, totalCoins
 }
 
+func loadBankGenState(simState *module.SimulationState, bep3Genesis types.GenesisState) (banktypes.GenesisState, []sdk.Coins) {
+	var bankGenesis banktypes.GenesisState
+	simState.Cdc.MustUnmarshalJSON(simState.GenState[banktypes.ModuleName], &bankGenesis)
+
+	var (
+		totalCoins      []sdk.Coins
+		genesisBalances = []banktypes.Balance{}
+	)
+
+	// Load total limit of each supported asset to deputy's account
+	for _, asset := range bep3Genesis.Params.AssetParams {
+
+		assetCoin := sdk.NewCoins(sdk.NewCoin(asset.Denom, asset.SupplyLimit.Limit))
+		genesisBalances = append(genesisBalances, banktypes.Balance{
+			Address: asset.DeputyAddress,
+			Coins:   assetCoin,
+		})
+
+		totalCoins = append(totalCoins, assetCoin)
+	}
+
+	bankGenesis.Balances = genesisBalances
+
+	return bankGenesis, totalCoins
+}
+
 // Return an account from a list of accounts that matches an address.
-func getAccount(accounts []authexported.GenesisAccount, addr sdk.AccAddress) (authexported.GenesisAccount, bool) {
+func getAccount(accounts authtypes.GenesisAccounts, addr sdk.AccAddress) (authtypes.GenesisAccount, bool) {
 	for _, a := range accounts {
 		if a.GetAddress().Equals(addr) {
 			return a, true
@@ -194,7 +234,7 @@ func getAccount(accounts []authexported.GenesisAccount, addr sdk.AccAddress) (au
 }
 
 // In a list of accounts, replace the first account found with the same address. If not found, append the account.
-func replaceOrAppendAccount(accounts []authexported.GenesisAccount, acc authexported.GenesisAccount) []authexported.GenesisAccount {
+func replaceOrAppendAccount(accounts authtypes.GenesisAccounts, acc authtypes.GenesisAccount) []authtypes.GenesisAccount {
 	newAccounts := accounts
 	for i, a := range accounts {
 		if a.GetAddress().Equals(acc.GetAddress()) {
