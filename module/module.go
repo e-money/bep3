@@ -9,7 +9,7 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	sim "github.com/cosmos/cosmos-sdk/x/simulation"
+	sdksim "github.com/cosmos/cosmos-sdk/x/simulation"
 	"github.com/e-money/bep3/module/client/cli"
 	"github.com/e-money/bep3/module/client/rest"
 	"github.com/e-money/bep3/module/keeper"
@@ -91,16 +91,16 @@ type AppModule struct {
 
 	keeper        Keeper
 	accountKeeper bep3types.AccountKeeper
-	supplyKeeper  bep3types.BankKeeper
+	bankKeeper    bep3types.BankKeeper
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper Keeper, accountKeeper bep3types.AccountKeeper, supplyKeeper bep3types.BankKeeper) AppModule {
+func NewAppModule(keeper Keeper, accountKeeper bep3types.AccountKeeper, bankKeeper bep3types.BankKeeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
 		accountKeeper:  accountKeeper,
-		supplyKeeper:   supplyKeeper,
+		bankKeeper:     bankKeeper,
 	}
 }
 
@@ -154,7 +154,7 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState GenesisState
 	cdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, am.supplyKeeper, genesisState)
+	InitGenesis(ctx, am.keeper, am.bankKeeper, genesisState)
 	return []abci.ValidatorUpdate{}
 }
 
@@ -186,12 +186,12 @@ func (AppModuleBasic) GenerateGenesisState(simState *module.SimulationState) {
 }
 
 // ProposalContents doesn't return any content functions for governance proposals.
-func (AppModuleBasic) ProposalContents(_ module.SimulationState) []sim.WeightedProposalContent {
+func (AppModuleBasic) ProposalContents(_ module.SimulationState) []sdksim.WeightedProposalContent {
 	return nil
 }
 
 // RandomizedParams returns nil because bep3 has no params.
-func (AppModuleBasic) RandomizedParams(r *rand.Rand) []sim.ParamChange {
+func (AppModuleBasic) RandomizedParams(r *rand.Rand) []sdksim.ParamChange {
 	return simulation.ParamChanges(r)
 }
 
