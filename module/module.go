@@ -91,11 +91,11 @@ type AppModule struct {
 
 	keeper        Keeper
 	accountKeeper bep3types.AccountKeeper
-	supplyKeeper  bep3types.SupplyKeeper
+	supplyKeeper  bep3types.BankKeeper
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper Keeper, accountKeeper bep3types.AccountKeeper, supplyKeeper bep3types.SupplyKeeper) AppModule {
+func NewAppModule(keeper Keeper, accountKeeper bep3types.AccountKeeper, supplyKeeper bep3types.BankKeeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,

@@ -19,14 +19,14 @@ type Keeper struct {
 	cdc           *codec.LegacyAmino
 	paramSubspace paramtypes.Subspace
 	// bankKeeper
-	supplyKeeper types.SupplyKeeper
+	supplyKeeper types.BankKeeper
 	// authKeeper
 	accountKeeper types.AccountKeeper
 	Maccs         map[string]bool
 }
 
 // NewKeeper creates a bep3 keeper
-func NewKeeper(cdc *codec.LegacyAmino, key sdk.StoreKey, sk types.SupplyKeeper, ak types.AccountKeeper,
+func NewKeeper(cdc *codec.LegacyAmino, key sdk.StoreKey, sk types.BankKeeper, ak types.AccountKeeper,
 	paramstore paramtypes.Subspace, maccs map[string]bool) Keeper {
 	if !paramstore.HasKeyTable() {
 		paramstore = paramstore.WithKeyTable(types.ParamKeyTable())
