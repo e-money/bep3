@@ -113,7 +113,6 @@ func ParamKeyTable() paramtypes.KeyTable {
 
 // ParamSetPairs implements the ParamSet interface and returns all the key/value pairs
 // pairs of bep3 module's parameters.
-// nolint
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyAssetParams, &p.AssetParams, validateAssetParams),
@@ -126,7 +125,7 @@ func (p Params) Validate() error {
 }
 
 func validateAssetParams(i interface{}) error {
-	assetParams, ok := i.(AssetParams)
+	assetParams, ok := i.([]AssetParam)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
