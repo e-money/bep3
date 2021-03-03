@@ -5,7 +5,6 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
@@ -20,7 +19,8 @@ type AtomicSwapTestSuite struct {
 	suite.Suite
 
 	keeper             keeper.Keeper
-	accountKeeper      auth.AccountKeeper
+	accountKeeper      types.AccountKeeper
+	bankKeeper         types.BankKeeper
 	ctx                sdk.Context
 	randMacc           sdk.AccAddress
 	deputy             sdk.AccAddress
@@ -42,7 +42,7 @@ func (suite *AtomicSwapTestSuite) SetupTest() {
 	config := sdk.GetConfig()
 	app.SetBech32AddressPrefixes(config)
 
-	ctx, bep3Keeper, accountKeeper, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, accountKeeper, bankKeeper, appModule := app.CreateTestComponents(suite.T())
 
 	// Generate a random moduleAccount for the test
 	key := ed25519.GenPrivKey()
@@ -56,11 +56,11 @@ func (suite *AtomicSwapTestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		account.SetCoins(coins)
+		bankKeeper.SetBalances(ctx, addr, coins)
 		accountKeeper.SetAccount(ctx, account)
 	}
 
-	appModule.InitGenesis(ctx, NewBep3GenState(deputy))
+	appModule.InitGenesis(ctx, jsonMarshaller, NewBep3GenState(deputy))
 
 	params := bep3Keeper.GetParams(ctx)
 	params.AssetParams[1].Active = true
@@ -71,6 +71,7 @@ func (suite *AtomicSwapTestSuite) SetupTest() {
 	suite.addrs = addrs
 	suite.keeper = bep3Keeper
 	suite.accountKeeper = accountKeeper
+	suite.bankKeeper = bankKeeper
 
 	suite.GenerateSwapDetails()
 }
@@ -406,9 +407,8 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			}
 
 			// Load sender's account prior to swap creation
-			ak := suite.accountKeeper
-			senderAccPre := ak.GetAccount(suite.ctx, tc.args.sender)
-			senderBalancePre := senderAccPre.GetCoins().AmountOf(swapAssetDenom)
+			bk := suite.bankKeeper
+			senderBalancePre := bk.GetBalance(suite.ctx, tc.args.sender, swapAssetDenom)
 			assetSupplyPre, _ := suite.keeper.GetAssetSupply(suite.ctx, swapAssetDenom)
 
 			// Create atomic swap
@@ -417,8 +417,8 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 				tc.args.recipientOtherChain, tc.args.coins, tc.args.crossChain)
 
 			// Load sender's account after swap creation
-			senderAccPost := ak.GetAccount(suite.ctx, tc.args.sender)
-			senderBalancePost := senderAccPost.GetCoins().AmountOf(swapAssetDenom)
+			senderBalancePost := bk.GetAllBalances(suite.ctx, tc.args.sender)
+
 			assetSupplyPost, _ := suite.keeper.GetAssetSupply(suite.ctx, swapAssetDenom)
 
 			// Load expected swap ID
@@ -433,7 +433,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 					suite.Equal(assetSupplyPre.IncomingSupply.Add(tc.args.coins[0]), assetSupplyPost.IncomingSupply)
 				case types.Outgoing:
 					// Check coins moved
-					suite.Equal(senderBalancePre.Sub(tc.args.coins[0].Amount), senderBalancePost)
+					suite.Equal(senderBalancePre.Amount.Sub(tc.args.coins[0].Amount), senderBalancePost)
 					suite.Equal(assetSupplyPre.OutgoingSupply.Add(tc.args.coins[0]), assetSupplyPost.OutgoingSupply)
 				default:
 					suite.Fail("should not have invalid direction")
@@ -451,8 +451,8 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 						RandomNumberHash:    tc.args.randomNumberHash,
 						ExpireTimestamp:     suite.ctx.BlockTime().Unix() + tc.args.timeSpan,
 						Timestamp:           tc.args.timestamp,
-						Sender:              tc.args.sender,
-						Recipient:           tc.args.recipient,
+						Sender:              tc.args.sender.String(),
+						Recipient:           tc.args.recipient.String(),
 						SenderOtherChain:    tc.args.senderOtherChain,
 						RecipientOtherChain: tc.args.recipientOtherChain,
 						ClosedBlock:         0,
@@ -614,9 +614,8 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 			bep3.BeginBlocker(tc.claimCtx, suite.keeper)
 
 			// Load expected recipient's account prior to claim attempt
-			ak := suite.accountKeeper
-			expectedRecipientAccPre := ak.GetAccount(tc.claimCtx, expectedRecipient)
-			expectedRecipientBalancePre := expectedRecipientAccPre.GetCoins().AmountOf(tc.args.coins[0].Denom)
+			bk := suite.bankKeeper
+			expectedRecipientBalancePre := bk.GetBalance(tc.claimCtx, expectedRecipient, tc.args.coins[0].Denom).Amount
 			// Load asset supplies prior to claim attempt
 			assetSupplyPre, _ := suite.keeper.GetAssetSupply(tc.claimCtx, tc.args.coins[0].Denom)
 
@@ -624,8 +623,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 			err = suite.keeper.ClaimAtomicSwap(tc.claimCtx, expectedRecipient, claimSwapID, claimRandomNumber)
 
 			// Load expected recipient's account after the claim attempt
-			expectedRecipientAccPost := ak.GetAccount(tc.claimCtx, expectedRecipient)
-			expectedRecipientBalancePost := expectedRecipientAccPost.GetCoins().AmountOf(tc.args.coins[0].Denom)
+			expectedRecipientBalancePost := bk.GetBalance(tc.claimCtx, expectedRecipient, tc.args.coins[0].Denom)
 			// Load asset supplies after the claim attempt
 			assetSupplyPost, _ := suite.keeper.GetAssetSupply(tc.claimCtx, tc.args.coins[0].Denom)
 
@@ -772,9 +770,8 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 			bep3.BeginBlocker(tc.refundCtx, suite.keeper)
 
 			// Load sender's account prior to swap refund
-			ak := suite.accountKeeper
-			originalSenderAccPre := ak.GetAccount(tc.refundCtx, sender)
-			originalSenderBalancePre := originalSenderAccPre.GetCoins().AmountOf(expectedRefundAmount[0].Denom)
+			bk := suite.bankKeeper
+			originalSenderBalancePre := bk.GetBalance(tc.refundCtx, sender, expectedRefundAmount[0].Denom).Amount
 			// Load asset supply prior to swap refund
 			assetSupplyPre, _ := suite.keeper.GetAssetSupply(tc.refundCtx, expectedRefundAmount[0].Denom)
 
@@ -782,8 +779,7 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 			err = suite.keeper.RefundAtomicSwap(tc.refundCtx, sender, refundSwapID)
 
 			// Load sender's account after refund
-			originalSenderAccPost := ak.GetAccount(tc.refundCtx, sender)
-			originalSenderBalancePost := originalSenderAccPost.GetCoins().AmountOf(expectedRefundAmount[0].Denom)
+			originalSenderBalancePost := bk.GetBalance(tc.refundCtx, sender, expectedRefundAmount[0].Denom)
 			// Load asset supply after to swap refund
 			assetSupplyPost, _ := suite.keeper.GetAssetSupply(tc.refundCtx, expectedRefundAmount[0].Denom)
 
