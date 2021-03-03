@@ -316,7 +316,9 @@ $ emcli q bep3 swaps --page=2 --limit=100
 			}
 
 			var matchingAtomicSwaps types.AugmentedAtomicSwaps
-			cliCtx.LegacyAmino.UnmarshalJSON(res, &matchingAtomicSwaps)
+			if err := cliCtx.LegacyAmino.UnmarshalJSON(res, &matchingAtomicSwaps); err != nil {
+				return err
+			}
 
 			if len(matchingAtomicSwaps) == 0 {
 				return fmt.Errorf("No matching atomic swaps found")

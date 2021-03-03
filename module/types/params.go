@@ -164,7 +164,11 @@ func validateAssetParams(i interface{}) error {
 			return fmt.Errorf("deputy address cannot be empty for %s", asset.Denom)
 		}
 
-		if len([]byte(asset.DeputyAddress)) != sdk.AddrLen {
+		depAddr, err := sdk.AccAddressFromBech32(asset.DeputyAddress)
+		if err != nil {
+			return err
+		}
+		if len(depAddr.Bytes()) != sdk.AddrLen {
 			return fmt.Errorf("%s deputy address invalid bytes length got %d, want %d", asset.Denom, len([]byte(asset.DeputyAddress)), sdk.AddrLen)
 		}
 

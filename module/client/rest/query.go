@@ -211,9 +211,7 @@ func queryAssetSuppliesHandlerFn(cliCtx client.Context) http.HandlerFunc {
 
 		// using empty slice so json returns [] instead of null when there's no swaps
 		sliceSupplies := types.AssetSupplies{}
-		for _, s := range supplies {
-			sliceSupplies = append(sliceSupplies, s)
-		}
+		sliceSupplies = append(sliceSupplies, supplies...)
 		rest.PostProcessResponse(w, cliCtx, cliCtx.LegacyAmino.MustMarshalJSON(sliceSupplies))
 	}
 }

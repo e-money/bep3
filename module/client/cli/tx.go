@@ -44,7 +44,9 @@ func GetCmdCreateAtomicSwap() *cobra.Command {
 			version.AppName, types.ModuleName),
 		Args: cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmd.Flags().Set(flags.FlagFrom, args[0])
+			if err := cmd.Flags().Set(flags.FlagFrom, args[0]); err != nil {
+				return err
+			}
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
