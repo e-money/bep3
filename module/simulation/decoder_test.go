@@ -10,14 +10,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/types"
-	"github.com/e-money/bep3/testapp"
 	"github.com/stretchr/testify/require"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
 
 func makeTestCodec() (cdc *codec.LegacyAmino) {
-	encConfig := testapp.GetAminoEncodingConfig()
+	encConfig := bep3.MakeAminoEncodingConfig()
 	cryptocodec.RegisterCrypto(encConfig.Amino)
 	legacytx.RegisterLegacyAminoCodec(cdc)
 
