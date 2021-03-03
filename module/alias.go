@@ -67,7 +67,6 @@ var (
 	NewKeeper                  = keeper.NewKeeper
 	NewQuerier                 = keeper.NewQuerier
 	NewAssetSupply             = types.NewAssetSupply
-	RegisterCodec              = types.RegisterCodec
 	NewGenesisState            = types.NewGenesisState
 	DefaultGenesisState        = types.DefaultGenesisState
 	GenerateSecureRandomNumber = types.GenerateSecureRandomNumber

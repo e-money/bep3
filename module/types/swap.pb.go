@@ -5,23 +5,20 @@ package types
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
-	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
+	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_tendermint_tendermint_libs_bytes "github.com/tendermint/tendermint/libs/bytes"
+	io "io"
+	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = proto.Marshal
-	_ = fmt.Errorf
-	_ = math.Inf
-)
+var _ = proto.Marshal
+var _ = fmt.Errorf
+var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -50,11 +47,9 @@ func (*AtomicSwap) ProtoMessage() {}
 func (*AtomicSwap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_576398e36903b242, []int{0}
 }
-
 func (m *AtomicSwap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *AtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_AtomicSwap.Marshal(b, m, deterministic)
@@ -67,15 +62,12 @@ func (m *AtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *AtomicSwap) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_AtomicSwap.Merge(m, src)
 }
-
 func (m *AtomicSwap) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *AtomicSwap) XXX_DiscardUnknown() {
 	xxx_messageInfo_AtomicSwap.DiscardUnknown(m)
 }
@@ -189,11 +181,9 @@ func (*AugmentedAtomicSwap) ProtoMessage()    {}
 func (*AugmentedAtomicSwap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_576398e36903b242, []int{1}
 }
-
 func (m *AugmentedAtomicSwap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *AugmentedAtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_AugmentedAtomicSwap.Marshal(b, m, deterministic)
@@ -206,15 +196,12 @@ func (m *AugmentedAtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-
 func (m *AugmentedAtomicSwap) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_AugmentedAtomicSwap.Merge(m, src)
 }
-
 func (m *AugmentedAtomicSwap) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *AugmentedAtomicSwap) XXX_DiscardUnknown() {
 	xxx_messageInfo_AugmentedAtomicSwap.DiscardUnknown(m)
 }
@@ -329,11 +316,9 @@ func (*MsgCreateAtomicSwap) ProtoMessage() {}
 func (*MsgCreateAtomicSwap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_576398e36903b242, []int{2}
 }
-
 func (m *MsgCreateAtomicSwap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *MsgCreateAtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MsgCreateAtomicSwap.Marshal(b, m, deterministic)
@@ -346,15 +331,12 @@ func (m *MsgCreateAtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-
 func (m *MsgCreateAtomicSwap) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MsgCreateAtomicSwap.Merge(m, src)
 }
-
 func (m *MsgCreateAtomicSwap) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *MsgCreateAtomicSwap) XXX_DiscardUnknown() {
 	xxx_messageInfo_MsgCreateAtomicSwap.DiscardUnknown(m)
 }
@@ -429,11 +411,9 @@ func (*MsgClaimAtomicSwap) ProtoMessage() {}
 func (*MsgClaimAtomicSwap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_576398e36903b242, []int{3}
 }
-
 func (m *MsgClaimAtomicSwap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *MsgClaimAtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MsgClaimAtomicSwap.Marshal(b, m, deterministic)
@@ -446,15 +426,12 @@ func (m *MsgClaimAtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-
 func (m *MsgClaimAtomicSwap) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MsgClaimAtomicSwap.Merge(m, src)
 }
-
 func (m *MsgClaimAtomicSwap) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *MsgClaimAtomicSwap) XXX_DiscardUnknown() {
 	xxx_messageInfo_MsgClaimAtomicSwap.DiscardUnknown(m)
 }
@@ -493,11 +470,9 @@ func (*MsgRefundAtomicSwap) ProtoMessage() {}
 func (*MsgRefundAtomicSwap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_576398e36903b242, []int{4}
 }
-
 func (m *MsgRefundAtomicSwap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *MsgRefundAtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_MsgRefundAtomicSwap.Marshal(b, m, deterministic)
@@ -510,15 +485,12 @@ func (m *MsgRefundAtomicSwap) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-
 func (m *MsgRefundAtomicSwap) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MsgRefundAtomicSwap.Merge(m, src)
 }
-
 func (m *MsgRefundAtomicSwap) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *MsgRefundAtomicSwap) XXX_DiscardUnknown() {
 	xxx_messageInfo_MsgRefundAtomicSwap.DiscardUnknown(m)
 }
@@ -1004,7 +976,6 @@ func encodeVarintSwap(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *AtomicSwap) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1197,11 +1168,9 @@ func (m *MsgRefundAtomicSwap) Size() (n int) {
 func sovSwap(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-
 func sozSwap(x uint64) (n int) {
 	return sovSwap(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-
 func (m *AtomicSwap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1563,7 +1532,6 @@ func (m *AtomicSwap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *AugmentedAtomicSwap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1957,7 +1925,6 @@ func (m *AugmentedAtomicSwap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *MsgCreateAtomicSwap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2242,7 +2209,6 @@ func (m *MsgCreateAtomicSwap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *MsgClaimAtomicSwap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2393,7 +2359,6 @@ func (m *MsgClaimAtomicSwap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *MsgRefundAtomicSwap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -2510,7 +2475,6 @@ func (m *MsgRefundAtomicSwap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipSwap(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

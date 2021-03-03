@@ -59,7 +59,11 @@ func (k Keeper) GetDeputyAddress(ctx sdk.Context, denom string) (sdk.AccAddress,
 	if err != nil {
 		return sdk.AccAddress{}, err
 	}
-	return asset.DeputyAddress, nil
+	depAddr, err := sdk.AccAddressFromBech32(asset.DeputyAddress)
+	if err != nil {
+		return sdk.AccAddress{}, err
+	}
+	return depAddr, nil
 }
 
 // GetFixedFee returns the fixed fee for incoming swaps

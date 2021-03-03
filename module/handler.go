@@ -3,6 +3,7 @@ package bep3
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/e-money/bep3/module/types"
 )
 
 // NewHandler creates an sdk.Handler for all the bep3 type messages
@@ -10,11 +11,11 @@ func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-		case MsgCreateAtomicSwap:
+		case *MsgCreateAtomicSwap:
 			return handleMsgCreateAtomicSwap(ctx, k, msg)
-		case MsgClaimAtomicSwap:
+		case *MsgClaimAtomicSwap:
 			return handleMsgClaimAtomicSwap(ctx, k, msg)
-		case MsgRefundAtomicSwap:
+		case *MsgRefundAtomicSwap:
 			return handleMsgRefundAtomicSwap(ctx, k, msg)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", ModuleName, msg)
@@ -23,9 +24,21 @@ func NewHandler(k Keeper) sdk.Handler {
 }
 
 // handleMsgCreateAtomicSwap handles requests to create a new AtomicSwap
-func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg MsgCreateAtomicSwap) (*sdk.Result, error) {
+func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgCreateAtomicSwap) (*sdk.Result, error) {
+	from, errBech := sdk.AccAddressFromBech32(msg.From)
+	if errBech != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgCreateAtomicSwap from:%s, error:%w",
+			msg.From, errBech)
+	}
+
+	to, errBech := sdk.AccAddressFromBech32(msg.To)
+	if errBech != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgCreateAtomicSwap to:%s, error:%w",
+			msg.From, errBech)
+	}
+
 	err := k.CreateAtomicSwap(ctx, msg.RandomNumberHash, msg.Timestamp, msg.TimeSpan,
-		msg.From, msg.To, msg.SenderOtherChain, msg.RecipientOtherChain, msg.Amount, true)
+		from, to, msg.SenderOtherChain, msg.RecipientOtherChain, msg.Amount, true)
 	if err != nil {
 		return nil, err
 	}
@@ -34,18 +47,24 @@ func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg MsgCreateAtomicSwa
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.From.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.From),
 		),
 	)
 
 	return &sdk.Result{
-		Events: ctx.EventManager().Events(),
+		Events: ctx.EventManager().ABCIEvents(),
 	}, nil
 }
 
 // handleMsgClaimAtomicSwap handles requests to claim funds in an active AtomicSwap
-func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg MsgClaimAtomicSwap) (*sdk.Result, error) {
-	err := k.ClaimAtomicSwap(ctx, msg.From, msg.SwapID, msg.RandomNumber)
+func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgClaimAtomicSwap) (*sdk.Result, error) {
+	from, errBech := sdk.AccAddressFromBech32(msg.From)
+	if errBech != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgClaimAtomicSwap from:%s, error:%w",
+			msg.From, errBech)
+	}
+
+	err := k.ClaimAtomicSwap(ctx, from, msg.SwapID, msg.RandomNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -54,18 +73,24 @@ func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg MsgClaimAtomicSwap)
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.From.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.From),
 		),
 	)
 
 	return &sdk.Result{
-		Events: ctx.EventManager().Events(),
+		Events: ctx.EventManager().ABCIEvents(),
 	}, nil
 }
 
 // handleMsgRefundAtomicSwap handles requests to refund an active AtomicSwap
-func handleMsgRefundAtomicSwap(ctx sdk.Context, k Keeper, msg MsgRefundAtomicSwap) (*sdk.Result, error) {
-	err := k.RefundAtomicSwap(ctx, msg.From, msg.SwapID)
+func handleMsgRefundAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgRefundAtomicSwap) (*sdk.Result, error) {
+	from, errBech := sdk.AccAddressFromBech32(msg.From)
+	if errBech != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgRefundAtomicSwap from:%s, error:%w",
+			msg.From, errBech)
+	}
+
+	err := k.RefundAtomicSwap(ctx, from, msg.SwapID)
 	if err != nil {
 		return nil, err
 	}
@@ -74,11 +99,11 @@ func handleMsgRefundAtomicSwap(ctx sdk.Context, k Keeper, msg MsgRefundAtomicSwa
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.From.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.From),
 		),
 	)
 
 	return &sdk.Result{
-		Events: ctx.EventManager().Events(),
+		Events: ctx.EventManager().ABCIEvents(),
 	}, nil
 }

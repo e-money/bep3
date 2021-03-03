@@ -5,11 +5,6 @@ package types
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-	time "time"
-
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
@@ -17,15 +12,17 @@ import (
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	_ "github.com/golang/protobuf/ptypes/duration"
 	_ "github.com/golang/protobuf/ptypes/timestamp"
+	io "io"
+	math "math"
+	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = proto.Marshal
-	_ = fmt.Errorf
-	_ = math.Inf
-	_ = time.Kitchen
-)
+var _ = proto.Marshal
+var _ = fmt.Errorf
+var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -50,11 +47,9 @@ func (*SupplyLimit) ProtoMessage() {}
 func (*SupplyLimit) Descriptor() ([]byte, []int) {
 	return fileDescriptor_dd4db49772fc257b, []int{0}
 }
-
 func (m *SupplyLimit) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *SupplyLimit) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_SupplyLimit.Marshal(b, m, deterministic)
@@ -67,15 +62,12 @@ func (m *SupplyLimit) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-
 func (m *SupplyLimit) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_SupplyLimit.Merge(m, src)
 }
-
 func (m *SupplyLimit) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *SupplyLimit) XXX_DiscardUnknown() {
 	xxx_messageInfo_SupplyLimit.DiscardUnknown(m)
 }
@@ -127,11 +119,9 @@ func (*AssetParam) ProtoMessage() {}
 func (*AssetParam) Descriptor() ([]byte, []int) {
 	return fileDescriptor_dd4db49772fc257b, []int{1}
 }
-
 func (m *AssetParam) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *AssetParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_AssetParam.Marshal(b, m, deterministic)
@@ -144,15 +134,12 @@ func (m *AssetParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *AssetParam) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_AssetParam.Merge(m, src)
 }
-
 func (m *AssetParam) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *AssetParam) XXX_DiscardUnknown() {
 	xxx_messageInfo_AssetParam.DiscardUnknown(m)
 }
@@ -218,11 +205,9 @@ func (*Params) ProtoMessage() {}
 func (*Params) Descriptor() ([]byte, []int) {
 	return fileDescriptor_dd4db49772fc257b, []int{2}
 }
-
 func (m *Params) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Params) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Params.Marshal(b, m, deterministic)
@@ -235,15 +220,12 @@ func (m *Params) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *Params) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Params.Merge(m, src)
 }
-
 func (m *Params) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Params) XXX_DiscardUnknown() {
 	xxx_messageInfo_Params.DiscardUnknown(m)
 }
@@ -271,11 +253,9 @@ func (*AssetSupply) ProtoMessage() {}
 func (*AssetSupply) Descriptor() ([]byte, []int) {
 	return fileDescriptor_dd4db49772fc257b, []int{3}
 }
-
 func (m *AssetSupply) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *AssetSupply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_AssetSupply.Marshal(b, m, deterministic)
@@ -288,15 +268,12 @@ func (m *AssetSupply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-
 func (m *AssetSupply) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_AssetSupply.Merge(m, src)
 }
-
 func (m *AssetSupply) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *AssetSupply) XXX_DiscardUnknown() {
 	xxx_messageInfo_AssetSupply.DiscardUnknown(m)
 }
@@ -338,7 +315,7 @@ func (m *AssetSupply) GetTimeElapsed() time.Duration {
 	return 0
 }
 
-// type GenesisState struct {
+//type GenesisState struct {
 type GenesisState struct {
 	Params            Params        `protobuf:"bytes,1,opt,name=params,proto3" json:"params" yaml:"params"`
 	AtomicSwaps       []AtomicSwap  `protobuf:"bytes,2,rep,name=atomic_swaps,json=atomicSwaps,proto3" json:"atomic_swaps" yaml:"atomic_swaps"`
@@ -352,11 +329,9 @@ func (*GenesisState) ProtoMessage()    {}
 func (*GenesisState) Descriptor() ([]byte, []int) {
 	return fileDescriptor_dd4db49772fc257b, []int{4}
 }
-
 func (m *GenesisState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *GenesisState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_GenesisState.Marshal(b, m, deterministic)
@@ -369,15 +344,12 @@ func (m *GenesisState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-
 func (m *GenesisState) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_GenesisState.Merge(m, src)
 }
-
 func (m *GenesisState) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *GenesisState) XXX_DiscardUnknown() {
 	xxx_messageInfo_GenesisState.DiscardUnknown(m)
 }
@@ -841,7 +813,6 @@ func encodeVarintGenesis(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *SupplyLimit) Size() (n int) {
 	if m == nil {
 		return 0
@@ -959,11 +930,9 @@ func (m *GenesisState) Size() (n int) {
 func sovGenesis(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-
 func sozGenesis(x uint64) (n int) {
 	return sovGenesis(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-
 func (m *SupplyLimit) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1135,7 +1104,6 @@ func (m *SupplyLimit) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *AssetParam) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1462,7 +1430,6 @@ func (m *AssetParam) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *Params) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1547,7 +1514,6 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *AssetSupply) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1763,7 +1729,6 @@ func (m *AssetSupply) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *GenesisState) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1948,7 +1913,6 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipGenesis(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

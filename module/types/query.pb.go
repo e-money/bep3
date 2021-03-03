@@ -5,21 +5,18 @@ package types
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_tendermint_tendermint_libs_bytes "github.com/tendermint/tendermint/libs/bytes"
+	io "io"
+	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = proto.Marshal
-	_ = fmt.Errorf
-	_ = math.Inf
-)
+var _ = proto.Marshal
+var _ = fmt.Errorf
+var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -38,11 +35,9 @@ func (*QueryAssetSupply) ProtoMessage()    {}
 func (*QueryAssetSupply) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f793549314fa9524, []int{0}
 }
-
 func (m *QueryAssetSupply) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryAssetSupply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryAssetSupply.Marshal(b, m, deterministic)
@@ -55,15 +50,12 @@ func (m *QueryAssetSupply) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-
 func (m *QueryAssetSupply) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryAssetSupply.Merge(m, src)
 }
-
 func (m *QueryAssetSupply) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryAssetSupply) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryAssetSupply.DiscardUnknown(m)
 }
@@ -88,11 +80,9 @@ func (*QueryAtomicSwapByID) ProtoMessage()    {}
 func (*QueryAtomicSwapByID) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f793549314fa9524, []int{1}
 }
-
 func (m *QueryAtomicSwapByID) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryAtomicSwapByID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryAtomicSwapByID.Marshal(b, m, deterministic)
@@ -105,15 +95,12 @@ func (m *QueryAtomicSwapByID) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-
 func (m *QueryAtomicSwapByID) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryAtomicSwapByID.Merge(m, src)
 }
-
 func (m *QueryAtomicSwapByID) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryAtomicSwapByID) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryAtomicSwapByID.DiscardUnknown(m)
 }
@@ -143,11 +130,9 @@ func (*QueryAtomicSwaps) ProtoMessage()    {}
 func (*QueryAtomicSwaps) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f793549314fa9524, []int{2}
 }
-
 func (m *QueryAtomicSwaps) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryAtomicSwaps) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryAtomicSwaps.Marshal(b, m, deterministic)
@@ -160,15 +145,12 @@ func (m *QueryAtomicSwaps) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-
 func (m *QueryAtomicSwaps) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryAtomicSwaps.Merge(m, src)
 }
-
 func (m *QueryAtomicSwaps) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryAtomicSwaps) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryAtomicSwaps.DiscardUnknown(m)
 }
@@ -383,7 +365,6 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *QueryAssetSupply) Size() (n int) {
 	if m == nil {
 		return 0
@@ -441,11 +422,9 @@ func (m *QueryAtomicSwaps) Size() (n int) {
 func sovQuery(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-
 func (m *QueryAssetSupply) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -528,7 +507,6 @@ func (m *QueryAssetSupply) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *QueryAtomicSwapByID) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -613,7 +591,6 @@ func (m *QueryAtomicSwapByID) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *QueryAtomicSwaps) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -791,7 +768,6 @@ func (m *QueryAtomicSwaps) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipQuery(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

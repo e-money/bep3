@@ -127,19 +127,6 @@ func (AppModule) QuerierRoute() string {
 	return QuerierRoute
 }
 
-//func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
-//	var genesisState types.GenesisState
-//	cdc.MustUnmarshalJSON(data, &genesisState)
-//
-//	InitGenesis(ctx, am.keeper, genesisState)
-//	return []abci.ValidatorUpdate{}
-//}
-
-//func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
-//	gs := ExportGenesis(ctx, am.keeper)
-//	return cdc.MustMarshalJSON(&gs)
-//}
-
 func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return keeper.NewQuerier(am.keeper)
 }
@@ -154,7 +141,7 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState GenesisState
 	cdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, am.bankKeeper, genesisState)
+	InitGenesis(ctx, am.keeper, am.accountKeeper, genesisState)
 	return []abci.ValidatorUpdate{}
 }
 
