@@ -19,6 +19,7 @@
     - [SupplyLimit](#bep3.SupplyLimit)
   
 - [bep3/query.proto](#bep3/query.proto)
+    - [QueryAssetSupplies](#bep3.QueryAssetSupplies)
     - [QueryAssetSupply](#bep3.QueryAssetSupply)
     - [QueryAtomicSwapByID](#bep3.QueryAtomicSwapByID)
     - [QueryAtomicSwaps](#bep3.QueryAtomicSwaps)
@@ -265,6 +266,26 @@ SupplyLimit parameters that control the absolute and time-based limits for an as
 <p align="right"><a href="#top">Top</a></p>
 
 ## bep3/query.proto
+
+
+
+<a name="bep3.QueryAssetSupplies"></a>
+
+### QueryAssetSupplies
+QueryAssetSupplies contains the params for an AssetSupplies query
+type QueryAssetSupplies struct {
+Page  int `json:"page" yaml:"page"`
+Limit int `json:"limit" yaml:"limit"`
+}
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `page` | [int64](#int64) |  |  |
+| `limit` | [int64](#int64) |  |  |
+
+
+
 
 
 

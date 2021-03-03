@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -31,18 +32,20 @@ type QuerierTestSuite struct {
 }
 
 func (suite *QuerierTestSuite) SetupTest() {
-	ctx, bep3Keeper, accountKeeper, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, accountKeeper, bankKeeper, appModule := app.CreateTestComponents(suite.T())
 
 	_, addrs := app.GeneratePrivKeyAddressPairs(11)
 	coins := cs(c("bnb", 10000000000), c("ukava", 10000000000))
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		account.SetCoins(coins)
+		if err := bankKeeper.SetBalances(ctx, addr, coins); err != nil {
+			panic(err)
+		}
 		accountKeeper.SetAccount(ctx, account)
 	}
 
-	appModule.InitGenesis(ctx, NewBep3GenState(addrs[10]))
+	appModule.InitGenesis(ctx, jsonMarshaller, NewBep3GenState(addrs[10]))
 
 	suite.ctx = ctx
 	suite.keeper = bep3Keeper
@@ -75,13 +78,14 @@ func (suite *QuerierTestSuite) SetupTest() {
 }
 
 func (suite *QuerierTestSuite) TestQueryAssetSupply() {
+	const denom = "bnb"
 	ctx := suite.ctx.WithIsCheckTx(false)
 
 	// Set up request query
-	denom := "bnb"
+	qAssetSupply := types.NewQueryAssetSupply(denom)
 	query := abci.RequestQuery{
 		Path: strings.Join([]string{custom, types.QuerierRoute, types.QueryGetAssetSupply}, "/"),
-		Data: types.ModuleCdc.MustMarshalJSON(types.NewQueryAssetSupply(denom)),
+		Data: types.ModuleCdc.MustMarshalJSON(&qAssetSupply),
 	}
 
 	// Execute query and check the []byte result
@@ -102,9 +106,10 @@ func (suite *QuerierTestSuite) TestQueryAtomicSwap() {
 	ctx := suite.ctx.WithIsCheckTx(false)
 
 	// Set up request query
+	qSwapByID := types.NewQueryAtomicSwapByID(suite.swapIDs[0])
 	query := abci.RequestQuery{
 		Path: strings.Join([]string{custom, types.QuerierRoute, types.QueryGetAtomicSwap}, "/"),
-		Data: types.ModuleCdc.MustMarshalJSON(types.NewQueryAtomicSwapByID(suite.swapIDs[0])),
+		Data: types.ModuleCdc.MustMarshalJSON(&qSwapByID),
 	}
 
 	// Execute query and check the []byte result
@@ -123,9 +128,10 @@ func (suite *QuerierTestSuite) TestQueryAtomicSwap() {
 func (suite *QuerierTestSuite) TestQueryAssetSupplies() {
 	ctx := suite.ctx.WithIsCheckTx(false)
 	// Set up request query
+	qAssetSupplies := types.NewQueryAssetSupplies(1, 100)
 	query := abci.RequestQuery{
 		Path: strings.Join([]string{custom, types.QuerierRoute, types.QueryGetAssetSupplies}, "/"),
-		Data: types.ModuleCdc.MustMarshalJSON(types.NewQueryAssetSupplies(1, 100)),
+		Data: types.ModuleCdc.MustMarshalJSON(&qAssetSupplies),
 	}
 
 	bz, err := suite.querier(ctx, []string{types.QueryGetAssetSupplies}, query)
@@ -133,7 +139,7 @@ func (suite *QuerierTestSuite) TestQueryAssetSupplies() {
 	suite.NotNil(bz)
 
 	var supplies types.AssetSupplies
-	suite.Nil(types.ModuleCdc.UnmarshalJSON(bz, &supplies))
+	suite.Nil(json.Unmarshal(bz, &supplies))
 
 	// Check that returned value matches asset supplies in state
 	storeSupplies := suite.keeper.GetAllAssetSupplies(ctx)
@@ -144,9 +150,10 @@ func (suite *QuerierTestSuite) TestQueryAssetSupplies() {
 func (suite *QuerierTestSuite) TestQueryAtomicSwaps() {
 	ctx := suite.ctx.WithIsCheckTx(false)
 	// Set up request query
+	qSwaps := types.NewQueryAtomicSwaps(1, 100, sdk.AccAddress{}, 0, types.Open, types.Incoming)
 	query := abci.RequestQuery{
 		Path: strings.Join([]string{custom, types.QuerierRoute, types.QueryGetAtomicSwaps}, "/"),
-		Data: types.ModuleCdc.MustMarshalJSON(types.NewQueryAtomicSwaps(1, 100, sdk.AccAddress{}, 0, types.Open, types.Incoming)),
+		Data: types.ModuleCdc.MustMarshalJSON(&qSwaps),
 	}
 
 	bz, err := suite.querier(ctx, []string{types.QueryGetAtomicSwaps}, query)
@@ -154,7 +161,7 @@ func (suite *QuerierTestSuite) TestQueryAtomicSwaps() {
 	suite.NotNil(bz)
 
 	var swaps types.AugmentedAtomicSwaps
-	suite.Nil(types.ModuleCdc.UnmarshalJSON(bz, &swaps))
+	suite.Nil(json.Unmarshal(bz, &swaps))
 
 	suite.Equal(len(suite.swapIDs), len(swaps))
 	for _, swap := range swaps {

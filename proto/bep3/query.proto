@@ -29,6 +29,24 @@ message QueryAtomicSwapByID {
 }
 
 /*
+// QueryAssetSupplies contains the params for an AssetSupplies query
+type QueryAssetSupplies struct {
+	Page  int `json:"page" yaml:"page"`
+	Limit int `json:"limit" yaml:"limit"`
+}
+ */
+message QueryAssetSupplies {
+  int64 page = 1 [
+    (gogoproto.moretags) = "yaml:\"page\"",
+    (gogoproto.casttype) = "int"
+  ];
+  int64 limit = 2 [
+    (gogoproto.moretags) = "yaml:\"limit\"",
+    (gogoproto.casttype) = "int"
+  ];
+}
+
+/*
 type QueryAtomicSwaps struct {
 	Page       int            `json:"page" yaml:"page"`
 	Limit      int            `json:"limit" yaml:"limit"`

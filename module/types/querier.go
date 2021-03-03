@@ -25,12 +25,6 @@ func NewQueryAssetSupply(denom string) QueryAssetSupply {
 	}
 }
 
-// QueryAssetSupplies contains the params for an AssetSupplies query
-type QueryAssetSupplies struct {
-	Page  int `json:"page" yaml:"page"`
-	Limit int `json:"limit" yaml:"limit"`
-}
-
 // NewQueryAssetSupplies creates a new QueryAssetSupplies
 func NewQueryAssetSupplies(page int, limit int) QueryAssetSupplies {
 	return QueryAssetSupplies{

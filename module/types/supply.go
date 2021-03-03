@@ -47,11 +47,11 @@ func (a AssetSupply) Equal(b AssetSupply) bool {
 	if a.GetDenom() != b.GetDenom() {
 		return false
 	}
-	return (a.IncomingSupply.IsEqual(b.IncomingSupply) &&
+	return a.IncomingSupply.IsEqual(b.IncomingSupply) &&
 		a.CurrentSupply.IsEqual(b.CurrentSupply) &&
 		a.OutgoingSupply.IsEqual(b.OutgoingSupply) &&
 		a.TimeLimitedCurrentSupply.IsEqual(b.TimeLimitedCurrentSupply) &&
-		a.TimeElapsed == b.TimeElapsed)
+		a.TimeElapsed == b.TimeElapsed
 }
 
 // String implements stringer
