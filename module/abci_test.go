@@ -22,7 +22,7 @@ type ABCITestSuite struct {
 }
 
 func (suite *ABCITestSuite) SetupTest() {
-	ctx, bep3Keeper, accountKeeper, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, accountKeeper, bankKeeper, appModule := app.CreateTestComponents(suite.T())
 
 	// Set up auth GenesisState
 	_, addrs := app.GeneratePrivKeyAddressPairs(12)
@@ -30,18 +30,26 @@ func (suite *ABCITestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		if err := account.SetCoins(coins); err != nil {
+		if err := bankKeeper.SetBalances(ctx, addr, coins); err != nil {
 			panic(err)
 		}
 		accountKeeper.SetAccount(ctx, account)
 	}
 
-	appModule.InitGenesis(ctx, NewBep3GenState(addrs[11]))
+	appModule.InitGenesis(ctx, jsonMarshaller, NewBep3GenState(addrs[11]))
 
 	suite.ctx = ctx
 	suite.addrs = addrs
 	suite.keeper = bep3Keeper
 	suite.ResetKeeper()
+}
+
+func coins(s string) sdk.Coins {
+	coins, err := sdk.ParseCoinsNormalized(s)
+	if err != nil {
+		panic(err)
+	}
+	return coins
 }
 
 func (suite *ABCITestSuite) ResetKeeper() {
