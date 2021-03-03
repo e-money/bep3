@@ -150,7 +150,7 @@ func (k Keeper) ClaimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []b
 
 	swapSender, errBech := sdk.AccAddressFromBech32(atomicSwap.Sender)
 	if errBech != nil {
-		return sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "ClaimSwap sender:%s, error:%w",
+		return sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "ClaimSwap sender:%s, error:%s",
 			atomicSwap.Sender, errBech)
 	}
 
@@ -181,7 +181,7 @@ func (k Keeper) ClaimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []b
 		// Send intended recipient coins
 		swapRecipient, errBech := sdk.AccAddressFromBech32(atomicSwap.Recipient)
 		if errBech != nil {
-			return sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "ClaimSwap sender:%s, error:%w", atomicSwap.Recipient, errBech)
+			return sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "ClaimSwap sender:%s, error:%s", atomicSwap.Recipient, errBech)
 		}
 
 		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, swapRecipient, atomicSwap.Amount)
@@ -254,7 +254,7 @@ func (k Keeper) RefundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []
 		// Refund coins to original swap sender for outgoing swaps
 		swapSender, errBech := sdk.AccAddressFromBech32(atomicSwap.Sender)
 		if errBech != nil {
-			return sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "RefundSwap sender:%s, error:%w",
+			return sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "RefundSwap sender:%s, error:%s",
 				atomicSwap.Sender, errBech)
 		}
 

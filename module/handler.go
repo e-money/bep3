@@ -27,13 +27,13 @@ func NewHandler(k Keeper) sdk.Handler {
 func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgCreateAtomicSwap) (*sdk.Result, error) {
 	from, errBech := sdk.AccAddressFromBech32(msg.From)
 	if errBech != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgCreateAtomicSwap from:%s, error:%w",
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgCreateAtomicSwap from:%s, error:%s",
 			msg.From, errBech)
 	}
 
 	to, errBech := sdk.AccAddressFromBech32(msg.To)
 	if errBech != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgCreateAtomicSwap to:%s, error:%w",
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgCreateAtomicSwap to:%s, error:%s",
 			msg.From, errBech)
 	}
 
@@ -60,7 +60,7 @@ func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgCreateAtomicSw
 func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgClaimAtomicSwap) (*sdk.Result, error) {
 	from, errBech := sdk.AccAddressFromBech32(msg.From)
 	if errBech != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgClaimAtomicSwap from:%s, error:%w",
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgClaimAtomicSwap from:%s, error:%s",
 			msg.From, errBech)
 	}
 
@@ -86,7 +86,7 @@ func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgClaimAtomicSwap
 func handleMsgRefundAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgRefundAtomicSwap) (*sdk.Result, error) {
 	from, errBech := sdk.AccAddressFromBech32(msg.From)
 	if errBech != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgRefundAtomicSwap from:%s, error:%w",
+		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgRefundAtomicSwap from:%s, error:%s",
 			msg.From, errBech)
 	}
 
