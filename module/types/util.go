@@ -1,22 +1,12 @@
-package simulation
+package types
 
 import (
-	"encoding/json"
 	"fmt"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/gogo/protobuf/proto"
 )
-
-func mustMarshalJSONIndent(o interface{}) []byte {
-	bz, err := json.MarshalIndent(o, "", "  ")
-	if err != nil {
-		panic(fmt.Sprintf("failed to JSON encode: %s", err))
-	}
-
-	return bz
-}
 
 // UnpackAccounts converts Any slice to GenesisAccounts
 func UnpackAccounts(accountsAny []*codectypes.Any) (authtypes.GenesisAccounts, error) {

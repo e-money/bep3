@@ -61,7 +61,7 @@ func TestDecodeBep3Store(t *testing.T) {
 		{"other", ""},
 	}
 
-	decodeStore := NewDecodeStore(cdc)
+	decodeStore := bep3.NewDecodeStore(cdc)
 
 	for i, tt := range tests {
 		i, tt := i, tt

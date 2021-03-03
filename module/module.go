@@ -10,10 +10,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	sdksim "github.com/cosmos/cosmos-sdk/types/simulation"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/e-money/bep3/module/client/cli"
 	"github.com/e-money/bep3/module/client/rest"
 	"github.com/e-money/bep3/module/keeper"
-	"github.com/e-money/bep3/module/simulation"
 	bep3types "github.com/e-money/bep3/module/types"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -164,11 +164,16 @@ func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.Valid
 	return []abci.ValidatorUpdate{}
 }
 
+// WeightedOperations returns the all the bep3 module operations with their respective weights.
+func (am AppModule) WeightedOperations(simState module.SimulationState) []sdksim.WeightedOperation {
+	return WeightedOperations(simState.AppParams, simState.Cdc, am.accountKeeper, am.bankKeeper, am.keeper)
+}
+
 //____________________________________________________________________________
 
 // GenerateGenesisState creates a randomized GenState of the bep3 module
 func (AppModuleBasic) GenerateGenesisState(simState *module.SimulationState) {
-	simulation.RandomizedGenState(simState)
+	RandomizedGenState(simState)
 }
 
 // ProposalContents doesn't return any content functions for governance proposals.
@@ -176,17 +181,12 @@ func (AppModuleBasic) ProposalContents(_ module.SimulationState) []sdksim.Weight
 	return nil
 }
 
-// RandomizedParams returns nil because bep3 has no params.
-func (AppModuleBasic) RandomizedParams(r *rand.Rand) []sdksim.ParamChange {
-	return simulation.ParamChanges(r)
-}
-
 // RegisterStoreDecoder registers a decoder for bep3 module's types
 func (ab AppModuleBasic) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
-	sdr[StoreKey] = simulation.NewDecodeStore(ab.cdc)
+	sdr[StoreKey] = NewDecodeStore(ab.cdc)
 }
 
-// WeightedOperations returns the all the bep3 module operations with their respective weights.
-func (am AppModule) WeightedOperations(simState module.SimulationState) []sdksim.WeightedOperation {
-	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, am.accountKeeper, am.bankKeeper, am.keeper)
+// RandomizedParams returns nil because bep3 has no params.
+func (AppModuleBasic) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
+	return ParamChanges(r)
 }

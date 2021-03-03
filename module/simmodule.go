@@ -1,8 +1,11 @@
-package simulation
+package bep3
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -10,30 +13,211 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/kv"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/cosmos/cosmos-sdk/x/simulation"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	simmod "github.com/cosmos/cosmos-sdk/x/simulation"
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
+	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+)
+
+const (
+	keyAssetParams = "AssetParams"
+	// Simulation operation weights constants
+	OpWeightMsgCreateAtomicSwap = "op_weight_msg_create_atomic_swap"
 )
 
 var (
-	noOpMsg      = simtypes.NoOpMsg(types.ModuleName, "NoOpMsg", "")
-	randomNumber = []byte{114, 21, 74, 180, 81, 92, 21, 91, 173, 164, 143, 111, 120, 58, 241, 58, 40, 22, 59, 133, 102, 233, 55, 149, 12, 199, 231, 63, 122, 23, 88, 9}
+	noOpMsg            = simtypes.NoOpMsg(types.ModuleName, "NoOpMsg", "")
+	randomNumber       = []byte{114, 21, 74, 180, 81, 92, 21, 91, 173, 164, 143, 111, 120, 58, 241, 58, 40, 22, 59, 133, 102, 233, 55, 149, 12, 199, 231, 63, 122, 23, 88, 9}
+	ConsistentDenoms   = [3]string{"bnb", "xrp", "btc"}
+	MaxSupplyLimit     = 1000000000000
+	MinSupplyLimit     = 100000000
+	MinSwapAmountLimit = 999
+	accs               []simtypes.Account
+	MinBlockLock       = uint64(5)
 )
 
-// Simulation operation weights constants
-const (
-	OpWeightMsgCreateAtomicSwap = "op_weight_msg_create_atomic_swap"
-)
+func mustMarshalJSONIndent(o interface{}) []byte {
+	bz, err := json.MarshalIndent(o, "", "  ")
+	if err != nil {
+		panic(fmt.Sprintf("failed to JSON encode: %s", err))
+	}
+
+	return bz
+}
+
+// RandomizedGenState generates a random GenesisState
+// https://github.com/cosmos/cosmos-sdk/blob/1c6e2679641d0892a3f35d778d7c2316a2937a7c/x/bank/simulation/genesis.go#L54
+func RandomizedGenState(simState *module.SimulationState) {
+	accs = simState.Accounts
+
+	bep3Genesis := loadRandomBep3GenState(simState)
+	fmt.Printf("Selected randomly generated %s parameters:\n%s\n", types.ModuleName,
+		mustMarshalJSONIndent(bep3Genesis))
+	simState.GenState[types.ModuleName] = mustMarshalJSONIndent(bep3Genesis)
+
+	// Update bank supply to match amount of coins in auth
+	bankGenesis, totalCoins := loadBankGenState(simState, bep3Genesis)
+
+	for _, deputyCoin := range totalCoins {
+		bankGenesis.Supply = bankGenesis.Supply.Add(deputyCoin...)
+	}
+
+	simState.GenState[banktypes.ModuleName] = mustMarshalJSONIndent(bankGenesis)
+}
+
+func loadBankGenState(simState *module.SimulationState, bep3Genesis types.GenesisState) (banktypes.GenesisState, []sdk.Coins) {
+	var bankGenesis banktypes.GenesisState
+	simState.Cdc.MustUnmarshalJSON(simState.GenState[banktypes.ModuleName], &bankGenesis)
+
+	var (
+		totalCoins      []sdk.Coins
+		genesisBalances = []banktypes.Balance{}
+	)
+
+	// Load total limit of each supported asset to deputy's account
+	for _, asset := range bep3Genesis.Params.AssetParams {
+
+		assetCoin := sdk.NewCoins(sdk.NewCoin(asset.Denom, asset.SupplyLimit.Limit))
+		genesisBalances = append(genesisBalances, banktypes.Balance{
+			Address: asset.DeputyAddress,
+			Coins:   assetCoin,
+		})
+
+		totalCoins = append(totalCoins, assetCoin)
+	}
+
+	bankGenesis.Balances = genesisBalances
+
+	return bankGenesis, totalCoins
+}
+
+// GenSupportedAssets gets randomized SupportedAssets
+func GenSupportedAssets(r *rand.Rand) types.AssetParams {
+	numAssets := r.Intn(10) + 1
+	assets := make(types.AssetParams, numAssets+1)
+	for i := 0; i < numAssets; i++ {
+		denom := strings.ToLower(simtypes.RandStringOfLength(r, r.Intn(3)+3))
+		asset := genSupportedAsset(r, denom)
+		assets[i] = asset
+	}
+	// Add bnb, btc, or xrp as a supported asset for interactions with other modules
+	assets[len(assets)-1] = genSupportedAsset(r, ConsistentDenoms[r.Intn(3)])
+
+	return assets
+}
+
+func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
+	coinID, _ := simtypes.RandPositiveInt(r, sdk.NewInt(100000))
+	limit := GenSupplyLimit(r, MaxSupplyLimit)
+
+	minSwapAmount := GenMinSwapAmount(r)
+	timeLimited := r.Float32() < 0.5
+	timeBasedLimit := sdk.ZeroInt()
+	if timeLimited {
+		// set time-based limit to between 10 and 25% of the total limit
+		min := int(limit.Quo(sdk.NewInt(10)).Int64())
+		max := int(limit.Quo(sdk.NewInt(4)).Int64())
+		timeBasedLimit = sdk.NewInt(int64(simtypes.RandIntBetween(r, min, max)))
+	}
+	return types.AssetParam{
+		Denom:  denom,
+		CoinID: int(coinID.Int64()),
+		SupplyLimit: types.SupplyLimit{
+			Limit:          limit,
+			TimeLimited:    timeLimited,
+			TimePeriod:     time.Hour * 24,
+			TimeBasedLimit: timeBasedLimit,
+		},
+		Active:        true,
+		DeputyAddress: GenRandBnbDeputy(r).Address.String(),
+		FixedFee:      GenRandFixedFee(r),
+		MinSwapAmount: minSwapAmount,
+		MaxSwapAmount: GenMaxSwapAmount(r, minSwapAmount, limit),
+		SwapTimestamp: time.Now().Unix(),
+		SwapTimeSpan:  limit.Int64(),
+	}
+}
+
+func loadRandomBep3GenState(simState *module.SimulationState) types.GenesisState {
+	supportedAssets := GenSupportedAssets(simState.Rand)
+	supplies := types.AssetSupplies{}
+	for _, asset := range supportedAssets {
+		supply := GenAssetSupply(simState.Rand, asset.Denom)
+		supplies = append(supplies, supply)
+	}
+
+	bep3Genesis := types.GenesisState{
+		Params: types.Params{
+			AssetParams: supportedAssets,
+		},
+		Supplies:          supplies,
+		PreviousBlockTime: types.DefaultPreviousBlockTime,
+	}
+
+	return bep3Genesis
+}
+
+type CodecUnmarshaler interface {
+	MustUnmarshalBinaryLengthPrefixed(bz []byte, ptr interface{})
+}
+
+// NewDecodeStore returns a decoder function closure that unmarshals the KVPair's
+// Value to the corresponding type.
+func NewDecodeStore(cdc CodecUnmarshaler) func(kvA, kvB kv.Pair) string {
+	return func(kvA, kvB kv.Pair) string {
+		switch {
+		case bytes.Equal(kvA.Key[:1], types.AtomicSwapKeyPrefix):
+			var swapA, swapB types.AtomicSwap
+			cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &swapA)
+			cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &swapB)
+			return fmt.Sprintf("%v\n%v", swapA, swapB)
+
+		case bytes.Equal(kvA.Key[:1], types.AtomicSwapByBlockPrefix),
+			bytes.Equal(kvA.Key[:1], types.AtomicSwapLongtermStoragePrefix):
+			var bytesA tmbytes.HexBytes = kvA.Value
+			var bytesB tmbytes.HexBytes = kvA.Value
+			return fmt.Sprintf("%s\n%s", bytesA.String(), bytesB.String())
+		case bytes.Equal(kvA.Key[:1], types.AssetSupplyPrefix):
+			var supplyA, supplyB types.AssetSupply
+			cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &supplyA)
+			cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &supplyB)
+			return fmt.Sprintf("%s\n%s", supplyA, supplyB)
+		case bytes.Equal(kvA.Key[:1], types.PreviousBlockTimeKey):
+			var timeA, timeB time.Time
+			cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &timeA)
+			cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &timeB)
+			return fmt.Sprintf("%s\n%s", timeA, timeB)
+
+		default:
+			panic(fmt.Sprintf("invalid %s key prefix %X", types.ModuleName, kvA.Key[:1]))
+		}
+	}
+}
 
 func defaultWeightMsgCreateAtomicSwap(r *rand.Rand) int {
 	return simtypes.RandIntBetween(r, 20, 100)
 }
 
+// ParamChanges defines the parameters that can be modified by param change proposals
+func ParamChanges(r *rand.Rand) []simtypes.ParamChange {
+	return []simtypes.ParamChange{
+		simmod.NewSimParamChange(types.ModuleName, keyAssetParams,
+			func(r *rand.Rand) string {
+				return fmt.Sprintf("\"%s\"", GenSupportedAssets(r))
+			},
+		),
+	}
+}
+
 // WeightedOperations returns all the operations from the module with their respective weights
 func WeightedOperations(
 	appParams simtypes.AppParams, cdc codec.JSONMarshaler, ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper,
-) simulation.WeightedOperations {
+) simmod.WeightedOperations {
 	var weightCreateAtomicSwap int
 
 	// GenDepositParamsDepositPeriod randomized DepositParamsDepositPeriod
@@ -43,8 +227,8 @@ func WeightedOperations(
 		},
 	)
 
-	return simulation.WeightedOperations{
-		simulation.NewWeightedOperation(
+	return simmod.WeightedOperations{
+		simmod.NewWeightedOperation(
 			weightCreateAtomicSwap,
 			SimulateMsgCreateAtomicSwap(ak, bk, k),
 		),
@@ -377,4 +561,114 @@ func findValidAccountAssetPair(accounts []simtypes.Account, assets types.AssetPa
 		}
 	}
 	return simtypes.Account{}, types.AssetParam{}, false
+}
+
+// GenSupplyLimit generates a random SupplyLimit
+func GenSupplyLimit(r *rand.Rand, max int) sdk.Int {
+	max = simtypes.RandIntBetween(r, MinSupplyLimit, max)
+	return sdk.NewInt(int64(max))
+}
+
+// GenSupplyLimit generates a random SupplyLimit
+func GenAssetSupply(r *rand.Rand, denom string) types.AssetSupply {
+	return types.NewAssetSupply(
+		sdk.NewCoin(denom, sdk.ZeroInt()), sdk.NewCoin(denom, sdk.ZeroInt()),
+		sdk.NewCoin(denom, sdk.ZeroInt()), sdk.NewCoin(denom, sdk.ZeroInt()), time.Duration(0))
+}
+
+// GenMinBlockLock randomized MinBlockLock
+func GenMinBlockLock(r *rand.Rand) uint64 {
+	return MinBlockLock
+}
+
+// GenMaxBlockLock randomized MaxBlockLock
+func GenMaxBlockLock(r *rand.Rand, minBlockLock uint64) uint64 {
+	max := int(50)
+	return uint64(r.Intn(max-int(MinBlockLock)) + int(MinBlockLock+1))
+}
+
+func loadAuthGenState(simState *module.SimulationState, bep3Genesis types.GenesisState) (authtypes.GenesisState, []sdk.Coins) {
+	var authGenesis authtypes.GenesisState
+	simState.Cdc.MustUnmarshalJSON(simState.GenState[authtypes.ModuleName], &authGenesis)
+	// Load total limit of each supported asset to deputy's account
+	var totalCoins []sdk.Coins
+
+	authGenesisAccounts, err := types.UnpackAccounts(authGenesis.Accounts)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, asset := range bep3Genesis.Params.AssetParams {
+		deputyAddress, err := sdk.AccAddressFromBech32(asset.DeputyAddress)
+		if err != nil {
+			panic(err)
+		}
+		deputy, found := getAccount(authGenesisAccounts, deputyAddress)
+		if !found {
+			panic("deputy address not found in available accounts")
+		}
+		assetCoin := sdk.NewCoins(sdk.NewCoin(asset.Denom, asset.SupplyLimit.Limit))
+		// Balances moved to bank module
+		// if err := deputy.SetCoins(deputy.GetCoins().Add(assetCoin...)); err != nil {
+		//	panic(err)
+		// }
+		totalCoins = append(totalCoins, assetCoin)
+
+		authUpdGenesisAccounts := replaceOrAppendAccount(authGenesisAccounts, deputy)
+
+		authGenesis.Accounts, err = types.PackAccounts(authUpdGenesisAccounts)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return authGenesis, totalCoins
+}
+
+// GenRandBnbDeputy randomized BnbDeputyAddress
+func GenRandBnbDeputy(r *rand.Rand) simtypes.Account {
+	acc, _ := simtypes.RandomAcc(r, accs)
+	return acc
+}
+
+// GenRandFixedFee randomized FixedFee in range [1, 10000]
+func GenRandFixedFee(r *rand.Rand) sdk.Int {
+	min := int(1)
+	max := types.DefaultBnbDeputyFixedFee.Int64()
+	return sdk.NewInt(int64(r.Intn(int(max)-min) + min))
+}
+
+// GenMinSwapAmount randomized MinAmount in range [1, 1000]
+func GenMinSwapAmount(r *rand.Rand) sdk.Int {
+	return sdk.OneInt().Add(simtypes.RandomAmount(r, sdk.NewInt(int64(MinSwapAmountLimit))))
+}
+
+// GenMaxSwapAmount randomized MaxAmount
+func GenMaxSwapAmount(r *rand.Rand, minAmount sdk.Int, supplyMax sdk.Int) sdk.Int {
+	min := minAmount.Int64()
+	max := supplyMax.Quo(sdk.NewInt(100)).Int64()
+
+	return sdk.NewInt((int64(r.Intn(int(max-min))) + min))
+}
+
+// Return an account from a list of accounts that matches an address.
+func getAccount(accounts authtypes.GenesisAccounts, addr sdk.AccAddress) (authtypes.GenesisAccount, bool) {
+	for _, a := range accounts {
+		if a.GetAddress().Equals(addr) {
+			return a, true
+		}
+	}
+	return nil, false
+}
+
+// In a list of accounts, replace the first account found with the same address. If not found, append the account.
+func replaceOrAppendAccount(accounts authtypes.GenesisAccounts, acc authtypes.GenesisAccount) []authtypes.GenesisAccount {
+	newAccounts := accounts
+	for i, a := range accounts {
+		if a.GetAddress().Equals(acc.GetAddress()) {
+			newAccounts[i] = acc
+			return newAccounts
+		}
+	}
+	return append(newAccounts, acc)
 }
