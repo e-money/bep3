@@ -6,7 +6,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
@@ -18,11 +18,13 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	ctx          sdk.Context
-	cdc          *codec.Codec
-	keeper       keeper.Keeper
-	supplyKeeper supply.Keeper
-	appModule    bep3.AppModule
+	ctx           sdk.Context
+	cdc           *codec.LegacyAmino
+	keeper        keeper.Keeper
+	bankKeeper    types.BankKeeper
+	accountKeeper types.AccountKeeper
+	appModule     bep3.AppModule
+	encConfig     bep3.EncodingConfig
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
@@ -30,23 +32,22 @@ func (suite *KeeperTestSuite) SetupTest() {
 	app.SetBech32AddressPrefixes(config)
 	suite.ResetChain()
 
-	suite.cdc = codec.New()
-	types.RegisterCodec(suite.cdc)
-	suite.cdc.Seal()
+	suite.encConfig = bep3.MakeAminoEncodingConfig()
 }
 
 func (suite *KeeperTestSuite) ResetChain() {
-	ctx, bep3Keeper, _, supplyKeeper, _ := app.CreateTestComponents(suite.T())
+	ctx, bep3Keeper, accountKeeper, bankKeeper, _ := app.CreateTestComponents(suite.T())
 
 	suite.ctx = ctx
 	suite.keeper = bep3Keeper
-	suite.supplyKeeper = supplyKeeper
+	suite.accountKeeper = accountKeeper
+	suite.bankKeeper = bankKeeper
 }
 
 func (suite *KeeperTestSuite) TestEnsureModuleAccountPermissions() {
-	suite.supplyKeeper.SetModuleAccount(suite.ctx, supply.NewEmptyModuleAccount(types.ModuleName)) // no permisions
+	suite.accountKeeper.SetModuleAccount(suite.ctx, authtypes.NewEmptyModuleAccount(types.ModuleName)) // no permisions
 
-	supplyKeeper := suite.supplyKeeper
+	supplyKeeper := suite.bankKeeper
 	testCoins := cs(c("busd", 1000_00_000_000))
 
 	// Ensure there are no minting and burning permissions.

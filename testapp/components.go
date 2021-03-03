@@ -5,29 +5,39 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	bep3 "github.com/e-money/bep3/module"
+	bep3types "github.com/e-money/bep3/module/types"
 	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 )
 
-func CreateTestComponents(t *testing.T) (sdk.Context, bep3.Keeper, auth.AccountKeeper, supply.Keeper, bep3.AppModule) {
+func CreateTestComponents(t *testing.T) (
+	sdk.Context,
+	codec.JSONMarshaler,
+	bep3.Keeper,
+	bep3types.AccountKeeper,
+	bep3types.BankKeeper,
+	bep3.AppModule) {
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 
-	keys := sdk.NewKVStoreKeys(bep3.StoreKey, auth.StoreKey, supply.StoreKey, params.StoreKey)
+	keys := sdk.NewKVStoreKeys(bep3.StoreKey, authtypes.StoreKey, banktypes.StoreKey, paramstypes.StoreKey)
 	for _, k := range keys {
 		ms.MountStoreWithDB(k, sdk.StoreTypeIAVL, db)
 	}
 
-	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
+	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	for _, k := range tkeys {
 		ms.MountStoreWithDB(k, sdk.StoreTypeTransient, db)
 	}
@@ -35,36 +45,39 @@ func CreateTestComponents(t *testing.T) (sdk.Context, bep3.Keeper, auth.AccountK
 	err := ms.LoadLatestVersion()
 	require.NoError(t, err)
 
-	ctx := sdk.NewContext(ms, abci.Header{ChainID: "test-chain"}, true, log.NewNopLogger())
+	ctx := sdk.NewContext(ms, tmproto.Header{
+		ChainID: "test-chain",
+	}, true, log.NewNopLogger())
 	ctx = ctx.WithBlockTime(time.Now())
 
-	cdc := codec.New()
-	codec.RegisterCrypto(cdc)
-	sdk.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	bep3.RegisterCodec(cdc)
-	supply.RegisterCodec(cdc)
-	cdc.Seal()
+	encoding := bep3.MakeAminoEncodingConfig()
+
+	cryptocodec.RegisterCrypto(encoding.Amino)
+	encoding.Amino.Seal()
 
 	mAccPerms := map[string][]string{
-		bep3.ModuleName: {supply.Minter, supply.Burner},
+		bep3.ModuleName: {authtypes.Minter, authtypes.Burner},
 	}
 
-	paramsKeeper := params.NewKeeper(cdc, keys[params.StoreKey], tkeys[params.TStoreKey])
+	paramsKeeper := paramskeeper.NewKeeper(encoding.Marshaler, encoding.Amino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 	var (
-		authSubspace = paramsKeeper.Subspace(auth.DefaultParamspace)
-		bankSubspace = paramsKeeper.Subspace(bank.DefaultParamspace)
+		authSubspace = paramsKeeper.Subspace(authtypes.ModuleName)
+		bankSubspace = paramsKeeper.Subspace(banktypes.ModuleName)
 		bep3Subspace = paramsKeeper.Subspace(bep3.DefaultParamspace)
 	)
 
 	var (
-		accountKeeper = auth.NewAccountKeeper(cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
-		bankKeeper    = bank.NewBaseKeeper(accountKeeper, bankSubspace, make(map[string]bool))
-		supplyKeeper  = supply.NewKeeper(cdc, keys[supply.StoreKey], accountKeeper, bankKeeper, mAccPerms)
-		bep3Keeper    = bep3.NewKeeper(cdc, keys[bep3.StoreKey], supplyKeeper, accountKeeper, bep3Subspace, make(map[string]bool))
+		accountKeeper = authkeeper.NewAccountKeeper(encoding.Marshaler, keys[authtypes.StoreKey], authSubspace, authtypes.ProtoBaseAccount, mAccPerms)
+		bankKeeper    = bankkeeper.NewBaseKeeper(encoding.Marshaler, keys[banktypes.ModuleName], accountKeeper, bankSubspace, make(map[string]bool))
+		bep3Keeper    = bep3.NewKeeper(encoding.Amino, keys[bep3.StoreKey], bankKeeper, accountKeeper, bep3Subspace, make(map[string]bool))
 	)
 
-	supplyKeeper.SetSupply(ctx, supply.NewSupply(sdk.NewCoins()))
+	bankKeeper.SetSupply(ctx, banktypes.NewSupply(sdk.NewCoins()))
 
-	return ctx, bep3Keeper, accountKeeper, supplyKeeper, bep3.NewAppModule(bep3Keeper, accountKeeper, supplyKeeper)
+	return ctx,
+		codec.NewAminoCodec(encoding.Amino),
+		bep3Keeper,
+		accountKeeper,
+		bankKeeper,
+		bep3.NewAppModule(bep3Keeper, accountKeeper, bankKeeper)
 }

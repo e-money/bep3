@@ -20,10 +20,10 @@ type ParamsTestSuite struct {
 }
 
 func (suite *ParamsTestSuite) SetupTest() {
-	ctx, bep3Keeper, _, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, _, _, appModule := app.CreateTestComponents(suite.T())
 
 	_, addrs := app.GeneratePrivKeyAddressPairs(10)
-	appModule.InitGenesis(ctx, NewBep3GenState(addrs[0]))
+	appModule.InitGenesis(ctx, jsonMarshaller, NewBep3GenState(addrs[0]))
 
 	suite.keeper = bep3Keeper
 	suite.ctx = ctx
@@ -50,7 +50,7 @@ func (suite *ParamsTestSuite) TestGetAssets() {
 func (suite *ParamsTestSuite) TestGetSetDeputyAddress() {
 	asset, err := suite.keeper.GetAsset(suite.ctx, "bnb")
 	suite.Require().NoError(err)
-	asset.DeputyAddress = suite.addrs[1]
+	asset.DeputyAddress = suite.addrs[1].String()
 	suite.NotPanics(func() { suite.keeper.SetAsset(suite.ctx, asset) })
 
 	asset, err = suite.keeper.GetAsset(suite.ctx, "bnb")

@@ -5,8 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
@@ -31,9 +30,9 @@ func c(denom string, amount int64) sdk.Coin { return sdk.NewInt64Coin(denom, amo
 func cs(coins ...sdk.Coin) sdk.Coins        { return sdk.NewCoins(coins...) }
 func ts(minOffset int) int64                { return tmtime.Now().Add(time.Duration(minOffset) * time.Minute).Unix() }
 
-func NewAuthGenStateFromAccs(accounts ...authexported.GenesisAccount) app.GenesisState {
-	authGenesis := auth.NewGenesisState(auth.DefaultParams(), accounts)
-	return app.GenesisState{auth.ModuleName: auth.ModuleCdc.MustMarshalJSON(authGenesis)}
+func NewAuthGenStateFromAccs(accounts ...authtypes.GenesisAccount) app.GenesisState {
+	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), accounts)
+	return app.GenesisState{authtypes.ModuleName: authtypes.ModuleCdc.MustMarshalJSON(authGenesis)}
 }
 
 func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
@@ -50,7 +49,7 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 						TimePeriod:     time.Hour,
 					},
 					Active:        true,
-					DeputyAddress: deputyAddress,
+					DeputyAddress: deputyAddress.String(),
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
@@ -67,7 +66,7 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 						TimePeriod:     time.Hour,
 					},
 					Active:        false,
-					DeputyAddress: deputyAddress,
+					DeputyAddress: deputyAddress.String(),
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(100000000000),
@@ -95,7 +94,7 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 		PreviousBlockTime: types.DefaultPreviousBlockTime,
 	}
 
-	return types.ModuleCdc.MustMarshalJSON(bep3Genesis)
+	return types.ModuleCdc.MustMarshalJSON(&bep3Genesis)
 }
 
 func atomicSwaps(ctx sdk.Context, count int) types.AtomicSwaps {
