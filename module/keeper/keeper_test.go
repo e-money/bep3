@@ -36,7 +36,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 }
 
 func (suite *KeeperTestSuite) ResetChain() {
-	ctx, bep3Keeper, accountKeeper, bankKeeper, _ := app.CreateTestComponents(suite.T())
+	ctx, _, bep3Keeper, accountKeeper, bankKeeper, _ := app.CreateTestComponents(suite.T())
 
 	suite.ctx = ctx
 	suite.keeper = bep3Keeper
