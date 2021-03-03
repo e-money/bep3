@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/codec"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bep3 "github.com/e-money/bep3/module"
 	app "github.com/e-money/bep3/testapp"
@@ -13,18 +15,20 @@ import (
 type GenesisTestSuite struct {
 	suite.Suite
 
-	appModule bep3.AppModule
-	ctx       sdk.Context
-	keeper    bep3.Keeper
-	addrs     []sdk.AccAddress
+	appModule     bep3.AppModule
+	ctx           sdk.Context
+	keeper        bep3.Keeper
+	addrs         []sdk.AccAddress
+	jsonMarshaler codec.JSONMarshaler
 }
 
 func (suite *GenesisTestSuite) SetupTest() {
-	ctx, bep3Keeper, _, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, _, _, appModule := app.CreateTestComponents(suite.T())
 
 	suite.ctx = ctx
 	suite.keeper = bep3Keeper
 	suite.appModule = appModule
+	suite.jsonMarshaler = jsonMarshaller
 
 	_, addrs := app.GeneratePrivKeyAddressPairs(3)
 	suite.addrs = addrs
@@ -59,7 +63,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				}
 				gs.AtomicSwaps = swaps
 				gs.Supplies = supplies
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: true,
 		},
@@ -68,7 +72,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
 				gs.Params.AssetParams[0].FixedFee = sdk.ZeroInt()
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: true,
 		},
@@ -79,7 +83,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				_, addrs := app.GeneratePrivKeyAddressPairs(1)
 				swap, _ := loadSwapAndSupply(addrs[0], 1)
 				gs.AtomicSwaps = bep3.AtomicSwaps{swap}
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -95,7 +99,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 						CurrentSupply:  c("bnb", assetParam.SupplyLimit.Limit.Add(i(1)).Int64()),
 					},
 				}
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -125,7 +129,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 						CurrentSupply:  c("bnb", 0),
 					},
 				}
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -156,7 +160,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 						CurrentSupply:  c("bnb", overHalfLimit),
 					},
 				}
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -186,7 +190,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 						CurrentSupply:  c("bnb", assetParam.SupplyLimit.Limit.Add(i(1)).Int64()),
 					},
 				}
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -201,7 +205,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 						CurrentSupply:  c("fake", 0),
 					},
 				}
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -218,7 +222,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 					TestRecipientOtherChain, 0, bep3.Open, true, bep3.Incoming)
 
 				gs.AtomicSwaps = bep3.AtomicSwaps{swap}
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -235,7 +239,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 					TestRecipientOtherChain, 0, bep3.NULL, true, bep3.Incoming)
 
 				gs.AtomicSwaps = bep3.AtomicSwaps{swap}
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -244,7 +248,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
 				gs.Params.AssetParams[0].SwapTimeSpan = 59
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -253,7 +257,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
 				gs.Params.AssetParams[0].SwapTimeSpan = (3600 * 24 * 7) + 1 // 1 week + 1 seconds
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -262,7 +266,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
 				gs.Params.AssetParams[0].Denom = ""
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -271,7 +275,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
 				gs.Params.AssetParams[0].SupplyLimit.Limit = i(-100)
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -280,7 +284,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
 				gs.Params.AssetParams[1].Denom = "bnb"
-				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(gs)}
+				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
 		},
@@ -295,11 +299,11 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 
 			if tc.expectPass {
 				suite.NotPanics(func() {
-					suite.appModule.InitGenesis(suite.ctx, genState)
+					suite.appModule.InitGenesis(suite.ctx, suite.jsonMarshaler, genState)
 				}, tc.name)
 			} else {
 				suite.Panics(func() {
-					suite.appModule.InitGenesis(suite.ctx, genState)
+					suite.appModule.InitGenesis(suite.ctx, suite.jsonMarshaler, genState)
 				}, tc.name)
 			}
 		})
