@@ -30,12 +30,12 @@ func ts(minOffset int) int64                { return tmtime.Now().Add(time.Durat
 
 func NewBep3GenState(deputy sdk.AccAddress) json.RawMessage {
 	bep3Genesis := baseGenState(deputy)
-	return bep3.ModuleCdc.MustMarshalJSON(bep3Genesis)
+	return bep3.ModuleCdc.MustMarshalJSON(&bep3Genesis)
 }
 
 func NewBep3GenStateMulti(deputy sdk.AccAddress) app.GenesisState {
 	bep3Genesis := baseGenState(deputy)
-	return app.GenesisState{bep3.ModuleName: bep3.ModuleCdc.MustMarshalJSON(bep3Genesis)}
+	return app.GenesisState{bep3.ModuleName: bep3.ModuleCdc.MustMarshalJSON(&bep3Genesis)}
 }
 
 func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
@@ -53,7 +53,7 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 						TimePeriod:     time.Hour,
 					},
 					Active:        true,
-					DeputyAddress: deputy,
+					DeputyAddress: deputy.String(),
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
@@ -70,7 +70,7 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 						TimePeriod:     time.Hour,
 					},
 					Active:        true,
-					DeputyAddress: deputy,
+					DeputyAddress: deputy.String(),
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),

@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bep3 "github.com/e-money/bep3/module"
 	app "github.com/e-money/bep3/testapp"
@@ -21,7 +22,7 @@ type HandlerTestSuite struct {
 }
 
 func (suite *HandlerTestSuite) SetupTest() {
-	ctx, bep3Keeper, accountKeeper, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, accountKeeper, bankKeeper, appModule := app.CreateTestComponents(suite.T())
 
 	// Set up genesis state and initialize
 	_, addrs := app.GeneratePrivKeyAddressPairs(3)
@@ -29,13 +30,13 @@ func (suite *HandlerTestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		if err := account.SetCoins(coins); err != nil {
+		if err := bankKeeper.SetBalances(ctx, addr, coins); err != nil {
 			panic(err)
 		}
 		accountKeeper.SetAccount(ctx, account)
 	}
 
-	appModule.InitGenesis(ctx, NewBep3GenState(addrs[0]))
+	appModule.InitGenesis(ctx, jsonMarshaller, NewBep3GenState(addrs[0]))
 
 	suite.addrs = addrs
 	suite.handler = bep3.NewHandler(bep3Keeper)
@@ -132,7 +133,7 @@ func (suite *HandlerTestSuite) TestMsgRefundAtomicSwap() {
 }
 
 func (suite *HandlerTestSuite) TestInvalidMsg() {
-	res, err := suite.handler(suite.ctx, sdk.NewTestMsg())
+	res, err := suite.handler(suite.ctx, testdata.NewTestMsg())
 	suite.Require().Error(err)
 	suite.Require().Nil(res)
 }
