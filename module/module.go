@@ -9,7 +9,7 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	sdksim "github.com/cosmos/cosmos-sdk/x/simulation"
+	sdksim "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/e-money/bep3/module/client/cli"
 	"github.com/e-money/bep3/module/client/rest"
 	"github.com/e-money/bep3/module/keeper"
@@ -25,7 +25,7 @@ var (
 	_ module.AppModule      = AppModule{}
 	_ module.AppModuleBasic = AppModuleBasic{}
 	// TODO Simulation
-	//_ module.AppModuleSimulation = AppModule{}
+	_ module.AppModuleSimulation = AppModule{}
 )
 
 // AppModuleBasic defines the basic application module used by the bep3 module.
@@ -188,6 +188,6 @@ func (ab AppModuleBasic) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
 }
 
 // WeightedOperations returns the all the bep3 module operations with their respective weights.
-func (am AppModule) WeightedOperations(simState module.SimulationState) sdksim.WeightedOperations {
+func (am AppModule) WeightedOperations(simState module.SimulationState) []sdksim.WeightedOperation {
 	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, am.accountKeeper, am.bankKeeper, am.keeper)
 }

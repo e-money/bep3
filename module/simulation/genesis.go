@@ -75,7 +75,7 @@ func GenMaxBlockLock(r *rand.Rand, minBlockLock uint64) uint64 {
 
 // GenSupportedAssets gets randomized SupportedAssets
 func GenSupportedAssets(r *rand.Rand) types.AssetParams {
-	numAssets := (r.Intn(10) + 1)
+	numAssets := r.Intn(10) + 1
 	assets := make(types.AssetParams, numAssets+1)
 	for i := 0; i < numAssets; i++ {
 		denom := strings.ToLower(simulation.RandStringOfLength(r, (r.Intn(3) + 3)))
