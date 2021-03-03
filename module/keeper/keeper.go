@@ -241,9 +241,9 @@ func (k Keeper) GetAllAssetSupplies(ctx sdk.Context) (supplies types.AssetSuppli
 }
 
 // GetPreviousBlockTime get the blocktime for the previous block
-func (k Keeper) GetPreviousBlockTime(ctx sdk.Context) (blockTime time.Time, found bool) {
+func (k Keeper) GetPreviousBlockTime(ctx sdk.Context, height int64) (blockTime time.Time, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.key), types.PreviousBlockTimeKey)
-	b := store.Get([]byte{})
+	b := store.Get(types.GetHeightSortableKey(uint64(height)))
 	if b == nil {
 		return time.Time{}, false
 	}
@@ -252,7 +252,7 @@ func (k Keeper) GetPreviousBlockTime(ctx sdk.Context) (blockTime time.Time, foun
 }
 
 // SetPreviousBlockTime set the time of the previous block
-func (k Keeper) SetPreviousBlockTime(ctx sdk.Context, blockTime time.Time) {
+func (k Keeper) SetPreviousBlockTime(ctx sdk.Context, height int64, blockTime time.Time) {
 	store := prefix.NewStore(ctx.KVStore(k.key), types.PreviousBlockTimeKey)
-	store.Set([]byte{}, k.cdc.MustMarshalBinaryLengthPrefixed(blockTime))
+	store.Set(types.GetHeightSortableKey(uint64(height)), k.cdc.MustMarshalBinaryLengthPrefixed(blockTime))
 }

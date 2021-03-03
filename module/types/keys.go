@@ -40,12 +40,16 @@ var (
 
 // GetAtomicSwapByHeightKey is used by the AtomicSwapByBlock index and AtomicSwapLongtermStorage index
 func GetAtomicSwapByHeightKey(height uint64, swapID []byte) []byte {
-	return append(sdk.Uint64ToBigEndian(height), swapID...)
+	return append(GetHeightSortableKey(height), swapID...)
 }
 
 func GetTimestampSortableKey(timestamp int64) []byte {
 	t := time.Unix(timestamp, 0).UTC()
 	return sdk.FormatTimeBytes(t)
+}
+
+func GetHeightSortableKey(height uint64) []byte {
+	return sdk.Uint64ToBigEndian(height)
 }
 
 // GetAtomicSwapByTimestampKey is used by the AtomicSwapByTimestamp and

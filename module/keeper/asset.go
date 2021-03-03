@@ -158,10 +158,10 @@ func (k Keeper) UpdateTimeBasedSupplyLimits(ctx sdk.Context) {
 	if !found {
 		return
 	}
-	previousBlockTime, found := k.GetPreviousBlockTime(ctx)
+	previousBlockTime, found := k.GetPreviousBlockTime(ctx, ctx.BlockHeight())
 	if !found {
 		previousBlockTime = ctx.BlockTime()
-		k.SetPreviousBlockTime(ctx, previousBlockTime)
+		k.SetPreviousBlockTime(ctx, ctx.BlockHeight(), previousBlockTime)
 	}
 	timeElapsed := ctx.BlockTime().Sub(previousBlockTime)
 	for _, asset := range assets {
@@ -179,5 +179,5 @@ func (k Keeper) UpdateTimeBasedSupplyLimits(ctx sdk.Context) {
 		}
 		k.SetAssetSupply(ctx, supply, asset.Denom)
 	}
-	k.SetPreviousBlockTime(ctx, ctx.BlockTime())
+	k.SetPreviousBlockTime(ctx, ctx.BlockHeight(), ctx.BlockTime())
 }
