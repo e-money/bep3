@@ -30,9 +30,12 @@ type KeeperTestSuite struct {
 func (suite *KeeperTestSuite) SetupTest() {
 	config := sdk.GetConfig()
 	app.SetBech32AddressPrefixes(config)
-	suite.ResetChain()
 
-	suite.encConfig = bep3.MakeAminoEncodingConfig()
+	suite.encConfig = bep3.MakeProtoEncodingConfig()
+	// suite.encConfig = bep3.MakeAminoEncodingConfig()
+	suite.cdc = suite.encConfig.Amino
+
+	suite.ResetChain()
 }
 
 func (suite *KeeperTestSuite) ResetChain() {
