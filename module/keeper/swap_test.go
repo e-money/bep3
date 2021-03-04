@@ -417,7 +417,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 				tc.args.recipientOtherChain, tc.args.coins, tc.args.crossChain)
 
 			// Load sender's account after swap creation
-			senderBalancePost := bk.GetAllBalances(suite.ctx, tc.args.sender)
+			senderBalancePost := bk.GetBalance(suite.ctx, tc.args.sender, swapAssetDenom)
 
 			assetSupplyPost, _ := suite.keeper.GetAssetSupply(suite.ctx, swapAssetDenom)
 
@@ -433,7 +433,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 					suite.Equal(assetSupplyPre.IncomingSupply.Add(tc.args.coins[0]), assetSupplyPost.IncomingSupply)
 				case types.Outgoing:
 					// Check coins moved
-					suite.Equal(senderBalancePre.Amount.Sub(tc.args.coins[0].Amount), senderBalancePost)
+					suite.Equal(senderBalancePre.Amount.Sub(tc.args.coins[0].Amount), senderBalancePost.Amount)
 					suite.Equal(assetSupplyPre.OutgoingSupply.Add(tc.args.coins[0]), assetSupplyPost.OutgoingSupply)
 				default:
 					suite.Fail("should not have invalid direction")
@@ -634,7 +634,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 				switch tc.args.direction {
 				case types.Incoming:
 					// Check coins moved
-					suite.Equal(expectedRecipientBalancePre.Add(tc.args.coins[0].Amount), expectedRecipientBalancePost)
+					suite.Equal(expectedRecipientBalancePre.Add(tc.args.coins[0].Amount), expectedRecipientBalancePost.Amount)
 					// Check incoming supply decreased
 					suite.True(assetSupplyPre.IncomingSupply.Amount.Sub(tc.args.coins[0].Amount).Equal(assetSupplyPost.IncomingSupply.Amount))
 					// Check current supply increased
@@ -654,7 +654,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 			} else {
 				suite.Error(err)
 				// Check coins not moved
-				suite.Equal(expectedRecipientBalancePre, expectedRecipientBalancePost)
+				suite.Equal(expectedRecipientBalancePre, expectedRecipientBalancePost.Amount)
 
 				// Check asset supply has not changed
 				switch tc.args.direction {
@@ -796,7 +796,7 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 					suite.Equal(assetSupplyPre.OutgoingSupply, assetSupplyPost.OutgoingSupply)
 				case types.Outgoing:
 					// Check coins moved
-					suite.Equal(originalSenderBalancePre.Add(expectedRefundAmount[0].Amount), originalSenderBalancePost)
+					suite.Equal(originalSenderBalancePre.Add(expectedRefundAmount[0].Amount), originalSenderBalancePost.Amount)
 					// Check incoming, current supply not changed
 					suite.Equal(assetSupplyPre.IncomingSupply, assetSupplyPost.IncomingSupply)
 					suite.Equal(assetSupplyPre.CurrentSupply, assetSupplyPost.CurrentSupply)
@@ -808,7 +808,7 @@ func (suite *AtomicSwapTestSuite) TestRefundAtomicSwap() {
 			} else {
 				suite.Error(err)
 				// Check coins not moved
-				suite.Equal(originalSenderBalancePre, originalSenderBalancePost)
+				suite.Equal(originalSenderBalancePre, originalSenderBalancePost.Amount)
 
 				// Check asset supply has not changed
 				switch tc.args.direction {
