@@ -109,8 +109,9 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 		{
 			name: "invalid denom - bad format",
 			args: args{
+				// note updated SDK denom regex mask  = `[a-zA-Z][a-zA-Z0-9/]{2,127}`
 				assetParams: types.AssetParams{types.NewAssetParam(
-					"BNB", 714, suite.supply[0], true,
+					"1BNB", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
 					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
