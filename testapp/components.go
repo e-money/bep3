@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -29,6 +28,8 @@ func CreateTestComponents(t *testing.T) (
 	bep3types.AccountKeeper,
 	bep3types.BankKeeper,
 	bep3.AppModule) {
+	encoding := bep3.MakeProtoEncodingConfig()
+
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 
@@ -50,16 +51,11 @@ func CreateTestComponents(t *testing.T) (
 	}, true, log.NewNopLogger())
 	ctx = ctx.WithBlockTime(time.Now())
 
-	encoding := bep3.MakeAminoEncodingConfig()
-
-	cryptocodec.RegisterCrypto(encoding.Amino)
-	encoding.Amino.Seal()
-
 	mAccPerms := map[string][]string{
 		bep3.ModuleName: {authtypes.Minter, authtypes.Burner},
 	}
 
-	paramsKeeper := paramskeeper.NewKeeper(encoding.Marshaler, encoding.Amino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
+	paramsKeeper := paramskeeper.NewKeeper(encoding.Marshaller, encoding.Amino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 	var (
 		authSubspace = paramsKeeper.Subspace(authtypes.ModuleName)
 		bankSubspace = paramsKeeper.Subspace(banktypes.ModuleName)
@@ -67,8 +63,8 @@ func CreateTestComponents(t *testing.T) (
 	)
 
 	var (
-		accountKeeper = authkeeper.NewAccountKeeper(encoding.Marshaler, keys[authtypes.StoreKey], authSubspace, authtypes.ProtoBaseAccount, mAccPerms)
-		bankKeeper    = bankkeeper.NewBaseKeeper(encoding.Marshaler, keys[banktypes.ModuleName], accountKeeper, bankSubspace, make(map[string]bool))
+		accountKeeper = authkeeper.NewAccountKeeper(encoding.Marshaller, keys[authtypes.StoreKey], authSubspace, authtypes.ProtoBaseAccount, mAccPerms)
+		bankKeeper    = bankkeeper.NewBaseKeeper(encoding.Marshaller, keys[banktypes.ModuleName], accountKeeper, bankSubspace, make(map[string]bool))
 		bep3Keeper    = bep3.NewKeeper(encoding.Amino, keys[bep3.StoreKey], bankKeeper, accountKeeper, bep3Subspace, make(map[string]bool))
 	)
 
