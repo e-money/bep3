@@ -82,13 +82,21 @@ func (msg MsgCreateAtomicSwap) ValidateBasic() error {
 	if len(msg.From) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address cannot be empty")
 	}
-	if len(msg.From) != AddrByteCount {
+	fromAcc, err := sdk.AccAddressFromBech32(msg.From)
+	if err != nil {
+		return fmt.Errorf("expected Bech32 create swap 'From' address %s, error:%s", msg.From, err)
+	}
+	if len(fromAcc.Bytes()) != AddrByteCount {
 		return fmt.Errorf("the expected address length is %d, actual length is %d", AddrByteCount, len(msg.From))
 	}
 	if len(msg.To) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient address cannot be empty")
 	}
-	if len(msg.To) != AddrByteCount {
+	toAcc, err := sdk.AccAddressFromBech32(msg.To)
+	if err != nil {
+		return fmt.Errorf("invalid Bech32 'To' address %s, %s", msg.To, err)
+	}
+	if len(toAcc.Bytes()) != AddrByteCount {
 		return fmt.Errorf("the expected address length is %d, actual length is %d", AddrByteCount, len(msg.To))
 	}
 	if strings.TrimSpace(msg.RecipientOtherChain) == "" {
@@ -167,7 +175,11 @@ func (msg MsgClaimAtomicSwap) ValidateBasic() error {
 	if len(msg.From) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address cannot be empty")
 	}
-	if len([]byte(msg.From)) != AddrByteCount {
+	fromAcc, err := sdk.AccAddressFromBech32(msg.From)
+	if err != nil {
+		return fmt.Errorf("expected Bech32 claim 'From' address %s, error:%s", msg.From, err)
+	}
+	if len(fromAcc.Bytes()) != AddrByteCount {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "actual address length ≠ expected length (%d ≠ %d)", len(msg.From), AddrByteCount)
 	}
 	if len(msg.SwapID) != SwapIDLength {
@@ -223,7 +235,11 @@ func (msg MsgRefundAtomicSwap) ValidateBasic() error {
 	if len(msg.From) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender address cannot be empty")
 	}
-	if len(msg.From) != AddrByteCount {
+	fromAcc, err := sdk.AccAddressFromBech32(msg.From)
+	if err != nil {
+		return fmt.Errorf("expected Bech32 refund 'From' address %s, error:%s", msg.From, err)
+	}
+	if len(fromAcc.Bytes()) != AddrByteCount {
 		return fmt.Errorf("the expected address length is %d, actual length is %d", AddrByteCount, len(msg.From))
 	}
 	if len(msg.SwapID) != SwapIDLength {
