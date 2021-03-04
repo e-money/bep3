@@ -70,10 +70,18 @@ func (a AtomicSwap) Validate() error {
 	if len(a.Recipient) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient cannot be empty")
 	}
-	if len([]byte(a.Sender)) != AddrByteCount {
+	senderAcc, err := sdk.AccAddressFromBech32(a.Sender)
+	if err != nil {
+		return fmt.Errorf("expected Bech32 address for sender %s", a.Sender)
+	}
+	if len(senderAcc.Bytes()) != AddrByteCount {
 		return fmt.Errorf("the expected address length is %d, actual length is %d", AddrByteCount, len(a.Sender))
 	}
-	if len([]byte(a.Recipient)) != AddrByteCount {
+	recAcc, err := sdk.AccAddressFromBech32(a.Recipient)
+	if err != nil {
+		return fmt.Errorf("expected Bech32 address for recipient %s", a.Recipient)
+	}
+	if len(recAcc.Bytes()) != AddrByteCount {
 		return fmt.Errorf("the expected address length is %d, actual length is %d", AddrByteCount, len(a.Recipient))
 	}
 	// NOTE: These adresses may not have a bech32 prefix.
