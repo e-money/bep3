@@ -4,6 +4,7 @@ package bep3;
 option go_package = "github.com/e-money/bep3/module/types";
 
 import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
 // type AtomicSwap struct {
@@ -168,5 +169,14 @@ message MsgRefundAtomicSwap {
     (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
     (gogoproto.moretags) = "yaml:\"swap_id\"",
     (gogoproto.customname) = "SwapID"
+  ];
+}
+
+// Proto type required for serializing the previous block time to manage supply
+// expirations.
+message PrevBlockTime {
+  google.protobuf.Timestamp val = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true
   ];
 }

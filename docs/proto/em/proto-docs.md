@@ -10,6 +10,7 @@
     - [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap)
     - [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap)
     - [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap)
+    - [PrevBlockTime](#bep3.PrevBlockTime)
   
 - [bep3/genesis.proto](#bep3/genesis.proto)
     - [AssetParam](#bep3.AssetParam)
@@ -137,6 +138,22 @@ MsgRefundAtomicSwap defines a refund msg
 | ----- | ---- | ----- | ----------- |
 | `from` | [string](#string) |  |  |
 | `swap_id` | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="bep3.PrevBlockTime"></a>
+
+### PrevBlockTime
+Proto type required for serializing the previous block time to manage supply
+expirations.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `val` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 
 
 
