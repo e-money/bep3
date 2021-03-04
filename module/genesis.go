@@ -19,7 +19,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, accountKeeper types.AccountKeep
 		panic(fmt.Sprintf("failed to validate %s genesis state: %s", ModuleName, err))
 	}
 
-	keeper.SetPreviousBlockTime(ctx, ctx.BlockHeight(), gs.PreviousBlockTime)
+	keeper.SetPreviousBlockTime(ctx, gs.PreviousBlockTime)
 
 	keeper.SetParams(ctx, gs.Params)
 	for _, supply := range gs.Supplies {
@@ -113,7 +113,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) (data *GenesisState) {
 	params := k.GetParams(ctx)
 	swaps := k.GetAllAtomicSwaps(ctx)
 	supplies := k.GetAllAssetSupplies(ctx)
-	previousBlockTime, found := k.GetPreviousBlockTime(ctx, ctx.BlockHeight())
+	previousBlockTime, found := k.GetPreviousBlockTime(ctx)
 	if !found {
 		previousBlockTime = DefaultPreviousBlockTime
 	}
