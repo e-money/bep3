@@ -2,11 +2,11 @@ package keeper_test
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
@@ -29,6 +29,7 @@ type QuerierTestSuite struct {
 	isSupplyDenom map[string]bool
 	swapIDs       []tmbytes.HexBytes
 	isSwapID      map[string]bool
+	marshaller    codec.JSONMarshaler
 }
 
 func (suite *QuerierTestSuite) SetupTest() {
@@ -51,6 +52,7 @@ func (suite *QuerierTestSuite) SetupTest() {
 	suite.keeper = bep3Keeper
 	suite.querier = keeper.NewQuerier(suite.keeper)
 	suite.addrs = addrs
+	suite.marshaller = jsonMarshaller
 
 	// Create atomic swaps and save IDs
 	var swapIDs []tmbytes.HexBytes
@@ -138,8 +140,9 @@ func (suite *QuerierTestSuite) TestQueryAssetSupplies() {
 	suite.Nil(err)
 	suite.NotNil(bz)
 
-	var supplies types.AssetSupplies
-	suite.Nil(json.Unmarshal(bz, &supplies))
+	supplies := types.AssetSupplies{}
+	err = suite.marshaller.UnmarshalJSON(bz, &supplies)
+	suite.Nil(err)
 
 	// Check that returned value matches asset supplies in state
 	storeSupplies := suite.keeper.GetAllAssetSupplies(ctx)
@@ -161,7 +164,7 @@ func (suite *QuerierTestSuite) TestQueryAtomicSwaps() {
 	suite.NotNil(bz)
 
 	var swaps types.AugmentedAtomicSwaps
-	suite.Nil(json.Unmarshal(bz, &swaps))
+	suite.Nil(suite.marshaller.UnmarshalJSON(bz, &swaps))
 
 	suite.Equal(len(suite.swapIDs), len(swaps))
 	for _, swap := range swaps {

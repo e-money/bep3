@@ -1,6 +1,7 @@
 package types
 
 import (
+	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -280,3 +281,14 @@ func NewAugmentedAtomicSwap(swap AtomicSwap) AugmentedAtomicSwap {
 }
 
 type AugmentedAtomicSwaps []AugmentedAtomicSwap
+
+// Meeting Proto Message interface for unit testing AugmentedAtomicSwaps
+// encoding.
+func (as *AugmentedAtomicSwaps) Reset()     { *as = []AugmentedAtomicSwap{} }
+func (*AugmentedAtomicSwaps) ProtoMessage() {}
+func (as *AugmentedAtomicSwaps) String() string {
+	asBytes := []byte(fmt.Sprintf("%v", *as))
+	var buf bytes.Buffer
+	_ = json.Compact(&buf, asBytes)
+	return buf.String()
+}

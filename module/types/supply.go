@@ -1,6 +1,8 @@
 package types
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -74,3 +76,14 @@ func (a AssetSupply) GetDenom() string {
 
 // AssetSupplies is a slice of AssetSupply
 type AssetSupplies []AssetSupply
+
+// Meeting Proto Message interface for unit testing AssetSupplies
+// encoding.
+func (as *AssetSupplies) Reset()     { *as = []AssetSupply{} }
+func (*AssetSupplies) ProtoMessage() {}
+func (as *AssetSupplies) String() string {
+	asBytes := []byte(fmt.Sprintf("%v", *as))
+	var buf bytes.Buffer
+	_ = json.Compact(&buf, asBytes)
+	return buf.String()
+}
