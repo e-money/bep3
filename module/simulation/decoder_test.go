@@ -6,10 +6,8 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/types"
 	"github.com/stretchr/testify/require"
@@ -17,9 +15,8 @@ import (
 )
 
 func makeTestCodec() (cdc *codec.LegacyAmino) {
-	encConfig := bep3.MakeAminoEncodingConfig()
-	cryptocodec.RegisterCrypto(encConfig.Amino)
-	legacytx.RegisterLegacyAminoCodec(cdc)
+	encConfig := bep3.MakeProtoEncodingConfig()
+	// encConfig := bep3.MakeAminoEncodingConfig()
 
 	return encConfig.Amino
 }
