@@ -55,7 +55,10 @@ func (suite *ParamsTestSuite) TestGetSetDeputyAddress() {
 
 	asset, err = suite.keeper.GetAsset(suite.ctx, "bnb")
 	suite.Require().NoError(err)
-	suite.Equal(suite.addrs[1], asset.DeputyAddress)
+
+	depAccAddr, err := sdk.AccAddressFromBech32(asset.DeputyAddress)
+	suite.Nil(err, "invalid bech32")
+	suite.Equal(suite.addrs[1], depAccAddr)
 	addr, err := suite.keeper.GetDeputyAddress(suite.ctx, "bnb")
 	suite.Require().NoError(err)
 	suite.Equal(suite.addrs[1], addr)

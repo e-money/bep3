@@ -44,14 +44,6 @@ func (suite *ABCITestSuite) SetupTest() {
 	suite.ResetKeeper()
 }
 
-func coins(s string) sdk.Coins {
-	coins, err := sdk.ParseCoinsNormalized(s)
-	if err != nil {
-		panic(err)
-	}
-	return coins
-}
-
 func (suite *ABCITestSuite) ResetKeeper() {
 	var swapIDs []tmbytes.HexBytes
 	var randomNumbers []tmbytes.HexBytes
