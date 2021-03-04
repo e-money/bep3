@@ -155,7 +155,7 @@ func QueryGetAssetSupplyCmd() *cobra.Command {
 			// Decode and print results
 			var assetSupply types.AssetSupply
 			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &assetSupply)
-			return cliCtx.PrintString(assetSupply.String())
+			return cliCtx.PrintProto(&assetSupply)
 		},
 	}
 }
@@ -182,17 +182,17 @@ func QueryGetAssetSuppliesCmd() *cobra.Command {
 			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &assetSupplies)
 
 			if len(assetSupplies) == 0 {
-				return fmt.Errorf("There are currently no asset supplies")
+				return fmt.Errorf("currently no asset supplies exist")
 			}
 
 			cliCtx = cliCtx.WithHeight(height)
 
-			sl := make([]string, len(assetSupplies), len(assetSupplies))
+			sl := make([]string, len(assetSupplies))
 			for i := 0; i < len(assetSupplies); i++ {
 				sl[i] = assetSupplies[i].String()
 			}
 
-			return cliCtx.PrintString(strings.Join(sl, ""))
+			return cliCtx.PrintProto(&assetSupplies)
 		},
 	}
 }
@@ -233,7 +233,7 @@ func QueryGetAtomicSwapCmd() *cobra.Command {
 			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &atomicSwap)
 
 			cliCtx = cliCtx.WithHeight(height)
-			return cliCtx.PrintString(atomicSwap.String())
+			return cliCtx.PrintProto(&atomicSwap)
 		},
 	}
 }
@@ -326,12 +326,12 @@ $ emcli q bep3 swaps --page=2 --limit=100
 
 			cliCtx = cliCtx.WithHeight(height)
 
-			al := make([]string, len(matchingAtomicSwaps), len(matchingAtomicSwaps))
+			al := make([]string, len(matchingAtomicSwaps))
 			for i := 0; i < len(matchingAtomicSwaps); i++ {
 				al[i] = matchingAtomicSwaps[i].String()
 			}
 
-			return cliCtx.PrintString(strings.Join(al, ""))
+			return cliCtx.PrintProto(&matchingAtomicSwaps)
 		},
 	}
 
@@ -368,7 +368,7 @@ func QueryParamsCmd() *cobra.Command {
 			// Decode and print results
 			var out types.Params
 			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintString(out.String())
+			return cliCtx.PrintProto(&out)
 		},
 	}
 }

@@ -65,7 +65,7 @@ func CreateTestComponents(t *testing.T) (
 	var (
 		accountKeeper = authkeeper.NewAccountKeeper(encoding.Marshaller, keys[authtypes.StoreKey], authSubspace, authtypes.ProtoBaseAccount, mAccPerms)
 		bankKeeper    = bankkeeper.NewBaseKeeper(encoding.Marshaller, keys[banktypes.ModuleName], accountKeeper, bankSubspace, make(map[string]bool))
-		bep3Keeper    = bep3.NewKeeper(encoding.Amino, keys[bep3.StoreKey], bankKeeper, accountKeeper, bep3Subspace, make(map[string]bool))
+		bep3Keeper    = bep3.NewKeeper(encoding.Marshaller, keys[bep3.StoreKey], bankKeeper, accountKeeper, bep3Subspace, make(map[string]bool))
 	)
 
 	bankKeeper.SetSupply(ctx, banktypes.NewSupply(sdk.NewCoins()))
