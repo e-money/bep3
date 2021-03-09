@@ -46,7 +46,7 @@ func DefaultParams() Params {
 }
 
 // NewAssetParam returns a new AssetParam
-func NewAssetParam(denom string, coinID int, limit SupplyLimit, active bool,
+func NewAssetParam(denom string, coinID int64, limit SupplyLimit, active bool,
 	deputyAddr sdk.AccAddress, fixedFee sdk.Int, minSwapAmount sdk.Int, maxSwapAmount sdk.Int,
 	swapTimestamp int64, timeSpan int64) AssetParam {
 	return AssetParam{

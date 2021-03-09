@@ -63,7 +63,6 @@ message AssetParam {
 	string denom = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
 	// SLIP-0044 registered coin type - see https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 	int64 coin_id = 2 [
-		(gogoproto.casttype) = "int",
 		(gogoproto.customname) = "CoinID",
 		(gogoproto.moretags) = "yaml:\"coin_id\""
 	];

@@ -126,7 +126,7 @@ func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
 	}
 	return types.AssetParam{
 		Denom:  denom,
-		CoinID: int(coinID.Int64()),
+		CoinID: coinID.Int64(),
 		SupplyLimit: types.SupplyLimit{
 			Limit:          limit,
 			TimeLimited:    timeLimited,

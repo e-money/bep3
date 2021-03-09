@@ -112,7 +112,7 @@ func (k Keeper) GetTimeSpan(ctx sdk.Context, denom string) (int64, error) {
 }
 
 // GetAssetByCoinID returns an asset by its denom
-func (k Keeper) GetAssetByCoinID(ctx sdk.Context, coinID int) (types.AssetParam, bool) {
+func (k Keeper) GetAssetByCoinID(ctx sdk.Context, coinID int64) (types.AssetParam, bool) {
 	params := k.GetParams(ctx)
 	for _, asset := range params.AssetParams {
 		if asset.CoinID == coinID {
