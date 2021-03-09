@@ -18,7 +18,7 @@ func TestAssetSupplyValidate(t *testing.T) {
 	}{
 		{
 			msg:     "valid asset",
-			asset:   NewAssetSupply(coin, coin, coin, coin, time.Duration(0)),
+			asset:   NewAssetSupply(coin, coin, coin, coin, 0),
 			expPass: true,
 		},
 		{
@@ -60,7 +60,7 @@ func TestAssetSupplyValidate(t *testing.T) {
 				OutgoingSupply:           coin,
 				CurrentSupply:            coin,
 				TimeLimitedCurrentSupply: sdk.NewCoin("lol", sdk.ZeroInt()),
-				TimeElapsed:              time.Hour,
+				TimeElapsed:              int64(time.Hour),
 			},
 			false,
 		},
@@ -87,25 +87,25 @@ func TestAssetSupplyEquality(t *testing.T) {
 	}{
 		{
 			name:    "equal",
-			asset1:  NewAssetSupply(coin, coin, coin, coin, time.Duration(0)),
-			asset2:  NewAssetSupply(coin, coin, coin, coin, time.Duration(0)),
+			asset1:  NewAssetSupply(coin, coin, coin, coin, 0),
+			asset2:  NewAssetSupply(coin, coin, coin, coin, 0),
 			expPass: true,
 		},
 		{
 			name:    "not equal duration",
-			asset1:  NewAssetSupply(coin, coin, coin, coin, time.Duration(0)),
+			asset1:  NewAssetSupply(coin, coin, coin, coin, 0),
 			asset2:  NewAssetSupply(coin, coin, coin, coin, time.Duration(1)),
 			expPass: false,
 		},
 		{
 			name:    "not equal coin amount",
-			asset1:  NewAssetSupply(coin, coin, coin, coin, time.Duration(0)),
+			asset1:  NewAssetSupply(coin, coin, coin, coin, 0),
 			asset2:  NewAssetSupply(sdk.NewCoin("test", sdk.ZeroInt()), coin, coin, coin, time.Duration(1)),
 			expPass: false,
 		},
 		{
 			name:    "not equal coin denom",
-			asset1:  NewAssetSupply(coin, coin, coin, coin, time.Duration(0)),
+			asset1:  NewAssetSupply(coin, coin, coin, coin, 0),
 			asset2:  NewAssetSupply(coin2, coin2, coin2, coin2, time.Duration(1)),
 			expPass: false,
 		},

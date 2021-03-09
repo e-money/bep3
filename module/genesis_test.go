@@ -164,7 +164,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 							SupplyLimit: bep3types.SupplyLimit{
 								Limit:          limit,
 								TimeLimited:    false,
-								TimePeriod:     time.Hour * 24,
+								TimePeriod:     int64(time.Hour * 24),
 								TimeBasedLimit: sdk.ZeroInt(),
 							},
 							Active:        true,

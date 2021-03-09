@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"time"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/e-money/bep3/module/types"
@@ -147,7 +145,7 @@ func (k Keeper) DecrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 func (k Keeper) CreateNewAssetSupply(ctx sdk.Context, denom string) types.AssetSupply {
 	supply := types.NewAssetSupply(
 		sdk.NewCoin(denom, sdk.ZeroInt()), sdk.NewCoin(denom, sdk.ZeroInt()),
-		sdk.NewCoin(denom, sdk.ZeroInt()), sdk.NewCoin(denom, sdk.ZeroInt()), time.Duration(0))
+		sdk.NewCoin(denom, sdk.ZeroInt()), sdk.NewCoin(denom, sdk.ZeroInt()), 0)
 	k.SetAssetSupply(ctx, supply, denom)
 	return supply
 }
@@ -170,11 +168,11 @@ func (k Keeper) UpdateTimeBasedSupplyLimits(ctx sdk.Context) {
 		if !found {
 			supply = k.CreateNewAssetSupply(ctx, asset.Denom)
 		}
-		newTimeElapsed := supply.TimeElapsed + timeElapsed
-		if asset.SupplyLimit.TimeLimited && newTimeElapsed < asset.SupplyLimit.TimePeriod {
-			supply.TimeElapsed = newTimeElapsed
+		newTimeElapsed := supply.TimeElapsed + int64(timeElapsed)
+		if asset.SupplyLimit.TimeLimited && int64(newTimeElapsed) < asset.SupplyLimit.TimePeriod {
+			supply.TimeElapsed = int64(newTimeElapsed)
 		} else {
-			supply.TimeElapsed = time.Duration(0)
+			supply.TimeElapsed = 0
 			supply.TimeLimitedCurrentSupply = sdk.NewCoin(asset.Denom, sdk.ZeroInt())
 		}
 		k.SetAssetSupply(ctx, supply, asset.Denom)

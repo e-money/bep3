@@ -130,7 +130,7 @@ func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
 		SupplyLimit: types.SupplyLimit{
 			Limit:          limit,
 			TimeLimited:    timeLimited,
-			TimePeriod:     time.Hour * 24,
+			TimePeriod:     int64(time.Hour * 24),
 			TimeBasedLimit: timeBasedLimit,
 		},
 		Active:        true,
@@ -573,7 +573,7 @@ func GenSupplyLimit(r *rand.Rand, max int) sdk.Int {
 func GenAssetSupply(r *rand.Rand, denom string) types.AssetSupply {
 	return types.NewAssetSupply(
 		sdk.NewCoin(denom, sdk.ZeroInt()), sdk.NewCoin(denom, sdk.ZeroInt()),
-		sdk.NewCoin(denom, sdk.ZeroInt()), sdk.NewCoin(denom, sdk.ZeroInt()), time.Duration(0))
+		sdk.NewCoin(denom, sdk.ZeroInt()), sdk.NewCoin(denom, sdk.ZeroInt()), 0)
 }
 
 // GenMinBlockLock randomized MinBlockLock

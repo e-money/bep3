@@ -31,7 +31,7 @@ func TestDecodeBep3Store(t *testing.T) {
 		200, types.Completed, true, types.Outgoing)
 	supply := types.AssetSupply{
 		IncomingSupply: oneCoin, OutgoingSupply: oneCoin, CurrentSupply: oneCoin,
-		TimeLimitedCurrentSupply: oneCoin, TimeElapsed: time.Duration(0),
+		TimeLimitedCurrentSupply: oneCoin, TimeElapsed: 0,
 	}
 	bz := tmbytes.HexBytes([]byte{1, 2})
 

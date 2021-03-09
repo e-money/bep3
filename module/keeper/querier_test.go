@@ -2,10 +2,6 @@ package keeper_test
 
 import (
 	"encoding/hex"
-	"strings"
-	"testing"
-	"time"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/e-money/bep3/module/keeper"
@@ -14,6 +10,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
+	"strings"
+	"testing"
 )
 
 const (
@@ -100,7 +98,7 @@ func (suite *QuerierTestSuite) TestQueryAssetSupply() {
 	suite.Nil(types.ModuleCdc.UnmarshalJSON(bz, &supply))
 
 	expectedSupply := types.NewAssetSupply(c(denom, 1000),
-		c(denom, 0), c(denom, 0), c(denom, 0), time.Duration(0))
+		c(denom, 0), c(denom, 0), c(denom, 0), 0)
 	suite.Equal(supply, expectedSupply)
 }
 

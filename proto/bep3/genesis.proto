@@ -28,10 +28,8 @@ message SupplyLimit {
 	];
 	// boolean for whether the supply is limited by time
 	bool time_limited = 2 [(gogoproto.moretags) = "yaml:\"time_limited\""];
-	// the duration for which the supply time limit applies
-	google.protobuf.Duration time_period = 3 [
-		(gogoproto.nullable)    = false,
-		(gogoproto.stdduration) = true,
+	// the time.duration int64 units for which the supply time limit applies
+	int64 time_period = 3 [
 		(gogoproto.moretags)    = "yaml:\"time_period\""
 	];
 	// the supply limit for an asset for each time period
@@ -146,10 +144,9 @@ message AssetSupply {
 		(gogoproto.moretags) = "yaml:\"time_limited_current_supply\"",
 		(gogoproto.nullable) = false
 	];
-	google.protobuf.Duration time_elapsed = 5 [
-		(gogoproto.moretags) = "yaml:\"time_elapsed\"",
-		(gogoproto.nullable) = false,
-		(gogoproto.stdduration) = true
+	// the time.duration int64 units of times elapsed
+	int64 time_elapsed = 5 [
+		(gogoproto.moretags) = "yaml:\"time_elapsed\""
 	];
 }
 

@@ -46,7 +46,7 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 						Limit:          sdk.NewInt(350000000000000),
 						TimeLimited:    false,
 						TimeBasedLimit: sdk.ZeroInt(),
-						TimePeriod:     time.Hour,
+						TimePeriod:     int64(time.Hour),
 					},
 					Active:        true,
 					DeputyAddress: deputyAddress.String(),
@@ -63,7 +63,7 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 						Limit:          sdk.NewInt(100000000000000),
 						TimeLimited:    true,
 						TimeBasedLimit: sdk.NewInt(50000000000),
-						TimePeriod:     time.Hour,
+						TimePeriod:     int64(time.Hour),
 					},
 					Active:        false,
 					DeputyAddress: deputyAddress.String(),
@@ -81,14 +81,14 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 				sdk.NewCoin("bnb", sdk.ZeroInt()),
 				sdk.NewCoin("bnb", sdk.ZeroInt()),
 				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				time.Duration(0),
+				0,
 			),
 			types.NewAssetSupply(
 				sdk.NewCoin("inc", sdk.ZeroInt()),
 				sdk.NewCoin("inc", sdk.ZeroInt()),
 				sdk.NewCoin("inc", sdk.ZeroInt()),
 				sdk.NewCoin("inc", sdk.ZeroInt()),
-				time.Duration(0),
+				0,
 			),
 		},
 		PreviousBlockTime: types.DefaultPreviousBlockTime,
@@ -133,5 +133,5 @@ func assetSupplies(count int) types.AssetSupplies {
 }
 
 func assetSupply(denom string) types.AssetSupply {
-	return types.NewAssetSupply(c(denom, 0), c(denom, 0), c(denom, 0), c(denom, 0), time.Duration(0))
+	return types.NewAssetSupply(c(denom, 0), c(denom, 0), c(denom, 0), c(denom, 0), 0)
 }

@@ -23,7 +23,7 @@ func (suite *GenesisTestSuite) SetupTest() {
 	coin := sdk.NewCoin("kava", sdk.OneInt())
 	suite.swaps = atomicSwaps(10)
 
-	supply := types.NewAssetSupply(coin, coin, coin, coin, time.Duration(0))
+	supply := types.NewAssetSupply(coin, coin, coin, coin, 0)
 	suite.supplies = types.AssetSupplies{supply}
 }
 

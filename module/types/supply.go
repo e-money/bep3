@@ -17,7 +17,7 @@ func NewAssetSupply(incomingSupply, outgoingSupply, currentSupply, timeLimitedSu
 		OutgoingSupply:           outgoingSupply,
 		CurrentSupply:            currentSupply,
 		TimeLimitedCurrentSupply: timeLimitedSupply,
-		TimeElapsed:              timeElapsed,
+		TimeElapsed:              int64(timeElapsed),
 	}
 }
 
@@ -66,7 +66,7 @@ func (a AssetSupply) String() string {
 		Time-limited current cupply: %s
 		Time elapsed: %s
 		`,
-		a.IncomingSupply, a.OutgoingSupply, a.CurrentSupply, a.TimeLimitedCurrentSupply, a.TimeElapsed)
+		a.IncomingSupply, a.OutgoingSupply, a.CurrentSupply, a.TimeLimitedCurrentSupply, time.Duration(a.TimeElapsed))
 }
 
 // GetDenom getter method for the denom of the asset supply

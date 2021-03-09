@@ -212,7 +212,7 @@ AssetSupply contains information about an asset's supply
 | `outgoing_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
 | `current_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
 | `time_limited_current_supply` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
-| `time_elapsed` | [google.protobuf.Duration](#google.protobuf.Duration) |  |  |
+| `time_elapsed` | [int64](#int64) |  | the time.duration int64 units of times elapsed |
 
 
 
@@ -262,7 +262,7 @@ SupplyLimit parameters that control the absolute and time-based limits for an as
 | ----- | ---- | ----- | ----------- |
 | `limit` | [string](#string) |  | the absolute supply limit for an asset |
 | `time_limited` | [bool](#bool) |  | boolean for whether the supply is limited by time |
-| `time_period` | [google.protobuf.Duration](#google.protobuf.Duration) |  | the duration for which the supply time limit applies |
+| `time_period` | [int64](#int64) |  | the time.duration int64 units for which the supply time limit applies |
 | `time_based_limit` | [string](#string) |  | the supply limit for an asset for each time period |
 
 

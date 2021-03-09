@@ -98,7 +98,7 @@ func (sl SupplyLimit) String() string {
 	%t
 	%s
 	%s
-	`, sl.Limit, sl.TimeLimited, sl.TimePeriod, sl.TimeBasedLimit)
+	`, sl.Limit, sl.TimeLimited, time.Duration(sl.TimePeriod), sl.TimeBasedLimit)
 }
 
 // Equals returns true if two supply limits are equal
