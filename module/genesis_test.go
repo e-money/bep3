@@ -2,12 +2,15 @@ package bep3_test
 
 import (
 	"encoding/json"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bep3 "github.com/e-money/bep3/module"
+	bep3types "github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
 	"github.com/stretchr/testify/suite"
 )
@@ -132,6 +135,58 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,
+		},
+		{
+			name: "emtest",
+			genState: func() app.GenesisState {
+				gs := bep3types.DefaultGenesisState()
+				bep3Denoms, bep3Coins := getBep3Coins()
+				gs.Params.AssetParams = make([]bep3types.AssetParam, len(bep3Denoms))
+				gs.Supplies = make([]bep3types.AssetSupply, len(bep3Denoms))
+
+				// Deterministic randomizer
+				r := rand.New(rand.NewSource(1))
+				limit := sdk.NewInt(int64(bep3.MaxSupplyLimit))
+				for idx, denom := range bep3Denoms {
+					bep3Coins[idx] = sdk.NewCoin(denom, limit)
+
+					gs.Supplies[idx] = bep3types.AssetSupply{
+						IncomingSupply:           sdk.NewCoin(denom, sdk.ZeroInt()),
+						OutgoingSupply:           sdk.NewCoin(denom, sdk.ZeroInt()),
+						CurrentSupply:            sdk.NewCoin(denom, limit),
+						TimeLimitedCurrentSupply: sdk.NewCoin(denom, sdk.ZeroInt()),
+						TimeElapsed:              0,
+					}
+					gs.Params.AssetParams[idx] =
+						bep3types.AssetParam{
+							Denom:  denom,
+							CoinID: int64(idx) + 1,
+							SupplyLimit: bep3types.SupplyLimit{
+								Limit:          limit,
+								TimeLimited:    false,
+								TimePeriod:     time.Hour * 24,
+								TimeBasedLimit: sdk.ZeroInt(),
+							},
+							Active:        true,
+							DeputyAddress: suite.addrs[0].String(),
+							FixedFee:      bep3.GenRandFixedFee(r),
+							MinSwapAmount: sdk.OneInt(),
+							MaxSwapAmount: limit,
+							SwapTimestamp: time.Now().Unix(),
+							SwapTimeSpan:  60 * 60 * 24 * 3, // 3 days
+						}
+				}
+
+				// test 2-way marshalling
+				gsBytes := bep3.ModuleCdc.MustMarshalJSON(gs)
+				var gsCp bep3.GenesisState
+				bep3.ModuleCdc.MustUnmarshalJSON(gsBytes, &gsCp)
+				if !gs.Equal(gsCp) {
+					panic("unwound genesis not equal")
+				}
+				return app.GenesisState{"bep3": gsBytes}
+			},
+			expectPass: true,
 		},
 		{
 			name: "incoming supply + current supply above limit",

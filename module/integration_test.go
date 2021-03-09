@@ -38,6 +38,19 @@ func NewBep3GenStateMulti(deputy sdk.AccAddress) app.GenesisState {
 	return app.GenesisState{bep3.ModuleName: bep3.ModuleCdc.MustMarshalJSON(&bep3Genesis)}
 }
 
+func getBep3Coins() ([]string, sdk.Coins) {
+	// bep3 genesis for supported coins
+	bep3Denoms := []string{"bnb", "inc", "echf", "edkk", "eeur", "enok", "esek", "ungm"}
+	coins := make(sdk.Coins, len(bep3Denoms))
+	amount := sdk.NewInt(int64(bep3.MaxSupplyLimit))
+
+	for idx, denom := range bep3Denoms {
+		coins[idx] = sdk.NewCoin(denom, amount)
+	}
+
+	return bep3Denoms, coins
+}
+
 func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 	_ = &bep3.MsgCreateAtomicSwap{}
 	bep3Genesis := bep3.GenesisState{
