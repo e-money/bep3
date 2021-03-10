@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -64,6 +65,9 @@ func (a AtomicSwap) Validate() error {
 	}
 	if a.Timestamp == 0 {
 		return errors.New("timestamp cannot be 0")
+	}
+	if time.Unix(a.Timestamp, 0).Add(24 * time.Hour).Before(time.Now()) {
+		return errors.New("timestamp cannot be more than 1 day in the past")
 	}
 	if len(a.Sender) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender cannot be empty")
