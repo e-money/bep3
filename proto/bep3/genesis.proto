@@ -150,6 +150,7 @@ message AssetSupply {
 	];
 }
 
+// slice of AssetSupply
 message AssetSupplies {
 	option (gogoproto.goproto_stringer) = true;
 	repeated AssetSupply asset_supplies = 1 [

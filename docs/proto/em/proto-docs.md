@@ -7,6 +7,7 @@
 - [bep3/swap.proto](#bep3/swap.proto)
     - [AtomicSwap](#bep3.AtomicSwap)
     - [AugmentedAtomicSwap](#bep3.AugmentedAtomicSwap)
+    - [AugmentedAtomicSwaps](#bep3.AugmentedAtomicSwaps)
     - [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap)
     - [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap)
     - [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap)
@@ -84,6 +85,21 @@ AtomicSwap with an ID
 | `status` | [uint32](#uint32) |  |  |
 | `cross_chain` | [bool](#bool) |  |  |
 | `direction` | [uint32](#uint32) |  |  |
+
+
+
+
+
+
+<a name="bep3.AugmentedAtomicSwaps"></a>
+
+### AugmentedAtomicSwaps
+Slice of Augmented Atomic Swaps
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `augmented_atomic_swaps` | [AugmentedAtomicSwap](#bep3.AugmentedAtomicSwap) | repeated |  |
 
 
 
@@ -204,7 +220,7 @@ AssetParam parameters that must be specified for each bep3 asset
 <a name="bep3.AssetSupplies"></a>
 
 ### AssetSupplies
-
+slice of AssetSupply
 
 
 | Field | Type | Label | Description |

@@ -320,15 +320,15 @@ $ emcli q bep3 swaps --page=2 --limit=100
 				return err
 			}
 
-			if len(matchingAtomicSwaps) == 0 {
+			if len(matchingAtomicSwaps.AugmentedAtomicSwaps) == 0 {
 				return fmt.Errorf("No matching atomic swaps found")
 			}
 
 			cliCtx = cliCtx.WithHeight(height)
 
-			al := make([]string, len(matchingAtomicSwaps))
-			for i := 0; i < len(matchingAtomicSwaps); i++ {
-				al[i] = matchingAtomicSwaps[i].String()
+			al := make([]string, len(matchingAtomicSwaps.AugmentedAtomicSwaps))
+			for i := 0; i < len(matchingAtomicSwaps.AugmentedAtomicSwaps); i++ {
+				al[i] = matchingAtomicSwaps.AugmentedAtomicSwaps[i].String()
 			}
 
 			return cliCtx.PrintProto(&matchingAtomicSwaps)

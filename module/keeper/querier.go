@@ -104,7 +104,7 @@ func queryAtomicSwaps(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]
 	augmentedSwaps := types.AugmentedAtomicSwaps{}
 
 	for _, swap := range swaps {
-		augmentedSwaps = append(augmentedSwaps, types.NewAugmentedAtomicSwap(swap))
+		augmentedSwaps.AugmentedAtomicSwaps = append(augmentedSwaps.AugmentedAtomicSwaps, types.NewAugmentedAtomicSwap(swap))
 	}
 
 	bz, err := codec.MarshalJSONIndent(types.ModuleCdc.LegacyAmino, augmentedSwaps)

@@ -316,6 +316,7 @@ func (m *AssetSupply) GetTimeElapsed() int64 {
 	return 0
 }
 
+// slice of AssetSupply
 type AssetSupplies struct {
 	AssetSupplies []AssetSupply `protobuf:"bytes,1,rep,name=asset_supplies,json=assetSupplies,proto3" json:"asset_supplies" yaml:"asset_supplies"`
 }

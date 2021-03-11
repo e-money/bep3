@@ -164,8 +164,8 @@ func (suite *QuerierTestSuite) TestQueryAtomicSwaps() {
 	var swaps types.AugmentedAtomicSwaps
 	suite.Nil(suite.marshaller.UnmarshalJSON(bz, &swaps))
 
-	suite.Equal(len(suite.swapIDs), len(swaps))
-	for _, swap := range swaps {
+	suite.Equal(len(suite.swapIDs), len(swaps.AugmentedAtomicSwaps))
+	for _, swap := range swaps.AugmentedAtomicSwaps {
 		suite.True(suite.isSwapID[swap.ID])
 	}
 }
