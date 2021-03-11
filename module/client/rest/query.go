@@ -203,8 +203,7 @@ func queryAssetSuppliesHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		cliCtx = cliCtx.WithHeight(height)
 
 		var supplies types.AssetSupplies
-		// TODO use proto codec
-		err = cliCtx.LegacyAmino.UnmarshalJSON(res, &supplies)
+		err = cliCtx.JSONMarshaler.UnmarshalJSON(res, &supplies)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

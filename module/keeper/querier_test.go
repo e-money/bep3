@@ -181,7 +181,9 @@ func (suite *QuerierTestSuite) TestQueryParams() {
 
 	bep3GenesisState := NewBep3GenState(suite.addrs[10])
 	gs := types.GenesisState{}
-	types.ModuleCdc.UnmarshalJSON(bep3GenesisState, &gs)
+	err = types.ModuleCdc.UnmarshalJSON(bep3GenesisState, &gs)
+	suite.Nil(err)
+
 	// update asset supply to account for swaps that were created in setup
 	suite.Equal(gs.Params, p)
 }

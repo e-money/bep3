@@ -56,7 +56,8 @@ func (suite *AtomicSwapTestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		bankKeeper.SetBalances(ctx, addr, coins)
+		err := bankKeeper.SetBalances(ctx, addr, coins)
+		suite.Require().Nil(err)
 		accountKeeper.SetAccount(ctx, account)
 	}
 

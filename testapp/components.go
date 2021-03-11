@@ -71,7 +71,7 @@ func CreateTestComponents(t *testing.T) (
 	bankKeeper.SetSupply(ctx, banktypes.NewSupply(sdk.NewCoins()))
 
 	return ctx,
-		codec.NewAminoCodec(encoding.Amino),
+		codec.NewProtoCodec(nil),
 		bep3Keeper,
 		accountKeeper,
 		bankKeeper,
