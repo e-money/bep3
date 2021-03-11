@@ -1,6 +1,8 @@
 package bep3
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/e-money/bep3/module/types"
@@ -25,6 +27,7 @@ func NewHandler(k Keeper) sdk.Handler {
 
 // handleMsgCreateAtomicSwap handles requests to create a new AtomicSwap
 func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgCreateAtomicSwap) (*sdk.Result, error) {
+	fmt.Println("***************** Entered handleMsgCreateAtomic Swap")
 	from, errBech := sdk.AccAddressFromBech32(msg.From)
 	if errBech != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgCreateAtomicSwap from:%s, error:%s",
@@ -58,6 +61,7 @@ func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgCreateAtomicSw
 
 // handleMsgClaimAtomicSwap handles requests to claim funds in an active AtomicSwap
 func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgClaimAtomicSwap) (*sdk.Result, error) {
+	fmt.Println("***************** Entered handleMsgClaimAtomicSwap")
 	from, errBech := sdk.AccAddressFromBech32(msg.From)
 	if errBech != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgClaimAtomicSwap from:%s, error:%s",
@@ -84,6 +88,7 @@ func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgClaimAtomicSwap
 
 // handleMsgRefundAtomicSwap handles requests to refund an active AtomicSwap
 func handleMsgRefundAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgRefundAtomicSwap) (*sdk.Result, error) {
+	fmt.Println("***************** Entered handleMsgRefundAtomicSwap")
 	from, errBech := sdk.AccAddressFromBech32(msg.From)
 	if errBech != nil {
 		return nil, sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "handleMsgRefundAtomicSwap from:%s, error:%s",

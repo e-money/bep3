@@ -2,7 +2,6 @@ syntax = "proto3";
 package bep3;
 
 import "gogoproto/gogo.proto";
-import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "bep3/swap.proto";
@@ -152,7 +151,6 @@ message AssetSupply {
 
 // slice of AssetSupply
 message AssetSupplies {
-	option (gogoproto.goproto_stringer) = true;
 	repeated AssetSupply asset_supplies = 1 [
 		(gogoproto.moretags) = "yaml:\"asset_supplies\"",
 		(gogoproto.nullable) = false

@@ -23,9 +23,19 @@
   
 - [bep3/query.proto](#bep3/query.proto)
     - [QueryAssetSupplies](#bep3.QueryAssetSupplies)
+    - [QueryAssetSuppliesRequest](#bep3.QueryAssetSuppliesRequest)
+    - [QueryAssetSuppliesResponse](#bep3.QueryAssetSuppliesResponse)
     - [QueryAssetSupply](#bep3.QueryAssetSupply)
+    - [QueryAssetSupplyRequest](#bep3.QueryAssetSupplyRequest)
+    - [QueryAssetSupplyResponse](#bep3.QueryAssetSupplyResponse)
     - [QueryAtomicSwapByID](#bep3.QueryAtomicSwapByID)
     - [QueryAtomicSwaps](#bep3.QueryAtomicSwaps)
+    - [QuerySwapRequest](#bep3.QuerySwapRequest)
+    - [QuerySwapResponse](#bep3.QuerySwapResponse)
+    - [QuerySwapsRequest](#bep3.QuerySwapsRequest)
+    - [QuerySwapsResponse](#bep3.QuerySwapsResponse)
+  
+    - [Query](#bep3.Query)
   
 - [Scalar Value Types](#scalar-value-types)
 
@@ -338,6 +348,31 @@ Limit int `json:"limit" yaml:"limit"`
 
 
 
+<a name="bep3.QueryAssetSuppliesRequest"></a>
+
+### QueryAssetSuppliesRequest
+gRPC assets req
+
+
+
+
+
+
+<a name="bep3.QueryAssetSuppliesResponse"></a>
+
+### QueryAssetSuppliesResponse
+gRPC asset supplies response
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `supplies` | [AssetSupplies](#bep3.AssetSupplies) |  |  |
+
+
+
+
+
+
 <a name="bep3.QueryAssetSupply"></a>
 
 ### QueryAssetSupply
@@ -347,6 +382,36 @@ QueryAssetSupply contains the params for query 'custom/bep3/supply'
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="bep3.QueryAssetSupplyRequest"></a>
+
+### QueryAssetSupplyRequest
+gRPC asset req
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="bep3.QueryAssetSupplyResponse"></a>
+
+### QueryAssetSupplyResponse
+gRPC asset supply response
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `supply` | [AssetSupply](#bep3.AssetSupply) |  |  |
 
 
 
@@ -387,11 +452,84 @@ QueryAtomicSwaps contains the params for an AtomicSwaps query
 
 
 
+
+<a name="bep3.QuerySwapRequest"></a>
+
+### QuerySwapRequest
+gRPC swap req
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `swap_id` | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="bep3.QuerySwapResponse"></a>
+
+### QuerySwapResponse
+gRPC swap response
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `swap` | [AtomicSwap](#bep3.AtomicSwap) |  |  |
+
+
+
+
+
+
+<a name="bep3.QuerySwapsRequest"></a>
+
+### QuerySwapsRequest
+gRPC swaps req
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [QueryAtomicSwaps](#bep3.QueryAtomicSwaps) |  |  |
+
+
+
+
+
+
+<a name="bep3.QuerySwapsResponse"></a>
+
+### QuerySwapsResponse
+gRPC swap response
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `swaps` | [AugmentedAtomicSwaps](#bep3.AugmentedAtomicSwaps) |  |  |
+
+
+
+
+
  <!-- end messages -->
 
  <!-- end enums -->
 
  <!-- end HasExtensions -->
+
+
+<a name="bep3.Query"></a>
+
+### Query
+
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `AssetSupply` | [QueryAssetSupplyRequest](#bep3.QueryAssetSupplyRequest) | [QueryAssetSupplyResponse](#bep3.QueryAssetSupplyResponse) |  | GET|/e-money/bep3/supply|
+| `AssetSupplies` | [QueryAssetSuppliesRequest](#bep3.QueryAssetSuppliesRequest) | [QueryAssetSuppliesResponse](#bep3.QueryAssetSuppliesResponse) |  | GET|/e-money/bep3/supplies|
+| `Swap` | [QuerySwapRequest](#bep3.QuerySwapRequest) | [QuerySwapResponse](#bep3.QuerySwapResponse) |  | GET|/e-money/bep3/swap|
+| `Swaps` | [QuerySwapsRequest](#bep3.QuerySwapsRequest) | [QuerySwapsResponse](#bep3.QuerySwapsResponse) |  | GET|/e-money/bep3/swap|
 
  <!-- end services -->
 

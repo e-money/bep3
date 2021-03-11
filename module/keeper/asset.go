@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/e-money/bep3/module/types"
@@ -12,6 +14,11 @@ func (k Keeper) IncrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) erro
 	if !found {
 		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
+
+	fmt.Println("******** Supply of ", coin.Denom,
+		"current:", supply.CurrentSupply.String(),
+		"outgoing:", supply.OutgoingSupply.String(),
+		"incoming:", supply.IncomingSupply.String())
 
 	limit, err := k.GetSupplyLimit(ctx, coin.Denom)
 	if err != nil {
@@ -34,6 +41,12 @@ func (k Keeper) IncrementCurrentAssetSupply(ctx sdk.Context, coin sdk.Coin) erro
 
 	supply.CurrentSupply = supply.CurrentSupply.Add(coin)
 	k.SetAssetSupply(ctx, supply, coin.Denom)
+
+	fmt.Println("******** Inc Current Supply of ", coin.Denom,
+		"current:", supply.CurrentSupply.String(),
+		"outgoing:", supply.OutgoingSupply.String(),
+		"incoming:", supply.IncomingSupply.String())
+
 	return nil
 }
 
@@ -94,6 +107,11 @@ func (k Keeper) DecrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
+	fmt.Println("******** Supply of ", coin.Denom,
+		"current:", supply.CurrentSupply.String(),
+		"outgoing:", supply.OutgoingSupply.String(),
+		"incoming:", supply.IncomingSupply.String())
+
 	// Resulting incoming supply must be greater than or equal to 0
 	// Use sdk.Int instead of sdk.Coin to prevent panic if true
 	if supply.IncomingSupply.Amount.Sub(coin.Amount).IsNegative() {
@@ -102,6 +120,12 @@ func (k Keeper) DecrementIncomingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 
 	supply.IncomingSupply = supply.IncomingSupply.Sub(coin)
 	k.SetAssetSupply(ctx, supply, coin.Denom)
+
+	fmt.Println("******** Dec In Supply of ", coin.Denom,
+		"current:", supply.CurrentSupply.String(),
+		"outgoing:", supply.OutgoingSupply.String(),
+		"incoming:", supply.IncomingSupply.String())
+
 	return nil
 }
 
@@ -112,6 +136,11 @@ func (k Keeper) IncrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
+	fmt.Println("******** Supply of ", coin.Denom,
+		"current:", supply.CurrentSupply.String(),
+		"outgoing:", supply.OutgoingSupply.String(),
+		"incoming:", supply.IncomingSupply.String())
+
 	// Result of (outgoing + amount) must be less than current supply
 	if supply.CurrentSupply.IsLT(supply.OutgoingSupply.Add(coin)) {
 		return sdkerrors.Wrapf(types.ErrExceedsAvailableSupply, "swap amount %s, available supply %s", coin,
@@ -120,6 +149,12 @@ func (k Keeper) IncrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 
 	supply.OutgoingSupply = supply.OutgoingSupply.Add(coin)
 	k.SetAssetSupply(ctx, supply, coin.Denom)
+
+	fmt.Println("******** Inc Out Supply of ", coin.Denom,
+		"current:", supply.CurrentSupply.String(),
+		"outgoing:", supply.OutgoingSupply.String(),
+		"incoming:", supply.IncomingSupply.String())
+
 	return nil
 }
 
@@ -130,6 +165,11 @@ func (k Keeper) DecrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 		return sdkerrors.Wrap(types.ErrAssetNotSupported, coin.Denom)
 	}
 
+	fmt.Println("******** Supply of ", coin.Denom,
+		"current:", supply.CurrentSupply.String(),
+		"outgoing:", supply.OutgoingSupply.String(),
+		"incoming:", supply.IncomingSupply.String())
+
 	// Resulting outgoing supply must be greater than or equal to 0
 	// Use sdk.Int instead of sdk.Coin to prevent panic if true
 	if supply.OutgoingSupply.Amount.Sub(coin.Amount).IsNegative() {
@@ -138,6 +178,12 @@ func (k Keeper) DecrementOutgoingAssetSupply(ctx sdk.Context, coin sdk.Coin) err
 
 	supply.OutgoingSupply = supply.OutgoingSupply.Sub(coin)
 	k.SetAssetSupply(ctx, supply, coin.Denom)
+
+	fmt.Println("******** Dec Out Supply of ", coin.Denom,
+		"current:", supply.CurrentSupply.String(),
+		"outgoing:", supply.OutgoingSupply.String(),
+		"incoming:", supply.IncomingSupply.String())
+
 	return nil
 }
 

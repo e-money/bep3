@@ -1,6 +1,7 @@
 package bep3
 
 import (
+	"context"
 	"encoding/json"
 	"math/rand"
 
@@ -68,8 +69,8 @@ func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
 	rest.RegisterRoutes(ctx, rtr)
 }
 
-// TODO GRPC
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
+	bep3types.RegisterQueryHandlerClient(context.Background(), mux, bep3types.NewQueryClient(clientCtx))
 }
 
 // GetTxCmd returns the root tx command for the bep3 module.
@@ -152,6 +153,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 }
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
+	bep3types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
 // BeginBlock returns the begin blocker for the bep3 module.

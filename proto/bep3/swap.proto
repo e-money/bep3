@@ -52,7 +52,6 @@ message AtomicSwap {
 
 // Slice of Augmented Atomic Swaps
 message AugmentedAtomicSwaps {
-  option (gogoproto.goproto_stringer) = true;
   repeated AugmentedAtomicSwap augmented_atomic_swaps = 1 [
     (gogoproto.moretags) = "yaml:\"augmented_atomic_swaps\"",
     (gogoproto.nullable) = false

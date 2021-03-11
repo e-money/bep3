@@ -4,6 +4,81 @@ package bep3;
 option go_package = "github.com/e-money/bep3/module/types";
 
 import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "bep3/genesis.proto";
+import "bep3/swap.proto";
+
+service Query {
+  rpc AssetSupply(QueryAssetSupplyRequest) returns (QueryAssetSupplyResponse) {
+    option (google.api.http).get = "/e-money/bep3/supply";
+  };
+  rpc AssetSupplies(QueryAssetSuppliesRequest) returns (QueryAssetSuppliesResponse) {
+    option (google.api.http).get = "/e-money/bep3/supplies";
+  };
+  rpc Swap(QuerySwapRequest) returns (QuerySwapResponse) {
+    option (google.api.http).get = "/e-money/bep3/swap";
+  };
+  rpc Swaps(QuerySwapsRequest) returns (QuerySwapsResponse) {
+    option (google.api.http).get = "/e-money/bep3/swap";
+  };
+}
+
+// gRPC asset req
+message QueryAssetSupplyRequest {
+  string denom = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
+}
+
+// gRPC asset supply response
+message QueryAssetSupplyResponse {
+  AssetSupply supply = 1 [
+    (gogoproto.moretags) = "yaml:\"supply\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// gRPC assets req
+message QueryAssetSuppliesRequest {}
+
+// gRPC asset supplies response
+message QueryAssetSuppliesResponse {
+  AssetSupplies supplies = 1 [
+    (gogoproto.moretags) = "yaml:\"supplies\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// gRPC swap req
+message QuerySwapRequest {
+  bytes swap_id = 1 [
+    (gogoproto.customname) = "SwapID",
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
+    (gogoproto.moretags) = "yaml:\"swap_id\""
+  ];
+}
+
+// gRPC swap response
+message QuerySwapResponse {
+  AtomicSwap swap = 1[
+    (gogoproto.moretags) = "yaml:\"swap\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// gRPC swaps req
+message QuerySwapsRequest {
+  QueryAtomicSwaps params = 1 [
+    (gogoproto.moretags) = "yaml:\"params\""
+  ];
+}
+
+// gRPC swap response
+message QuerySwapsResponse {
+  AugmentedAtomicSwaps swaps = 1 [
+    (gogoproto.moretags) = "yaml:\"swaps\"",
+    (gogoproto.nullable) = false
+  ];
+}
 
 /* type QueryAssetSupply struct {
 	Denom string `json:"denom" yaml:"denom"`

@@ -139,23 +139,15 @@ func QueryGetAssetSupplyCmd() *cobra.Command {
 				return err
 			}
 
-			// Prepare query params
-			bz, err := cliCtx.LegacyAmino.MarshalJSON(types.NewQueryAssetSupply(args[0]))
-			if err != nil {
-				return err
-			}
-
+			queryClient := types.NewQueryClient(cliCtx)
 			// Execute query
-			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetAssetSupply), bz)
+			res, err := queryClient.AssetSupply(cmd.Context(), &types.QueryAssetSupplyRequest{Denom: args[0]})
 			if err != nil {
 				return err
 			}
 
 			// Decode and print results
-			var assetSupply types.AssetSupply
-			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &assetSupply)
-			return cliCtx.PrintProto(&assetSupply)
+			return cliCtx.PrintProto(res)
 		},
 	}
 }
@@ -172,27 +164,14 @@ func QueryGetAssetSuppliesCmd() *cobra.Command {
 				return err
 			}
 
-			res, height, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetAssetSupplies), nil)
+			queryClient := types.NewQueryClient(cliCtx)
+			// Execute query
+			res, err := queryClient.AssetSupplies(cmd.Context(), &types.QueryAssetSuppliesRequest{})
 			if err != nil {
 				return err
 			}
 
-			var assetSupplies types.AssetSupplies
-			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &assetSupplies)
-
-			if len(assetSupplies.AssetSupplies) == 0 {
-				return fmt.Errorf("currently no asset supplies exist")
-			}
-
-			cliCtx = cliCtx.WithHeight(height)
-
-			sl := make([]string, len(assetSupplies.AssetSupplies))
-			for i := 0; i < len(assetSupplies.AssetSupplies); i++ {
-				sl[i] = assetSupplies.AssetSupplies[i].String()
-			}
-
-			return cliCtx.PrintProto(&assetSupplies)
+			return cliCtx.PrintProto(res)
 		},
 	}
 }
@@ -216,24 +195,15 @@ func QueryGetAtomicSwapCmd() *cobra.Command {
 				return err
 			}
 
-			// Prepare query params
-			bz, err := cliCtx.LegacyAmino.MarshalJSON(types.NewQueryAtomicSwapByID(swapID))
-			if err != nil {
-				return err
-			}
-
+			queryClient := types.NewQueryClient(cliCtx)
 			// Execute query
-			res, height, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetAtomicSwap), bz)
-			if err != nil {
-				return err
-			}
+			res, err := queryClient.Swap(cmd.Context(), &types.QuerySwapRequest{
+				SwapID: swapID,
+			})
 
-			var atomicSwap types.AugmentedAtomicSwap
-			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &atomicSwap)
+			// TODO add ID to result
 
-			cliCtx = cliCtx.WithHeight(height)
-			return cliCtx.PrintProto(&atomicSwap)
+			return cliCtx.PrintProto(res)
 		},
 	}
 }
@@ -304,34 +274,13 @@ $ emcli q bep3 swaps --page=2 --limit=100
 				return err
 			}
 
-			bz, err := cliCtx.LegacyAmino.MarshalJSON(params)
-			if err != nil {
-				return err
-			}
+			queryClient := types.NewQueryClient(cliCtx)
+			// Execute query
+			res, err := queryClient.Swaps(cmd.Context(), &types.QuerySwapsRequest{
+				Params: &params,
+			})
 
-			res, height, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryGetAtomicSwaps), bz)
-			if err != nil {
-				return err
-			}
-
-			var matchingAtomicSwaps types.AugmentedAtomicSwaps
-			if err := cliCtx.LegacyAmino.UnmarshalJSON(res, &matchingAtomicSwaps); err != nil {
-				return err
-			}
-
-			if len(matchingAtomicSwaps.AugmentedAtomicSwaps) == 0 {
-				return fmt.Errorf("No matching atomic swaps found")
-			}
-
-			cliCtx = cliCtx.WithHeight(height)
-
-			al := make([]string, len(matchingAtomicSwaps.AugmentedAtomicSwaps))
-			for i := 0; i < len(matchingAtomicSwaps.AugmentedAtomicSwaps); i++ {
-				al[i] = matchingAtomicSwaps.AugmentedAtomicSwaps[i].String()
-			}
-
-			return cliCtx.PrintProto(&matchingAtomicSwaps)
+			return cliCtx.PrintProto(res)
 		},
 	}
 
