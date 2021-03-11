@@ -78,18 +78,18 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 		Supplies: types.AssetSupplies{
 			AssetSupplies: []types.AssetSupply{
 				{
-					sdk.NewCoin("bnb", sdk.ZeroInt()),
-					sdk.NewCoin("bnb", sdk.ZeroInt()),
-					sdk.NewCoin("bnb", sdk.ZeroInt()),
-					sdk.NewCoin("bnb", sdk.ZeroInt()),
-					0,
+					IncomingSupply:sdk.NewCoin("bnb", sdk.ZeroInt()),
+					OutgoingSupply:sdk.NewCoin("bnb", sdk.ZeroInt()),
+					CurrentSupply:sdk.NewCoin("bnb", sdk.ZeroInt()),
+					TimeLimitedCurrentSupply:sdk.NewCoin("bnb", sdk.ZeroInt()),
+					TimeElapsed:0,
 				},
 				{
-					sdk.NewCoin("inc", sdk.ZeroInt()),
-					sdk.NewCoin("inc", sdk.ZeroInt()),
-					sdk.NewCoin("inc", sdk.ZeroInt()),
-					sdk.NewCoin("inc", sdk.ZeroInt()),
-					0,
+					IncomingSupply:sdk.NewCoin("inc", sdk.ZeroInt()),
+					OutgoingSupply:sdk.NewCoin("inc", sdk.ZeroInt()),
+					CurrentSupply:sdk.NewCoin("inc", sdk.ZeroInt()),
+					TimeLimitedCurrentSupply:sdk.NewCoin("inc", sdk.ZeroInt()),
+					TimeElapsed:0,
 				},
 			},
 		},
