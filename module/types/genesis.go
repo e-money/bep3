@@ -59,7 +59,7 @@ func (gs GenesisState) Validate() error {
 	}
 
 	supplyDenoms := map[string]bool{}
-	for _, supply := range gs.Supplies {
+	for _, supply := range gs.Supplies.AssetSupplies {
 		if err := supply.Validate(); err != nil {
 			return err
 		}

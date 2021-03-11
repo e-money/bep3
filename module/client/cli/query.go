@@ -181,15 +181,15 @@ func QueryGetAssetSuppliesCmd() *cobra.Command {
 			var assetSupplies types.AssetSupplies
 			cliCtx.LegacyAmino.MustUnmarshalJSON(res, &assetSupplies)
 
-			if len(assetSupplies) == 0 {
+			if len(assetSupplies.AssetSupplies) == 0 {
 				return fmt.Errorf("currently no asset supplies exist")
 			}
 
 			cliCtx = cliCtx.WithHeight(height)
 
-			sl := make([]string, len(assetSupplies))
-			for i := 0; i < len(assetSupplies); i++ {
-				sl[i] = assetSupplies[i].String()
+			sl := make([]string, len(assetSupplies.AssetSupplies))
+			for i := 0; i < len(assetSupplies.AssetSupplies); i++ {
+				sl[i] = assetSupplies.AssetSupplies[i].String()
 			}
 
 			return cliCtx.PrintProto(&assetSupplies)

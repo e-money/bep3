@@ -234,7 +234,7 @@ func (k Keeper) IterateAssetSupplies(ctx sdk.Context, cb func(supply types.Asset
 // GetAllAssetSupplies returns all asset supplies from the store
 func (k Keeper) GetAllAssetSupplies(ctx sdk.Context) (supplies types.AssetSupplies) {
 	k.IterateAssetSupplies(ctx, func(supply types.AssetSupply) bool {
-		supplies = append(supplies, supply)
+		supplies.AssetSupplies = append(supplies.AssetSupplies, supply)
 		return false
 	})
 	return

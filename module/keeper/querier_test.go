@@ -144,7 +144,7 @@ func (suite *QuerierTestSuite) TestQueryAssetSupplies() {
 
 	// Check that returned value matches asset supplies in state
 	storeSupplies := suite.keeper.GetAllAssetSupplies(ctx)
-	suite.Equal(len(storeSupplies), len(supplies))
+	suite.Equal(len(storeSupplies.GetAssetSupplies()), len(supplies.GetAssetSupplies()))
 	suite.Equal(supplies, storeSupplies)
 }
 

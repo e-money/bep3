@@ -22,7 +22,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, accountKeeper types.AccountKeep
 	keeper.SetPreviousBlockTime(ctx, gs.PreviousBlockTime)
 
 	keeper.SetParams(ctx, gs.Params)
-	for _, supply := range gs.Supplies {
+	for _, supply := range gs.Supplies.AssetSupplies {
 		keeper.SetAssetSupply(ctx, supply, supply.GetDenom())
 	}
 
@@ -77,7 +77,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, accountKeeper types.AccountKeep
 
 	// Asset's given incoming/outgoing supply much match the amount of coins in incoming/outgoing atomic swaps
 	supplies := keeper.GetAllAssetSupplies(ctx)
-	for _, supply := range supplies {
+	for _, supply := range supplies.AssetSupplies {
 		incomingSupply := incomingSupplies.AmountOf(supply.GetDenom())
 		if !supply.IncomingSupply.Amount.Equal(incomingSupply) {
 			panic(fmt.Sprintf("asset's incoming supply %s does not match amount %s in incoming atomic swaps",

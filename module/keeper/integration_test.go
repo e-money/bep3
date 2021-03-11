@@ -76,20 +76,22 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 			},
 		},
 		Supplies: types.AssetSupplies{
-			types.NewAssetSupply(
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				0,
-			),
-			types.NewAssetSupply(
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				0,
-			),
+			AssetSupplies: []types.AssetSupply{
+				{
+					sdk.NewCoin("bnb", sdk.ZeroInt()),
+					sdk.NewCoin("bnb", sdk.ZeroInt()),
+					sdk.NewCoin("bnb", sdk.ZeroInt()),
+					sdk.NewCoin("bnb", sdk.ZeroInt()),
+					0,
+				},
+				{
+					sdk.NewCoin("inc", sdk.ZeroInt()),
+					sdk.NewCoin("inc", sdk.ZeroInt()),
+					sdk.NewCoin("inc", sdk.ZeroInt()),
+					sdk.NewCoin("inc", sdk.ZeroInt()),
+					0,
+				},
+			},
 		},
 		PreviousBlockTime: types.DefaultPreviousBlockTime,
 	}
@@ -127,7 +129,7 @@ func assetSupplies(count int) types.AssetSupplies {
 
 	for i := 0; i < count; i++ {
 		supply := assetSupply(DenomMap[i])
-		supplies = append(supplies, supply)
+		supplies.AssetSupplies = append(supplies.AssetSupplies, supply)
 	}
 	return supplies
 }

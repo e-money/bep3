@@ -372,7 +372,7 @@ func (suite *KeeperTestSuite) TestGetAllAssetSupplies() {
 	suite.keeper.SetAssetSupply(suite.ctx, assetSupply, "inc")
 
 	supplies := suite.keeper.GetAllAssetSupplies(suite.ctx)
-	suite.Equal(2, len(supplies))
+	suite.Equal(2, len(supplies.AssetSupplies))
 }
 
 func TestKeeperTestSuite(t *testing.T) {

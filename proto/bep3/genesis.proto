@@ -150,6 +150,14 @@ message AssetSupply {
 	];
 }
 
+message AssetSupplies {
+	option (gogoproto.goproto_stringer) = true;
+	repeated AssetSupply asset_supplies = 1 [
+		(gogoproto.moretags) = "yaml:\"asset_supplies\"",
+		(gogoproto.nullable) = false
+	];
+}
+
 //	Params            Params        `json:"params" yaml:"params"`
 //	AtomicSwaps       AtomicSwaps   `json:"atomic_swaps" yaml:"atomic_swaps"`
 //	Supplies          AssetSupplies `json:"supplies" yaml:"supplies"`
@@ -166,7 +174,7 @@ message GenesisState {
 			(gogoproto.moretags) = "yaml:\"atomic_swaps\"",
 			(gogoproto.nullable) = false
 		];
-		repeated AssetSupply supplies = 3 [
+		AssetSupplies supplies = 3 [
 			(gogoproto.moretags) = "yaml:\"supplies\"",
 			(gogoproto.nullable) = false
 		];

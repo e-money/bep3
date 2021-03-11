@@ -2,6 +2,7 @@ package bep3_test
 
 import (
 	"encoding/json"
+	"github.com/e-money/bep3/module/types"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -93,20 +94,22 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 			},
 		},
 		Supplies: bep3.AssetSupplies{
-			bep3.NewAssetSupply(
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				0,
-			),
-			bep3.NewAssetSupply(
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				0,
-			),
+			AssetSupplies: []types.AssetSupply{
+				{
+					sdk.NewCoin("bnb", sdk.ZeroInt()),
+					sdk.NewCoin("bnb", sdk.ZeroInt()),
+					sdk.NewCoin("bnb", sdk.ZeroInt()),
+					sdk.NewCoin("bnb", sdk.ZeroInt()),
+					0,
+				},
+				{
+					sdk.NewCoin("inc", sdk.ZeroInt()),
+					sdk.NewCoin("inc", sdk.ZeroInt()),
+					sdk.NewCoin("inc", sdk.ZeroInt()),
+					sdk.NewCoin("inc", sdk.ZeroInt()),
+					0,
+				},
+			},
 		},
 		PreviousBlockTime: bep3.DefaultPreviousBlockTime,
 	}

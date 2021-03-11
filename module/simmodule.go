@@ -148,7 +148,7 @@ func loadRandomBep3GenState(simState *module.SimulationState) types.GenesisState
 	supplies := types.AssetSupplies{}
 	for _, asset := range supportedAssets {
 		supply := GenAssetSupply(simState.Rand, asset.Denom)
-		supplies = append(supplies, supply)
+		supplies.AssetSupplies = append(supplies.AssetSupplies, supply)
 	}
 
 	bep3Genesis := types.GenesisState{

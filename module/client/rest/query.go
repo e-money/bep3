@@ -203,6 +203,7 @@ func queryAssetSuppliesHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		cliCtx = cliCtx.WithHeight(height)
 
 		var supplies types.AssetSupplies
+		// TODO use proto codec
 		err = cliCtx.LegacyAmino.UnmarshalJSON(res, &supplies)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
@@ -211,7 +212,7 @@ func queryAssetSuppliesHandlerFn(cliCtx client.Context) http.HandlerFunc {
 
 		// using empty slice so json returns [] instead of null when there's no swaps
 		sliceSupplies := types.AssetSupplies{}
-		sliceSupplies = append(sliceSupplies, supplies...)
+		sliceSupplies.AssetSupplies = append(sliceSupplies.AssetSupplies, supplies.AssetSupplies...)
 		rest.PostProcessResponse(w, cliCtx, cliCtx.LegacyAmino.MustMarshalJSON(sliceSupplies))
 	}
 }

@@ -24,7 +24,7 @@ func (suite *GenesisTestSuite) SetupTest() {
 	suite.swaps = atomicSwaps(10)
 
 	supply := types.NewAssetSupply(coin, coin, coin, coin, 0)
-	suite.supplies = types.AssetSupplies{supply}
+	suite.supplies = types.AssetSupplies{AssetSupplies: []types.AssetSupply{supply}}
 }
 
 func (suite *GenesisTestSuite) TestValidate() {
@@ -67,7 +67,15 @@ func (suite *GenesisTestSuite) TestValidate() {
 			"invalid supply",
 			args{
 				swaps:             types.AtomicSwaps{},
-				supplies:          types.AssetSupplies{types.AssetSupply{IncomingSupply: sdk.Coin{Denom: "Invalid", Amount: sdk.ZeroInt()}}},
+				supplies:          types.AssetSupplies{
+					AssetSupplies: []types.AssetSupply{
+						{
+							IncomingSupply: sdk.Coin{
+								Denom: "Invalid", Amount: sdk.ZeroInt(),
+							},
+						},
+					},
+				},
 				previousBlockTime: types.DefaultPreviousBlockTime,
 			},
 			false,

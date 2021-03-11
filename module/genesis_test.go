@@ -62,7 +62,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				for i := 0; i < 2; i++ {
 					swap, supply := loadSwapAndSupply(addrs[i], i)
 					swaps = append(swaps, swap)
-					supplies = append(supplies, supply)
+					supplies.AssetSupplies = append(supplies.AssetSupplies, supply)
 				}
 				gs.AtomicSwaps = swaps
 				gs.Supplies = supplies
@@ -95,11 +95,13 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
 				assetParam, _ := suite.keeper.GetAsset(suite.ctx, "bnb")
-				gs.Supplies = bep3.AssetSupplies{
-					bep3.AssetSupply{
-						IncomingSupply: c("bnb", 0),
-						OutgoingSupply: c("bnb", 0),
-						CurrentSupply:  c("bnb", assetParam.SupplyLimit.Limit.Add(i(1)).Int64()),
+				gs.Supplies = bep3types.AssetSupplies{
+					AssetSupplies: []bep3types.AssetSupply{
+						{
+							IncomingSupply: c("bnb", 0),
+							OutgoingSupply: c("bnb", 0),
+							CurrentSupply:  c("bnb", assetParam.SupplyLimit.Limit.Add(i(1)).Int64()),
+						},
 					},
 				}
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
@@ -125,11 +127,13 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				gs.AtomicSwaps = bep3.AtomicSwaps{swap}
 
 				// Set up asset supply with overlimit current supply
-				gs.Supplies = bep3.AssetSupplies{
-					bep3.AssetSupply{
-						IncomingSupply: c("bnb", assetParam.SupplyLimit.Limit.Add(i(1)).Int64()),
-						OutgoingSupply: c("bnb", 0),
-						CurrentSupply:  c("bnb", 0),
+				gs.Supplies = bep3types.AssetSupplies{
+					AssetSupplies: []bep3types.AssetSupply{
+						{
+							IncomingSupply: c("bnb", assetParam.SupplyLimit.Limit.Add(i(1)).Int64()),
+							OutgoingSupply: c("bnb", 0),
+							CurrentSupply:  c("bnb", 0),
+						},
 					},
 				}
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
@@ -142,7 +146,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				gs := bep3types.DefaultGenesisState()
 				bep3Denoms, bep3Coins := getBep3Coins()
 				gs.Params.AssetParams = make([]bep3types.AssetParam, len(bep3Denoms))
-				gs.Supplies = make([]bep3types.AssetSupply, len(bep3Denoms))
+				gs.Supplies.AssetSupplies = make([]bep3types.AssetSupply, len(bep3Denoms))
 
 				// Deterministic randomizer
 				r := rand.New(rand.NewSource(1))
@@ -150,7 +154,7 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				for idx, denom := range bep3Denoms {
 					bep3Coins[idx] = sdk.NewCoin(denom, limit)
 
-					gs.Supplies[idx] = bep3types.AssetSupply{
+					gs.Supplies.AssetSupplies[idx] = bep3types.AssetSupply{
 						IncomingSupply:           sdk.NewCoin(denom, sdk.ZeroInt()),
 						OutgoingSupply:           sdk.NewCoin(denom, sdk.ZeroInt()),
 						CurrentSupply:            sdk.NewCoin(denom, limit),
@@ -208,11 +212,13 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 				gs.AtomicSwaps = bep3.AtomicSwaps{swap}
 
 				// Set up asset supply with overlimit current supply
-				gs.Supplies = bep3.AssetSupplies{
-					bep3.AssetSupply{
-						IncomingSupply: c("bnb", halfLimit),
-						OutgoingSupply: c("bnb", 0),
-						CurrentSupply:  c("bnb", overHalfLimit),
+				gs.Supplies = bep3types.AssetSupplies{
+					AssetSupplies: []bep3types.AssetSupply{
+						{
+							IncomingSupply: c("bnb", halfLimit),
+							OutgoingSupply: c("bnb", 0),
+							CurrentSupply:  c("bnb", overHalfLimit),
+						},
 					},
 				}
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
@@ -239,10 +245,12 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 
 				// Set up asset supply with overlimit current supply
 				gs.Supplies = bep3.AssetSupplies{
-					bep3.AssetSupply{
-						IncomingSupply: c("bnb", 0),
-						OutgoingSupply: c("bnb", 0),
-						CurrentSupply:  c("bnb", assetParam.SupplyLimit.Limit.Add(i(1)).Int64()),
+					AssetSupplies: []bep3types.AssetSupply{
+						{
+							IncomingSupply: c("bnb", 0),
+							OutgoingSupply: c("bnb", 0),
+							CurrentSupply:  c("bnb", assetParam.SupplyLimit.Limit.Add(i(1)).Int64()),
+						},
 					},
 				}
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
@@ -253,13 +261,16 @@ func (suite *GenesisTestSuite) TestGenesisState() {
 			name: "asset supply denom is not a supported asset",
 			genState: func() app.GenesisState {
 				gs := baseGenState(suite.addrs[0])
-				gs.Supplies = bep3.AssetSupplies{
-					bep3.AssetSupply{
-						IncomingSupply: c("fake", 0),
-						OutgoingSupply: c("fake", 0),
-						CurrentSupply:  c("fake", 0),
+				gs.Supplies = bep3types.AssetSupplies{
+					AssetSupplies: []bep3types.AssetSupply{
+						{
+							IncomingSupply: c("fake", 0),
+							OutgoingSupply: c("fake", 0),
+							CurrentSupply:  c("fake", 0),
+						},
 					},
 				}
+
 				return app.GenesisState{"bep3": bep3.ModuleCdc.MustMarshalJSON(&gs)}
 			},
 			expectPass: false,

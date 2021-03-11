@@ -14,6 +14,7 @@
   
 - [bep3/genesis.proto](#bep3/genesis.proto)
     - [AssetParam](#bep3.AssetParam)
+    - [AssetSupplies](#bep3.AssetSupplies)
     - [AssetSupply](#bep3.AssetSupply)
     - [GenesisState](#bep3.GenesisState)
     - [Params](#bep3.Params)
@@ -200,6 +201,21 @@ AssetParam parameters that must be specified for each bep3 asset
 
 
 
+<a name="bep3.AssetSupplies"></a>
+
+### AssetSupplies
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `asset_supplies` | [AssetSupply](#bep3.AssetSupply) | repeated |  |
+
+
+
+
+
+
 <a name="bep3.AssetSupply"></a>
 
 ### AssetSupply
@@ -229,7 +245,7 @@ type GenesisState struct {
 | ----- | ---- | ----- | ----------- |
 | `params` | [Params](#bep3.Params) |  |  |
 | `atomic_swaps` | [AtomicSwap](#bep3.AtomicSwap) | repeated |  |
-| `supplies` | [AssetSupply](#bep3.AssetSupply) | repeated |  |
+| `supplies` | [AssetSupplies](#bep3.AssetSupplies) |  |  |
 | `previous_block_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 
 

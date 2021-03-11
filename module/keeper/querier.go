@@ -53,10 +53,8 @@ func queryAssetSupply(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]
 
 func queryAssetSupplies(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) (res []byte, err error) {
 	assets := keeper.GetAllAssetSupplies(ctx)
-	if assets == nil {
-		assets = types.AssetSupplies{}
-	}
 
+	// TODO use proto codec
 	bz, err := codec.MarshalJSONIndent(types.ModuleCdc.LegacyAmino, assets)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
