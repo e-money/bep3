@@ -200,6 +200,9 @@ func QueryGetAtomicSwapCmd() *cobra.Command {
 			res, err := queryClient.Swap(cmd.Context(), &types.QuerySwapRequest{
 				SwapID: swapID,
 			})
+			if err != nil {
+				return err
+			}
 
 			// TODO add ID to result
 
@@ -279,6 +282,9 @@ $ emcli q bep3 swaps --page=2 --limit=100
 			res, err := queryClient.Swaps(cmd.Context(), &types.QuerySwapsRequest{
 				Params: &params,
 			})
+			if err != nil {
+				return err
+			}
 
 			return cliCtx.PrintProto(res)
 		},
