@@ -37,26 +37,26 @@ func GetTxCmd() *cobra.Command {
 
 // GetCmdCreateAtomicSwap cli command for creating atomic swaps
 func GetCmdCreateAtomicSwap() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "create [to] [recipient-other-chain] [sender-other-chain] [timestamp] [coins] [height-span]",
 		Short: "create a new atomic swap",
 		Example: fmt.Sprintf("%s tx %s create emoneyxy7hrjy9r0algz9w3gzm8u6mrpq97kwta747gj 0x1urfermcg92dwq36572cx4xg84wpk3lfpksr5g7 0x1uky3me9ggqypmrsvxk7ur6hqkzq7zmv4ed4ng7 now 100ungm 270 --from validator",
 			version.AppName, types.ModuleName),
 		Args: cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := cmd.Flags().Set(flags.FlagFrom, args[0]); err != nil {
-				return err
-			}
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
 			from := cliCtx.GetFromAddress() // same as e-Money executor's deputy address
+
 			to, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
+
+			fmt.Printf("From: %s\nTo: %s\n", from.String(), to.String())
 
 			recipientOtherChain := args[1] // same as the other executor's deputy address
 			senderOtherChain := args[2]
@@ -112,11 +112,13 @@ func GetCmdCreateAtomicSwap() *cobra.Command {
 			)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 // GetCmdClaimAtomicSwap cli command for claiming an atomic swap
 func GetCmdClaimAtomicSwap() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "claim [swap-id] [random-number]",
 		Short:   "claim coins in an atomic swap using the secret number",
 		Example: fmt.Sprintf("%s tx %s claim 6682c03cc3856879c8fb98c9733c6b0c30758299138166b6523fe94628b1d3af 56f13e6a5cd397447f8b5f8c82fdb5bbf56127db75269f5cc14e50acd8ac9a4c --from accA", version.Name, types.ModuleName),
@@ -152,11 +154,13 @@ func GetCmdClaimAtomicSwap() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), msg)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 // GetCmdRefundAtomicSwap cli command for claiming an atomic swap
 func GetCmdRefundAtomicSwap() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "refund [swap-id]",
 		Short:   "refund the coins in an atomic swap",
 		Example: fmt.Sprintf("%s tx %s refund 6682c03cc3856879c8fb98c9733c6b0c30758299138166b6523fe94628b1d3af --from accA", version.Name, types.ModuleName),
@@ -184,4 +188,6 @@ func GetCmdRefundAtomicSwap() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), msg)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }

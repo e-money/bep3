@@ -128,7 +128,7 @@ func QueryCalcSwapIDCmd() *cobra.Command {
 // QueryGetAssetSupplyCmd queries as asset's current in swap supply, active,
 // supply, and supply limit
 func QueryGetAssetSupplyCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "supply [denom]",
 		Short:   "get information about an asset's supply",
 		Example: "bep3 supply bnb",
@@ -150,11 +150,13 @@ func QueryGetAssetSupplyCmd() *cobra.Command {
 			return cliCtx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 // QueryGetAssetSuppliesCmd queries AssetSupplies in the store
 func QueryGetAssetSuppliesCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "supplies",
 		Short:   "get a list of all asset supplies",
 		Example: "bep3 supplies",
@@ -174,11 +176,13 @@ func QueryGetAssetSuppliesCmd() *cobra.Command {
 			return cliCtx.PrintProto(res)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 // QueryGetAtomicSwapCmd queries an AtomicSwap by swapID
 func QueryGetAtomicSwapCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "swap [swap-id]",
 		Short:   "get atomic swap information",
 		Example: "bep3 swap 6682c03cc3856879c8fb98c9733c6b0c30758299138166b6523fe94628b1d3af",
@@ -204,11 +208,13 @@ func QueryGetAtomicSwapCmd() *cobra.Command {
 				return err
 			}
 
-			// TODO add ID to result
+			augmSwap := types.NewAugmentedAtomicSwap(res.Swap)
 
-			return cliCtx.PrintProto(res)
+			return cliCtx.PrintProto(&augmSwap)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 // QueryGetAtomicSwapsCmd queries AtomicSwaps in the store
@@ -296,13 +302,14 @@ $ emcli q bep3 swaps --page=2 --limit=100
 	cmd.Flags().String(flagExpiration, "", "(optional) filter by atomic swaps that expire before a block height")
 	cmd.Flags().String(flagStatus, "", "(optional) filter by atomic swap status, status: open/completed/expired")
 	cmd.Flags().String(flagDirection, "", "(optional) filter by atomic swap direction, direction: incoming/outgoing")
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }
 
 // QueryParamsCmd queries the bep3 module parameters
 func QueryParamsCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "params",
 		Short:   "get the bep3 module parameters",
 		Example: "bep3 params",
@@ -326,4 +333,6 @@ func QueryParamsCmd() *cobra.Command {
 			return cliCtx.PrintProto(&out)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
