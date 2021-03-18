@@ -26,8 +26,8 @@ func RegisterRoutes(cliCtx client.Context, r *mux.Router) {
 // PostCreateSwapReq defines the properties of a swap create request's body
 type PostCreateSwapReq struct {
 	BaseReq             rest.BaseReq     `json:"base_req" yaml:"base_req"`
-	From                sdk.AccAddress   `json:"from" yaml:"from"`
-	To                  sdk.AccAddress   `json:"to" yaml:"to"`
+	From                string           `json:"from" yaml:"from"`
+	To                  string           `json:"to" yaml:"to"`
 	RecipientOtherChain string           `json:"recipient_other_chain" yaml:"recipient_other_chain"`
 	SenderOtherChain    string           `json:"sender_other_chain" yaml:"sender_other_chain"`
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash" yaml:"random_number_hash"`
