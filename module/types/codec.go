@@ -31,6 +31,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgRefundAtomicSwap{},
 		&MsgClaimAtomicSwap{},
 	)
+	sdk.RegisterInterfaces(registry)
 }
 
 func init() {
@@ -38,5 +39,4 @@ func init() {
 	cryptocodec.RegisterCrypto(amino)
 	authtypes.RegisterLegacyAminoCodec(amino)
 	banktypes.RegisterLegacyAminoCodec(amino)
-	amino.Seal()
 }
