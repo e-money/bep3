@@ -154,6 +154,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	bep3types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	bep3types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 }
 
 // BeginBlock returns the begin blocker for the bep3 module.

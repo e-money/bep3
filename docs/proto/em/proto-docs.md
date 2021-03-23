@@ -37,6 +37,9 @@
   
     - [Query](#bep3.Query)
   
+- [bep3/tx.proto](#bep3/tx.proto)
+    - [Msg](#bep3.Msg)
+  
 - [Scalar Value Types](#scalar-value-types)
 
 
@@ -530,6 +533,34 @@ gRPC swap response
 | `AssetSupplies` | [QueryAssetSuppliesRequest](#bep3.QueryAssetSuppliesRequest) | [QueryAssetSuppliesResponse](#bep3.QueryAssetSuppliesResponse) |  | GET|/e-money/bep3/supplies|
 | `Swap` | [QuerySwapRequest](#bep3.QuerySwapRequest) | [QuerySwapResponse](#bep3.QuerySwapResponse) |  | GET|/e-money/bep3/swap|
 | `Swaps` | [QuerySwapsRequest](#bep3.QuerySwapsRequest) | [QuerySwapsResponse](#bep3.QuerySwapsResponse) |  | GET|/e-money/bep3/swap|
+
+ <!-- end services -->
+
+
+
+<a name="bep3/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## bep3/tx.proto
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="bep3.Msg"></a>
+
+### Msg
+
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `CreateAtomicSwap` | [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap) | [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap) |  | |
+| `ClaimAtomicSwap` | [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap) | [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap) |  | |
+| `RefundAtomicSwap` | [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap) | [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap) |  | |
 
  <!-- end services -->
 

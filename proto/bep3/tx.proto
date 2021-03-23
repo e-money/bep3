@@ -1,0 +1,21 @@
+syntax = "proto3";
+package bep3;
+
+option go_package = "github.com/e-money/bep3/module/types";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "bep3/swap.proto";
+
+service Msg {
+
+  rpc CreateAtomicSwap(MsgCreateAtomicSwap)
+      returns (MsgCreateAtomicSwap);
+
+  rpc ClaimAtomicSwap(MsgClaimAtomicSwap)
+      returns (MsgClaimAtomicSwap);
+
+  rpc RefundAtomicSwap(MsgRefundAtomicSwap)
+      returns (MsgRefundAtomicSwap);
+}
