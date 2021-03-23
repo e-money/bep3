@@ -15,16 +15,34 @@ const (
 	sixtySeconds = 60
 )
 
-// CreateAtomicSwap creates a new atomic swap.
-func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
+//var _ types.MsgServer = msgServer{}
+//
+//type bep3Keeper interface {
+//	createAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
+//		sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, amount sdk.Coins,
+//		crossChain bool)
+//	claimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte, randomNumber []byte) error
+//	refundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte) error
+//}
+//
+//type msgServer struct {
+//	k bep3Keeper
+//}
+//
+//func NewMsgServerImpl(keeper bep3Keeper) types.MsgServer {
+//	return &msgServer{k: keeper}
+//}
+
+// createAtomicSwap creates a new atomic swap.
+func (k Keeper) createAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
 	sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, amount sdk.Coins,
 	crossChain bool) error {
 	// Confirm that this is not a duplicate swap
 	swapID := types.CalculateSwapID(randomNumberHash, sender, senderOtherChain)
 	hexSwapID := hex.EncodeToString(swapID)
-	 fmt.Println("***************** Entered CreateAtomic Swap, swapID:", )
-	 fmt.Printf("**** Swap id from hash:%s,\nsender:%s,\nsenderOtherChain:%s\n",
-		hex.EncodeToString(randomNumberHash), sender.String(), senderOtherChain)
+	 fmt.Println("***************** Entered CreateAtomic Swap, swapID:", hexSwapID)
+	 fmt.Printf("**** Swap from sender: %s,\nTo: %s\nsenderOtherChain: %s\n",
+		sender.String(), recipient.String(), senderOtherChain)
 
 	_, found := k.GetAtomicSwap(ctx, swapID)
 	if found {
@@ -49,7 +67,7 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 		return err
 	}
 
-	fmt.Println("***************** Validated Asset in CreateAtomicSwap(), amount:", amount[0].Amount.String())
+	fmt.Println("***************** Validated Asset in createAtomicSwap(), amount:", amount[0].Amount.String())
 
 	// Swap amount must be within the specified swap amount limits
 	if amount[0].Amount.LT(asset.MinSwapAmount) || amount[0].Amount.GT(asset.MaxSwapAmount) {
@@ -71,14 +89,19 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 	var direction types.SwapDirection
 	if sender.String() == asset.DeputyAddress {
 		if recipient.String() == asset.DeputyAddress {
-			fmt.Println("***************** Error ErrInvalidSwapAccount: deputy cannot be both sender and receiver", asset.DeputyAddress)
+			fmt.Println("***************** ErrInvalidSwapAccount: deputy cannot be both sender and receiver", asset.DeputyAddress)
 			return sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "deputy cannot be both sender and receiver: %s", asset.DeputyAddress)
 		}
 		direction = types.Incoming
 	} else {
 		if recipient.String() != asset.DeputyAddress {
-			fmt.Println("***************** Error ErrInvalidSwapAccount: deputy must be recipient for outgoing account", asset.DeputyAddress)
-			return sdkerrors.Wrapf(types.ErrInvalidSwapAccount, "deputy must be recipient for outgoing account: %s", recipient)
+			fmt.Printf("***************** ErrInvalidSwapAccount: sender: %s, deputy %s must be recipient %s for outgoing swap\n",
+				sender.String(), asset.DeputyAddress, recipient.String())
+			return sdkerrors.Wrapf(types.ErrInvalidSwapAccount,
+				fmt.Sprintf("***************** ErrInvalidSwapAccount: sender: %s, deputy %s must be recipient %s for outgoing swap\n",
+					sender.String(), asset.DeputyAddress, recipient.String()))
+			//return sdkerrors.Wrapf(types.ErrInvalidSwapAccount,
+			//	"asset: %s deputy %s must be recipient for outgoing account: %s",asset.Denom, asset.DeputyAddress, recipient)
 		}
 		direction = types.Outgoing
 	}
@@ -132,7 +155,7 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 	atomicSwap := types.NewAtomicSwap(amount, randomNumberHash, expireTime.Unix(), timestamp, sender, recipient,
 		senderOtherChain, recipientOtherChain, 0, types.Open, crossChain, direction)
 
-	// fmt.Println("***************** About to store the swap in keeper within CreateAtomicSwap")
+	// fmt.Println("***************** About to store the swap in keeper within createAtomicSwap")
 
 	// Insert the atomic swap under both keys
 	k.SetAtomicSwap(ctx, atomicSwap)
@@ -167,8 +190,8 @@ func (k Keeper) CreateAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 	return nil
 }
 
-// ClaimAtomicSwap validates a claim attempt, and if successful, sends the escrowed amount and closes the AtomicSwap.
-func (k Keeper) ClaimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte, randomNumber []byte) error {
+// claimAtomicSwap validates a claim attempt, and if successful, sends the escrowed amount and closes the AtomicSwap.
+func (k Keeper) claimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte, randomNumber []byte) error {
 	fmt.Println("***************** attempting to Claim Swap", hex.EncodeToString(swapID))
 	atomicSwap, found := k.GetAtomicSwap(ctx, swapID)
 	if !found {
@@ -275,8 +298,8 @@ func (k Keeper) ClaimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []b
 	return nil
 }
 
-// RefundAtomicSwap refunds an AtomicSwap, sending assets to the original sender and closing the AtomicSwap.
-func (k Keeper) RefundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte) error {
+// refundAtomicSwap refunds an AtomicSwap, sending assets to the original sender and closing the AtomicSwap.
+func (k Keeper) refundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte) error {
 	fmt.Println("***************** attempting to refund Swap", hex.EncodeToString(swapID))
 	atomicSwap, found := k.GetAtomicSwap(ctx, swapID)
 	if !found {

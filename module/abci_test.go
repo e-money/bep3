@@ -56,7 +56,7 @@ func (suite *ABCITestSuite) ResetKeeper() {
 		randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 
 		// Create atomic swap and check err to confirm creation
-		err := suite.keeper.CreateAtomicSwap(suite.ctx, randomNumberHash, timestamp, swapTimeSpan,
+		err := suite.keeper.createAtomicSwap(suite.ctx, randomNumberHash, timestamp, swapTimeSpan,
 			suite.addrs[11], suite.addrs[i], TestSenderOtherChain, TestRecipientOtherChain,
 			amount, true)
 		suite.Nil(err)
@@ -132,12 +132,12 @@ func (suite *ABCITestSuite) TestBeginBlocker_UpdateExpiredAtomicSwaps() {
 			switch tc.expectedStatus {
 			case bep3.Completed:
 				for i, swapID := range suite.swapIDs {
-					err := suite.keeper.ClaimAtomicSwap(tc.firstCtx, suite.addrs[5], swapID, suite.randomNumbers[i])
+					err := suite.keeper.claimAtomicSwap(tc.firstCtx, suite.addrs[5], swapID, suite.randomNumbers[i])
 					suite.Nil(err)
 				}
 			case bep3.NULL:
 				for _, swapID := range suite.swapIDs {
-					err := suite.keeper.RefundAtomicSwap(tc.firstCtx, suite.addrs[5], swapID)
+					err := suite.keeper.refundAtomicSwap(tc.firstCtx, suite.addrs[5], swapID)
 					suite.Nil(err)
 				}
 			}
@@ -221,7 +221,7 @@ func (suite *ABCITestSuite) TestBeginBlocker_DeleteClosedAtomicSwapsFromLongterm
 			switch tc.action {
 			case Claim:
 				for i, swapID := range suite.swapIDs {
-					err := suite.keeper.ClaimAtomicSwap(tc.firstCtx, suite.addrs[5], swapID, suite.randomNumbers[i])
+					err := suite.keeper.claimAtomicSwap(tc.firstCtx, suite.addrs[5], swapID, suite.randomNumbers[i])
 					suite.Nil(err)
 				}
 			case Refund:
@@ -229,7 +229,7 @@ func (suite *ABCITestSuite) TestBeginBlocker_DeleteClosedAtomicSwapsFromLongterm
 					swap, _ := suite.keeper.GetAtomicSwap(tc.firstCtx, swapID)
 					refundCtx := suite.ctx.WithBlockTime(time.Unix(int64(swap.ExpireTimestamp), 0))
 					bep3.BeginBlocker(refundCtx, suite.keeper)
-					err := suite.keeper.RefundAtomicSwap(refundCtx, suite.addrs[5], swapID)
+					err := suite.keeper.refundAtomicSwap(refundCtx, suite.addrs[5], swapID)
 					suite.Nil(err)
 					// Add expiration timestamp to second ctx block timestamp
 					tc.secondCtx = tc.secondCtx.WithBlockTime(

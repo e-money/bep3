@@ -40,7 +40,7 @@ func handleMsgCreateAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgCreateAtomicSw
 			msg.From, errBech)
 	}
 
-	err := k.CreateAtomicSwap(ctx, msg.RandomNumberHash, msg.Timestamp, msg.TimeSpan,
+	err := k.createAtomicSwap(ctx, msg.RandomNumberHash, msg.Timestamp, msg.TimeSpan,
 		from, to, msg.SenderOtherChain, msg.RecipientOtherChain, msg.Amount, true)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func handleMsgClaimAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgClaimAtomicSwap
 			msg.From, errBech)
 	}
 
-	err := k.ClaimAtomicSwap(ctx, from, msg.SwapID, msg.RandomNumber)
+	err := k.claimAtomicSwap(ctx, from, msg.SwapID, msg.RandomNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func handleMsgRefundAtomicSwap(ctx sdk.Context, k Keeper, msg *MsgRefundAtomicSw
 			msg.From, errBech)
 	}
 
-	err := k.RefundAtomicSwap(ctx, from, msg.SwapID)
+	err := k.refundAtomicSwap(ctx, from, msg.SwapID)
 	if err != nil {
 		return nil, err
 	}
