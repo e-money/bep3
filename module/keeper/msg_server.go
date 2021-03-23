@@ -10,11 +10,11 @@ import (
 var _ types.MsgServer = msgServer{}
 
 type bep3Keeper interface {
-	createAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
+	CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
 		sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, amount sdk.Coins,
 		crossChain bool) (*sdk.Result, error)
-	claimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte, randomNumber []byte) (*sdk.Result, error)
-	refundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte) (*sdk.Result, error)
+	ClaimAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapID []byte, randomNumber []byte) (*sdk.Result, error)
+	RefundAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapID []byte) (*sdk.Result, error)
 }
 
 type msgServer struct {
@@ -35,7 +35,7 @@ func (m msgServer)CreateAtomicSwap(goCtx context.Context, msg *types.MsgCreateAt
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "to")
 	}
-	res, err := m.k.createAtomicSwap(ctx, msg.RandomNumberHash, msg.Timestamp,
+	res, err := m.k.CreateAtomicSwapState(ctx, msg.RandomNumberHash, msg.Timestamp,
 		msg.TimeSpan, fromAcc, toAcc, msg.SenderOtherChain, msg.RecipientOtherChain, msg.Amount, true)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (m msgServer)ClaimAtomicSwap(goCtx context.Context, msg *types.MsgClaimAtom
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender")
 	}
 
-	res, err := m.k.claimAtomicSwap(ctx, fromAcc, msg.SwapID, msg.RandomNumber)
+	res, err := m.k.ClaimAtomicSwapState(ctx, fromAcc, msg.SwapID, msg.RandomNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (m msgServer)RefundAtomicSwap(goCtx context.Context, msg *types.MsgRefundAt
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender")
 	}
 
-	res, err := m.k.refundAtomicSwap(ctx, fromAcc, msg.SwapID)
+	res, err := m.k.RefundAtomicSwapState(ctx, fromAcc, msg.SwapID)
 	if err != nil {
 		return nil, err
 	}

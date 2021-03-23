@@ -16,7 +16,7 @@ const (
 )
 
 // createAtomicSwap creates a new atomic swap.
-func (k Keeper) createAtomicSwap(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
+func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
 	sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, amount sdk.Coins,
 	crossChain bool) (*sdk.Result, error) {
 	// Confirm that this is not a duplicate swap
@@ -49,7 +49,7 @@ func (k Keeper) createAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 		return nil, err
 	}
 
-	fmt.Println("***************** Validated Asset in createAtomicSwap(), amount:", amount[0].Amount.String())
+	fmt.Println("***************** Validated Asset in CreateAtomicSwapState(), amount:", amount[0].Amount.String())
 
 	// Swap amount must be within the specified swap amount limits
 	if amount[0].Amount.LT(asset.MinSwapAmount) || amount[0].Amount.GT(asset.MaxSwapAmount) {
@@ -137,7 +137,7 @@ func (k Keeper) createAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 	atomicSwap := types.NewAtomicSwap(amount, randomNumberHash, expireTime.Unix(), timestamp, sender, recipient,
 		senderOtherChain, recipientOtherChain, 0, types.Open, crossChain, direction)
 
-	// fmt.Println("***************** About to store the swap in keeper within createAtomicSwap")
+	// fmt.Println("***************** About to store the swap in keeper within CreateAtomicSwapState")
 
 	// Insert the atomic swap under both keys
 	k.SetAtomicSwap(ctx, atomicSwap)
@@ -174,7 +174,7 @@ func (k Keeper) createAtomicSwap(ctx sdk.Context, randomNumberHash []byte, times
 }
 
 // claimAtomicSwap validates a claim attempt, and if successful, sends the escrowed amount and closes the AtomicSwap.
-func (k Keeper) claimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte, randomNumber []byte) (*sdk.Result, error) {
+func (k Keeper) ClaimAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapID []byte, randomNumber []byte) (*sdk.Result, error) {
 	fmt.Println("***************** attempting to Claim Swap", hex.EncodeToString(swapID))
 	atomicSwap, found := k.GetAtomicSwap(ctx, swapID)
 	if !found {
@@ -283,7 +283,7 @@ func (k Keeper) claimAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []b
 }
 
 // refundAtomicSwap refunds an AtomicSwap, sending assets to the original sender and closing the AtomicSwap.
-func (k Keeper) refundAtomicSwap(ctx sdk.Context, from sdk.AccAddress, swapID []byte) (*sdk.Result, error) {
+func (k Keeper) RefundAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapID []byte) (*sdk.Result, error) {
 	fmt.Println(
 		"***************** attempting to refund Swap",
 		hex.EncodeToString(swapID))

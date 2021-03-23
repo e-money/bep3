@@ -52,7 +52,8 @@ func (suite *HandlerTestSuite) AddAtomicSwap() (tmbytes.HexBytes, tmbytes.HexByt
 	randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 
 	// Create atomic swap and check err to confirm creation
-	err := suite.keeper.createAtomicSwap(suite.ctx, randomNumberHash, timestamp, expireTimeSpan,
+
+	_, err := suite.keeper.CreateAtomicSwapState(suite.ctx, randomNumberHash, timestamp, expireTimeSpan,
 		suite.addrs[0], suite.addrs[1], TestSenderOtherChain, TestRecipientOtherChain,
 		amount, true)
 	suite.Nil(err)
