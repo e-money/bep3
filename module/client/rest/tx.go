@@ -39,8 +39,6 @@ func BroadcastTxRequest(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		clientCtx.LegacyAmino = types.ModuleCdc.LegacyAmino
-
 		err = clientCtx.LegacyAmino.UnmarshalJSON(body, &req)
 		if err != nil {
 			err = fmt.Errorf("Unmarshalling error of req: %w", err)
