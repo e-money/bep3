@@ -36,11 +36,11 @@ var (
 )
 
 // NewMsgCreateAtomicSwap initializes a new MsgCreateAtomicSwap
-func NewMsgCreateAtomicSwap(from, to sdk.AccAddress, recipientOtherChain, senderOtherChain string,
+func NewMsgCreateAtomicSwap(from, to string, recipientOtherChain, senderOtherChain string,
 	randomNumberHash tmbytes.HexBytes, timestamp int64, amount sdk.Coins, timeSpan int64) *MsgCreateAtomicSwap {
 	return &MsgCreateAtomicSwap{
-		From:                from.String(),
-		To:                  to.String(),
+		From:                from,
+		To:                  to,
 		RecipientOtherChain: recipientOtherChain,
 		SenderOtherChain:    senderOtherChain,
 		RandomNumberHash:    randomNumberHash,

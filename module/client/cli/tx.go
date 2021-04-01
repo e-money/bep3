@@ -51,12 +51,9 @@ func GetCmdCreateAtomicSwap() *cobra.Command {
 
 			from := cliCtx.GetFromAddress() // same as e-Money executor's deputy address
 
-			to, err := sdk.AccAddressFromBech32(args[0])
-			if err != nil {
-				return err
-			}
+			to := args[0]
 
-			fmt.Printf("From: %s\nTo: %s\n", from.String(), to.String())
+			fmt.Printf("From: %s\nTo: %s\n", from.String(), to)
 
 			recipientOtherChain := args[1] // same as the other executor's deputy address
 			senderOtherChain := args[2]
@@ -96,7 +93,7 @@ func GetCmdCreateAtomicSwap() *cobra.Command {
 			}
 
 			msg := types.NewMsgCreateAtomicSwap(
-				from, to, recipientOtherChain, senderOtherChain,
+				from.String(), to, recipientOtherChain, senderOtherChain,
 				randomNumberHash, timestamp, coins, timeSpan,
 			)
 

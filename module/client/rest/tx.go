@@ -76,24 +76,23 @@ func postCreateHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		from, err := sdk.AccAddressFromBech32(req.From)
+		_, err := sdk.AccAddressFromBech32(req.To)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusUnauthorized, fmt.Sprintf("invalid from address: %s, bech32 format error:%s", req.From, err))
-
-			return
-		}
-
-		to, err := sdk.AccAddressFromBech32(req.To)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusUnauthorized, fmt.Sprintf("invalid to address: %s, bech32 format error:%s", req.To, err))
+			rest.WriteErrorResponse(
+				w, http.StatusBadRequest,
+				fmt.Sprintf(
+					"invalid To address: %s, bech32 format error:%s",
+					req.To, err,
+				),
+			)
 
 			return
 		}
 
 		// Create and return msg
 		msg := types.NewMsgCreateAtomicSwap(
-			from,
-			to,
+			req.From,
+			req.To,
 			req.RecipientOtherChain,
 			req.SenderOtherChain,
 			req.RandomNumberHash,

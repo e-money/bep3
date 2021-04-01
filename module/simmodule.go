@@ -363,8 +363,14 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k 
 		coins := sdk.NewCoins(sdk.NewCoin(asset.Denom, amount))
 
 		msg := types.NewMsgCreateAtomicSwap(
-			sender.Address, recipient.Address, recipientOtherChain, senderOtherChain,
-			randomNumberHash, timestamp, coins, asset.SwapTimeSpan,
+			sender.Address.String(),
+			recipient.Address.String(),
+			recipientOtherChain,
+			senderOtherChain,
+			randomNumberHash,
+			timestamp,
+			coins,
+			asset.SwapTimeSpan,
 		)
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
