@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,6 +12,9 @@ import (
 
 const (
 	ThreeDaySeconds = 60 * 60 * 24 * 3
+
+	// Todo set this to a meaningful value
+	DeputyFee = 50000
 )
 
 // Parameter keys
@@ -49,6 +53,12 @@ func DefaultParams() Params {
 func NewAssetParam(denom string, coinID int64, limit SupplyLimit, active bool,
 	deputyAddr sdk.AccAddress, fixedFee sdk.Int, minSwapAmount sdk.Int, maxSwapAmount sdk.Int,
 	swapTimestamp int64, timeSpan int64) AssetParam {
+
+	fmt.Printf("*** NewAssetParam Fee:%s%s\n", denom, fixedFee.String())
+	if strings.Contains(denom, "ngm") || strings.Contains(denom, "NGM") {
+		panic("*** NewAssetParam stop -> ***")
+	}
+
 	return AssetParam{
 		Denom:         denom,
 		CoinID:        coinID,
