@@ -140,6 +140,7 @@ func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, 
 	// Insert the atomic swap under both keys
 	k.SetAtomicSwap(ctx, atomicSwap)
 	k.InsertIntoByTimestamp(ctx, atomicSwap)
+	fmt.Println("*** Succeeded with InsertIntoByTimestamp within CreateAtomicSwapState")
 
 	fmt.Println("*** Success swap created id:", hex.EncodeToString(atomicSwap.GetSwapID()),
 		", height:", ctx.BlockHeight(), ", amount:", atomicSwap.Amount.String(), ", timestamp:",
