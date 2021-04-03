@@ -2,9 +2,11 @@ package keeper
 
 import (
 	"context"
+	"encoding/hex"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/e-money/bep3/module/types"
+	"strconv"
 )
 
 var _ types.MsgServer = msgServer{}
@@ -25,7 +27,7 @@ func NewMsgServerImpl(keeper bep3Keeper) types.MsgServer {
 	return &msgServer{k: keeper}
 }
 
-func (m msgServer)CreateAtomicSwap(goCtx context.Context, msg *types.MsgCreateAtomicSwap)(*types.MsgCreateAtomicSwap, error) {
+func (m msgServer)CreateAtomicSwap(goCtx context.Context, msg *types.MsgCreateAtomicSwap)(*types.MsgCreateAtomicSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	fromAcc, err := sdk.AccAddressFromBech32(msg.From)
 	if err != nil {
@@ -45,7 +47,10 @@ func (m msgServer)CreateAtomicSwap(goCtx context.Context, msg *types.MsgCreateAt
 		ctx.EventManager().EmitEvent(sdk.Event(e))
 	}
 
-	return msg, nil
+	return &types.MsgCreateAtomicSwapResponse{
+		RandomNumberHash: res.Log,
+		SwapID:           hex.EncodeToString(res.Data),
+	}, nil
 }
 
 func (m msgServer)ClaimAtomicSwap(goCtx context.Context, msg *types.MsgClaimAtomicSwap)(*types.MsgClaimAtomicSwap, error) {
@@ -64,10 +69,15 @@ func (m msgServer)ClaimAtomicSwap(goCtx context.Context, msg *types.MsgClaimAtom
 		ctx.EventManager().EmitEvent(sdk.Event(e))
 	}
 
-	return msg, nil
+	timestamp, _ := strconv.Atoi(res.Log)
+
+	return &types.MsgClaimAtomicSwapResponse{
+		RandomNumberHash: hex.EncodeToString(res.Data),
+		Timestamp:        int64(timestamp),
+	}, nil
 }
 
-func (m msgServer)RefundAtomicSwap(goCtx context.Context, msg *types.MsgRefundAtomicSwap)(*types.MsgRefundAtomicSwap, error) {
+func (m msgServer)RefundAtomicSwap(goCtx context.Context, msg *types.MsgRefundAtomicSwap)(*types.MsgRefundAtomicSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	fromAcc, err := sdk.AccAddressFromBech32(msg.From)
@@ -84,5 +94,10 @@ func (m msgServer)RefundAtomicSwap(goCtx context.Context, msg *types.MsgRefundAt
 		ctx.EventManager().EmitEvent(sdk.Event(e))
 	}
 
-	return msg, nil
+	timestamp, _ := strconv.Atoi(res.Log)
+
+	return &types.MsgRefundAtomicSwapResponse{
+		RandomNumberHash: hex.EncodeToString(res.Data),
+		Timestamp:        int64(timestamp),
+	}, nil
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"strconv"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -169,7 +170,10 @@ func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, 
 		sdk.NewAttribute(types.AttributeKeyAtomicSwapID, hex.EncodeToString(atomicSwap.GetSwapID())).String(),
 		sdk.NewAttribute(types.AttributeKeyRandomNumberHash, hex.EncodeToString(atomicSwap.RandomNumberHash)).String())
 
-	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
+	return &sdk.Result{
+		Log:  hex.EncodeToString(atomicSwap.RandomNumberHash),
+		Data: swapID,
+		Events: ctx.EventManager().ABCIEvents()}, nil
 }
 
 // claimAtomicSwap validates a claim attempt, and if successful, sends the escrowed amount and closes the AtomicSwap.
@@ -188,7 +192,7 @@ func (k Keeper) ClaimAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapI
 	}
 
 	//  Calculate hashed secret using submitted number
-	hashedSubmittedNumber := types.CalculateRandomHash(randomNumber, atomicSwap.Timestamp)
+	randomNumberHash := types.CalculateRandomHash(randomNumber, atomicSwap.Timestamp)
 
 	swapSender, errBech := sdk.AccAddressFromBech32(atomicSwap.Sender)
 	if errBech != nil {
@@ -196,7 +200,7 @@ func (k Keeper) ClaimAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapI
 			atomicSwap.Sender, errBech)
 	}
 
-	hashedSecret := types.CalculateSwapID(hashedSubmittedNumber, swapSender, atomicSwap.SenderOtherChain)
+	hashedSecret := types.CalculateSwapID(randomNumberHash, swapSender, atomicSwap.SenderOtherChain)
 
 	// Confirm that secret unlocks the atomic swap
 	if !bytes.Equal(hashedSecret, atomicSwap.GetSwapID()) {
@@ -278,7 +282,11 @@ func (k Keeper) ClaimAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapI
 		sdk.NewAttribute(types.AttributeKeyRandomNumberHash, hex.EncodeToString(atomicSwap.RandomNumberHash)).String(),
 		sdk.NewAttribute(types.AttributeKeyRandomNumber, hex.EncodeToString(randomNumber)).String())
 
-	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
+	return &sdk.Result{
+		Data:   randomNumberHash,
+		Log:    strconv.Itoa(int(atomicSwap.Timestamp)),
+		Events: ctx.EventManager().ABCIEvents(),
+	}, nil
 }
 
 // refundAtomicSwap refunds an AtomicSwap, sending assets to the original sender and closing the AtomicSwap.
@@ -370,7 +378,11 @@ func (k Keeper) RefundAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swap
 		).String(),
 	)
 
-	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
+	return &sdk.Result{
+		Data:   atomicSwap.RandomNumberHash,
+		Log:    strconv.Itoa(int(atomicSwap.Timestamp)),
+		Events: ctx.EventManager().ABCIEvents(),
+	}, nil
 }
 
 // UpdateExpiredAtomicSwaps finds all AtomicSwaps that are past (or at) their ending times and expires them.

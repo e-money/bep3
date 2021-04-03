@@ -11,11 +11,11 @@ import "bep3/swap.proto";
 service Msg {
 
   rpc CreateAtomicSwap(MsgCreateAtomicSwap)
-      returns (MsgCreateAtomicSwap);
+      returns (MsgCreateAtomicSwapResponse);
 
   rpc ClaimAtomicSwap(MsgClaimAtomicSwap)
-      returns (MsgClaimAtomicSwap);
+      returns (MsgClaimAtomicSwapResponse);
 
   rpc RefundAtomicSwap(MsgRefundAtomicSwap)
-      returns (MsgRefundAtomicSwap);
+      returns (MsgRefundAtomicSwapResponse);
 }

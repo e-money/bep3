@@ -9,8 +9,11 @@
     - [AugmentedAtomicSwap](#bep3.AugmentedAtomicSwap)
     - [AugmentedAtomicSwaps](#bep3.AugmentedAtomicSwaps)
     - [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap)
+    - [MsgClaimAtomicSwapResponse](#bep3.MsgClaimAtomicSwapResponse)
     - [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap)
+    - [MsgCreateAtomicSwapResponse](#bep3.MsgCreateAtomicSwapResponse)
     - [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap)
+    - [MsgRefundAtomicSwapResponse](#bep3.MsgRefundAtomicSwapResponse)
     - [PrevBlockTime](#bep3.PrevBlockTime)
   
 - [bep3/genesis.proto](#bep3/genesis.proto)
@@ -136,6 +139,22 @@ MsgClaimAtomicSwap defines a AtomicSwap claim
 
 
 
+<a name="bep3.MsgClaimAtomicSwapResponse"></a>
+
+### MsgClaimAtomicSwapResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `random_number_hash` | [string](#string) |  |  |
+| `timestamp` | [int64](#int64) |  |  |
+
+
+
+
+
+
 <a name="bep3.MsgCreateAtomicSwap"></a>
 
 ### MsgCreateAtomicSwap
@@ -150,8 +169,24 @@ MsgCreateAtomicSwap contains an AtomicSwap struct
 | `sender_other_chain` | [string](#string) |  |  |
 | `random_number_hash` | [bytes](#bytes) |  |  |
 | `timestamp` | [int64](#int64) |  |  |
-| `Amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `time_span` | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="bep3.MsgCreateAtomicSwapResponse"></a>
+
+### MsgCreateAtomicSwapResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `random_number_hash` | [string](#string) |  |  |
+| `swap_id` | [string](#string) |  |  |
 
 
 
@@ -168,6 +203,22 @@ MsgRefundAtomicSwap defines a refund msg
 | ----- | ---- | ----- | ----------- |
 | `from` | [string](#string) |  |  |
 | `swap_id` | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="bep3.MsgRefundAtomicSwapResponse"></a>
+
+### MsgRefundAtomicSwapResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `random_number_hash` | [string](#string) |  |  |
+| `timestamp` | [int64](#int64) |  |  |
 
 
 
@@ -558,9 +609,9 @@ gRPC swap response
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `CreateAtomicSwap` | [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap) | [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap) |  | |
-| `ClaimAtomicSwap` | [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap) | [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap) |  | |
-| `RefundAtomicSwap` | [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap) | [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap) |  | |
+| `CreateAtomicSwap` | [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap) | [MsgCreateAtomicSwapResponse](#bep3.MsgCreateAtomicSwapResponse) |  | |
+| `ClaimAtomicSwap` | [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap) | [MsgClaimAtomicSwapResponse](#bep3.MsgClaimAtomicSwapResponse) |  | |
+| `RefundAtomicSwap` | [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap) | [MsgRefundAtomicSwapResponse](#bep3.MsgRefundAtomicSwapResponse) |  | |
 
  <!-- end services -->
 
