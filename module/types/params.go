@@ -14,7 +14,7 @@ const (
 	ThreeDaySeconds = 60 * 60 * 24 * 3
 
 	// Todo set this to a meaningful value
-	DeputyFee = 50000
+	DeputyFee = 5000
 )
 
 // Parameter keys
