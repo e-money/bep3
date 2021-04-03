@@ -124,25 +124,16 @@ func (k Keeper) GetAllAtomicSwaps(ctx sdk.Context) (atomicSwaps types.AtomicSwap
 
 // InsertIntoByTimestamp adds a swap ID and expiration time into the byTimestamp index.
 func (k Keeper) InsertIntoByTimestamp(ctx sdk.Context, atomicSwap types.AtomicSwap) {
-	fmt.Println("*** Entered InsertIntoByTimestamp")
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapByBlockPrefix)
-	fmt.Println("*** about to get a tm key:",
-		atomicSwap.ExpireTimestamp, "swapID:",
-		hex.EncodeToString(atomicSwap.GetSwapID()), "within InsertIntoByTimestamp")
 	swapKey := types.GetAtomicSwapByTimestampKey(
 		atomicSwap.ExpireTimestamp, atomicSwap.GetSwapID())
 
-	fmt.Println("*** about to store.Set with swapKey: ", hex.EncodeToString(swapKey),)
-	fmt.Println("*** with swapID:", atomicSwap.GetSwapID())
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Printf("\n\n***panic occurred before store set:%v,%s\n", err, err)
+			fmt.Printf("\n\n***panic occurred at InsertIntoByTimestamp:%v,%s\n", err, err)
 		}
-		fmt.Println("*** store has key:",store.Has(swapKey))
-		fmt.Println("*** store has value:", hex.EncodeToString(store.Get(swapKey)))
 	}()
 	store.Set(swapKey, atomicSwap.GetSwapID())
-	fmt.Println("*** store.Set within InsertIntoByTimestamp")
 }
 
 // RemoveFromByTimestamp removes an AtomicSwap from the byTimestamp index.
