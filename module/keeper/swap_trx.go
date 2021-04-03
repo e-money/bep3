@@ -200,11 +200,11 @@ func (k Keeper) ClaimAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapI
 			atomicSwap.Sender, errBech)
 	}
 
-	hashedSecret := types.CalculateSwapID(randomNumberHash, swapSender, atomicSwap.SenderOtherChain)
+	recreatedSwapID := types.CalculateSwapID(randomNumberHash, swapSender, atomicSwap.SenderOtherChain)
 
 	// Confirm that secret unlocks the atomic swap
-	if !bytes.Equal(hashedSecret, atomicSwap.GetSwapID()) {
-		fmt.Println("*** incorrect random number:", hex.EncodeToString(randomNumber))
+	if !bytes.Equal(recreatedSwapID, atomicSwap.GetSwapID()) {
+		fmt.Println("*** incorrect swap number fron random number:", hex.EncodeToString(randomNumber))
 		return nil, sdkerrors.Wrapf(types.ErrInvalidClaimSecret, "the submitted random number is incorrect")
 	}
 
