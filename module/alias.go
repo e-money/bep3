@@ -114,7 +114,6 @@ var (
 	AtomicSwapLongtermStoragePrefix = types.AtomicSwapLongtermStoragePrefix
 	AtomicSwapCoinsAccAddr          = types.AtomicSwapCoinsAccAddr
 	KeyAssetParams                  = types.KeyAssetParams
-	DefaultBnbDeputyFixedFee        = types.DefaultBnbDeputyFixedFee
 	DefaultPreviousBlockTime        = types.DefaultPreviousBlockTime
 	DefaultSwapBlockTimestamp       = types.DefaultSwapBlockTimestamp
 	DefaultSwapTimeSpan             = types.DefaultSwapTimeSpan

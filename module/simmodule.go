@@ -640,7 +640,7 @@ func GenRandBnbDeputy(r *rand.Rand) simtypes.Account {
 // GenRandFixedFee randomized FixedFee in range [1, 10000]
 func GenRandFixedFee(r *rand.Rand) sdk.Int {
 	min := int(1)
-	max := types.DefaultBnbDeputyFixedFee.Int64()
+	max := types.DeputyFee
 	return sdk.NewInt(int64(r.Intn(int(max)-min) + min))
 }
 

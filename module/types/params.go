@@ -21,7 +21,6 @@ const (
 var (
 	KeyAssetParams = []byte("AssetParams")
 
-	DefaultBnbDeputyFixedFee  sdk.Int = sdk.NewInt(1000) // 0.00001 BNB
 	DefaultMinAmount          sdk.Int = sdk.ZeroInt()
 	DefaultMaxAmount          sdk.Int = sdk.NewInt(1000000000000) // 10,000 BNB
 	DefaultPreviousBlockTime          = tmtime.Canonical(time.Unix(0, 0))
