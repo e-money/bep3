@@ -9,11 +9,8 @@
     - [AugmentedAtomicSwap](#bep3.AugmentedAtomicSwap)
     - [AugmentedAtomicSwaps](#bep3.AugmentedAtomicSwaps)
     - [MsgClaimAtomicSwap](#bep3.MsgClaimAtomicSwap)
-    - [MsgClaimAtomicSwapResponse](#bep3.MsgClaimAtomicSwapResponse)
     - [MsgCreateAtomicSwap](#bep3.MsgCreateAtomicSwap)
-    - [MsgCreateAtomicSwapResponse](#bep3.MsgCreateAtomicSwapResponse)
     - [MsgRefundAtomicSwap](#bep3.MsgRefundAtomicSwap)
-    - [MsgRefundAtomicSwapResponse](#bep3.MsgRefundAtomicSwapResponse)
     - [PrevBlockTime](#bep3.PrevBlockTime)
   
 - [bep3/genesis.proto](#bep3/genesis.proto)
@@ -41,6 +38,10 @@
     - [Query](#bep3.Query)
   
 - [bep3/tx.proto](#bep3/tx.proto)
+    - [MsgClaimAtomicSwapResponse](#bep3.MsgClaimAtomicSwapResponse)
+    - [MsgCreateAtomicSwapResponse](#bep3.MsgCreateAtomicSwapResponse)
+    - [MsgRefundAtomicSwapResponse](#bep3.MsgRefundAtomicSwapResponse)
+  
     - [Msg](#bep3.Msg)
   
 - [Scalar Value Types](#scalar-value-types)
@@ -139,22 +140,6 @@ MsgClaimAtomicSwap defines a AtomicSwap claim
 
 
 
-<a name="bep3.MsgClaimAtomicSwapResponse"></a>
-
-### MsgClaimAtomicSwapResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `random_number_hash` | [string](#string) |  |  |
-| `timestamp` | [int64](#int64) |  |  |
-
-
-
-
-
-
 <a name="bep3.MsgCreateAtomicSwap"></a>
 
 ### MsgCreateAtomicSwap
@@ -177,22 +162,6 @@ MsgCreateAtomicSwap contains an AtomicSwap struct
 
 
 
-<a name="bep3.MsgCreateAtomicSwapResponse"></a>
-
-### MsgCreateAtomicSwapResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `random_number_hash` | [string](#string) |  |  |
-| `swap_id` | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="bep3.MsgRefundAtomicSwap"></a>
 
 ### MsgRefundAtomicSwap
@@ -203,22 +172,6 @@ MsgRefundAtomicSwap defines a refund msg
 | ----- | ---- | ----- | ----------- |
 | `from` | [string](#string) |  |  |
 | `swap_id` | [bytes](#bytes) |  |  |
-
-
-
-
-
-
-<a name="bep3.MsgRefundAtomicSwapResponse"></a>
-
-### MsgRefundAtomicSwapResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `random_number_hash` | [string](#string) |  |  |
-| `timestamp` | [int64](#int64) |  |  |
 
 
 
@@ -593,6 +546,54 @@ gRPC swap response
 <p align="right"><a href="#top">Top</a></p>
 
 ## bep3/tx.proto
+
+
+
+<a name="bep3.MsgClaimAtomicSwapResponse"></a>
+
+### MsgClaimAtomicSwapResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `random_number_hash` | [string](#string) |  |  |
+| `timestamp` | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="bep3.MsgCreateAtomicSwapResponse"></a>
+
+### MsgCreateAtomicSwapResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `random_number_hash` | [string](#string) |  |  |
+| `swap_id` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="bep3.MsgRefundAtomicSwapResponse"></a>
+
+### MsgRefundAtomicSwapResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `random_number_hash` | [string](#string) |  |  |
+| `timestamp` | [int64](#int64) |  |  |
+
+
+
 
 
  <!-- end messages -->

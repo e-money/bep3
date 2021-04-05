@@ -141,16 +141,6 @@ message MsgCreateAtomicSwap {
   int64 time_span = 8[(gogoproto.moretags) = "yaml:\"time_span\""];
 }
 
-message MsgCreateAtomicSwapResponse {
-  string random_number_hash = 1 [
-    (gogoproto.moretags) = "yaml:\"random_number_hash\""
-  ];
-  string swap_id = 2 [
-    (gogoproto.customname) = "SwapID",
-    (gogoproto.moretags) = "yaml:\"swap_id\""
-  ];
-}
-
 // type MsgClaimAtomicSwap struct {
 //	From         sdk.AccAddress   `json:"from"  yaml:"from"`
 //	SwapID       tmbytes.HexBytes `json:"swap_id"  yaml:"swap_id"`
@@ -173,13 +163,6 @@ message MsgClaimAtomicSwap {
   ];
 }
 
-message MsgClaimAtomicSwapResponse {
-  string random_number_hash = 1 [
-    (gogoproto.moretags) = "yaml:\"random_number_hash\""
-  ];
-  int64 timestamp = 2 [(gogoproto.moretags) = "yaml:\"timestamp\""];
-}
-
 // type MsgRefundAtomicSwap struct {
 //	From   sdk.AccAddress   `json:"from" yaml:"from"`
 //	SwapID tmbytes.HexBytes `json:"swap_id" yaml:"swap_id"`
@@ -195,13 +178,6 @@ message MsgRefundAtomicSwap {
     (gogoproto.moretags) = "yaml:\"swap_id\"",
     (gogoproto.customname) = "SwapID"
   ];
-}
-
-message MsgRefundAtomicSwapResponse {
-  string random_number_hash = 1 [
-    (gogoproto.moretags) = "yaml:\"random_number_hash\""
-  ];
-  int64 timestamp = 2 [(gogoproto.moretags) = "yaml:\"timestamp\""];
 }
 
 // Proto type required for serializing the previous block time to manage supply
