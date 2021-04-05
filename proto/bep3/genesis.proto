@@ -93,11 +93,10 @@ message AssetParam {
 		(gogoproto.customname) = "SwapTimestamp",
 		(gogoproto.moretags) = "yaml:\"swap_time\""
 	];
-	// seconds span before time expiration
+	// minutes span before time expiration
 	// Original SwapTimeSpan int64 `json:"time_span" yaml:"time_span"`
-	int64 time_span = 10 [
-		(gogoproto.customname) = "SwapTimeSpan",
-		(gogoproto.moretags) = "yaml:\"time_span\""
+	int64 swap_time_span_min = 10 [
+		(gogoproto.moretags) = "yaml:\"swap_time_span_min\""
 	];
 }
 

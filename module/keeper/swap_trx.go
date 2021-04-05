@@ -12,10 +12,6 @@ import (
 	"github.com/e-money/bep3/module/types"
 )
 
-const (
-	sixtySeconds = 60
-)
-
 // createAtomicSwap creates a new atomic swap.
 func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
 	sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, amount sdk.Coins,
@@ -103,15 +99,16 @@ func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, 
 	case types.Outgoing:
 
 		// Outgoing swaps must have a seconds time span within [60, 3 days]
-		if swapTimeSpan < sixtySeconds || swapTimeSpan > types.ThreeDaySeconds {
+		if swapTimeSpan < 1 || swapTimeSpan > types.ThreeDayMinutes {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidTimeSpan,
 				"seconds span %d outside range of 1 min...1 day[%d, %d]",
-				swapTimeSpan, sixtySeconds, types.ThreeDaySeconds)
+				swapTimeSpan, 1, types.ThreeDayMinutes,
+			)
 		}
 		// Amount in outgoing swaps must be able to pay the deputy's fixed fee.
 		fee := asset.FixedFee.Int64()
 		if amount[0].Amount.LTE(asset.FixedFee.Add(asset.MinSwapAmount)) {
-			fmt.Printf("amount %s - fee %d must be <= min swap amount %s\n",
+			fmt.Printf("*** min swap amount %s\n", asset.MinSwapAmount.String())
 				amount[0].Amount.String(), fee, asset.MinSwapAmount.String())
 			return nil, sdkerrors.Wrap(types.ErrInsufficientAmount, amount[0].String())
 		}

@@ -135,10 +135,10 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					244, types.DefaultSwapTimeSpan-1)},
+					244, 0)},
 			},
 			expectPass:  false,
-			expectedErr: "asset bnb swap time span be within [60, 3 days in seconds] 59",
+			expectedErr: "asset bnb swap time span be within [1, 3 days in minutes(4320)]",
 		},
 		{
 			name: "min swap not positive",

@@ -37,7 +37,7 @@ var (
 
 // NewMsgCreateAtomicSwap initializes a new MsgCreateAtomicSwap
 func NewMsgCreateAtomicSwap(from, to string, recipientOtherChain, senderOtherChain string,
-	randomNumberHash tmbytes.HexBytes, timestamp int64, amount sdk.Coins, timeSpan int64) *MsgCreateAtomicSwap {
+	randomNumberHash tmbytes.HexBytes, timestamp int64, amount sdk.Coins, timeSpanMin int64) *MsgCreateAtomicSwap {
 	return &MsgCreateAtomicSwap{
 		From:                from,
 		To:                  to,
@@ -46,7 +46,7 @@ func NewMsgCreateAtomicSwap(from, to string, recipientOtherChain, senderOtherCha
 		RandomNumberHash:    randomNumberHash,
 		Timestamp:           timestamp,
 		Amount:              amount,
-		TimeSpan:            timeSpan,
+		TimeSpanMin:         timeSpanMin,
 	}
 }
 
@@ -60,7 +60,7 @@ func (msg MsgCreateAtomicSwap) Type() string { return CreateAtomicSwap }
 func (msg MsgCreateAtomicSwap) String() string {
 	return fmt.Sprintf("AtomicSwap{%s#%s#%v#%v#%v#%v#%v#%v}",
 		msg.From, msg.To, msg.RecipientOtherChain, msg.SenderOtherChain,
-		msg.RandomNumberHash, msg.Timestamp, msg.Amount, msg.TimeSpan)
+		msg.RandomNumberHash, msg.Timestamp, msg.Amount, msg.TimeSpanMin)
 }
 
 // GetInvolvedAddresses gets the addresses involved in a MsgCreateAtomicSwap
@@ -123,7 +123,7 @@ func (msg MsgCreateAtomicSwap) ValidateBasic() error {
 	if msg.Amount.IsAnyNegative() {
 		return fmt.Errorf("the swapped out coin must be positive")
 	}
-	if msg.TimeSpan <= 0 {
+	if msg.TimeSpanMin <= 0 {
 		return errors.New("height span must be positive")
 	}
 	return nil

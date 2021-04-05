@@ -71,7 +71,7 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
-					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 				bep3.AssetParam{
@@ -88,7 +88,7 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
-					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 			},

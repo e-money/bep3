@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ThreeDaySeconds = 60 * 60 * 24 * 3
+	ThreeDayMinutes = 60 * 24 * 3
 
 	// Todo set this to a meaningful value
 	DeputyFee = 5000
@@ -25,7 +25,7 @@ var (
 	DefaultMaxAmount          sdk.Int = sdk.NewInt(1000000000000) // 10,000 BNB
 	DefaultPreviousBlockTime          = tmtime.Canonical(time.Unix(0, 0))
 	DefaultSwapBlockTimestamp int64   = 10 // At 10th second.
-	DefaultSwapTimeSpan       int64   = 60 // 1 minute
+	DefaultSwapTimeSpan       int64   = 180 // 5 minutes
 )
 
 // String implements fmt.Stringer
@@ -51,7 +51,7 @@ func DefaultParams() Params {
 // NewAssetParam returns a new AssetParam
 func NewAssetParam(denom string, coinID int64, limit SupplyLimit, active bool,
 	deputyAddr sdk.AccAddress, fixedFee sdk.Int, minSwapAmount sdk.Int, maxSwapAmount sdk.Int,
-	swapTimestamp int64, timeSpan int64) AssetParam {
+	swapTimestamp int64, swapTimeSpanMin int64) AssetParam {
 
 	fmt.Printf("*** NewAssetParam Fee:%s%s\n", denom, fixedFee.String())
 	if strings.Contains(denom, "ngm") || strings.Contains(denom, "NGM") {
@@ -59,16 +59,16 @@ func NewAssetParam(denom string, coinID int64, limit SupplyLimit, active bool,
 	}
 
 	return AssetParam{
-		Denom:         denom,
-		CoinID:        coinID,
-		SupplyLimit:   limit,
-		Active:        active,
-		DeputyAddress: deputyAddr.String(),
-		FixedFee:      fixedFee,
-		MinSwapAmount: minSwapAmount,
-		MaxSwapAmount: maxSwapAmount,
-		SwapTimestamp: swapTimestamp,
-		SwapTimeSpan:  timeSpan,
+		Denom:           denom,
+		CoinID:          coinID,
+		SupplyLimit:     limit,
+		Active:          active,
+		DeputyAddress:   deputyAddr.String(),
+		FixedFee:        fixedFee,
+		MinSwapAmount:   minSwapAmount,
+		MaxSwapAmount:   maxSwapAmount,
+		SwapTimestamp:   swapTimestamp,
+		SwapTimeSpanMin: swapTimeSpanMin,
 	}
 }
 
@@ -84,9 +84,9 @@ func (ap AssetParam) String() string {
 	Min Swap Amount: %s
 	Max Swap Amount: %s
 	Swap Time in Seconds: %d
-	Time Span in Seconds: %d`,
+	Time Span in Minutes: %d`,
 		ap.Denom, ap.CoinID, ap.SupplyLimit, ap.Active, ap.DeputyAddress, ap.FixedFee,
-		ap.MinSwapAmount, ap.MaxSwapAmount, ap.SwapTimestamp, ap.SwapTimeSpan)
+		ap.MinSwapAmount, ap.MaxSwapAmount, ap.SwapTimestamp, ap.SwapTimeSpanMin)
 }
 
 // AssetParams array of AssetParam
@@ -184,8 +184,8 @@ func validateAssetParams(i interface{}) error {
 			return fmt.Errorf("asset %s cannot have a negative fixed fee %s", asset.Denom, asset.FixedFee)
 		}
 
-		if asset.SwapTimeSpan < 60 || asset.SwapTimeSpan > ThreeDaySeconds {
-			return fmt.Errorf("asset %s swap time span be within [60, 3 days in seconds] %d", asset.Denom, asset.SwapTimeSpan)
+		if asset.SwapTimeSpanMin < 1 || asset.SwapTimeSpanMin > ThreeDayMinutes {
+			return fmt.Errorf("asset %s swap time span be within [1, 3 days in minutes(4320)] %d", asset.Denom, asset.SwapTimeSpanMin)
 		}
 
 		if !asset.MinSwapAmount.IsPositive() {

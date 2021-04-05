@@ -102,13 +102,13 @@ func (k Keeper) GetSwapTime(ctx sdk.Context, denom string) (int64, error) {
 	return asset.SwapTimestamp, nil
 }
 
-// GetTimeSpan returns the swap seconds allowance
-func (k Keeper) GetTimeSpan(ctx sdk.Context, denom string) (int64, error) {
+// GetTimeSpanMin returns the swap minutes allowance
+func (k Keeper) GetTimeSpanMin(ctx sdk.Context, denom string) (int64, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
 		return int64(0), err
 	}
-	return asset.SwapTimeSpan, nil
+	return asset.SwapTimeSpanMin, nil
 }
 
 // GetAssetByCoinID returns an asset by its denom

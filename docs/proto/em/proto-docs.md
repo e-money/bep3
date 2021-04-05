@@ -155,7 +155,7 @@ MsgCreateAtomicSwap contains an AtomicSwap struct
 | `random_number_hash` | [bytes](#bytes) |  |  |
 | `timestamp` | [int64](#int64) |  |  |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-| `time_span` | [int64](#int64) |  |  |
+| `time_span_min` | [int64](#int64) |  | minutes span before time expiration |
 
 
 
@@ -227,7 +227,7 @@ AssetParam parameters that must be specified for each bep3 asset
 | `min_swap_amount` | [string](#string) |  | Minimum swap amount |
 | `max_swap_amount` | [string](#string) |  | Maximum swap amount |
 | `swap_time` | [int64](#int64) |  | Unix seconds of swap creation block timestamp Original	SwapTimestamp int64 `json:"swap_time" yaml:"swap_time"` |
-| `time_span` | [int64](#int64) |  | seconds span before time expiration Original SwapTimeSpan int64 `json:"time_span" yaml:"time_span"` |
+| `swap_time_span_min` | [int64](#int64) |  | minutes span before time expiration Original SwapTimeSpan int64 `json:"time_span" yaml:"time_span"` |
 
 
 

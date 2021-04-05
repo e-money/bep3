@@ -98,10 +98,10 @@ func (suite *ParamsTestSuite) TestGetMinMaxBlockLock() {
 	suite.Require().NoError(err)
 	suite.Equal(swapTimestamp, res)
 
-	swapTimeSpan := asset.SwapTimeSpan
-	res, err = suite.keeper.GetTimeSpan(suite.ctx, asset.Denom)
+	swapTimeSpanMin := asset.SwapTimeSpanMin
+	res, err = suite.keeper.GetTimeSpanMin(suite.ctx, asset.Denom)
 	suite.Require().NoError(err)
-	suite.Equal(swapTimeSpan, res)
+	suite.Equal(swapTimeSpanMin, res)
 }
 
 func (suite *ParamsTestSuite) TestGetAssetByCoinID() {

@@ -357,7 +357,8 @@ type MsgCreateAtomicSwap struct {
 	RandomNumberHash    github_com_tendermint_tendermint_libs_bytes.HexBytes `protobuf:"bytes,5,opt,name=random_number_hash,json=randomNumberHash,proto3,casttype=github.com/tendermint/tendermint/libs/bytes.HexBytes" json:"random_number_hash,omitempty" yaml:"random_number_hash"`
 	Timestamp           int64                                                `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty" yaml:"timestamp"`
 	Amount              github_com_cosmos_cosmos_sdk_types.Coins             `protobuf:"bytes,7,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount" yaml:"amount"`
-	TimeSpan            int64                                                `protobuf:"varint,8,opt,name=time_span,json=timeSpan,proto3" json:"time_span,omitempty" yaml:"time_span"`
+	// minutes span before time expiration
+	TimeSpanMin int64 `protobuf:"varint,8,opt,name=time_span_min,json=timeSpanMin,proto3" json:"time_span_min,omitempty" yaml:"time_span_min"`
 }
 
 func (m *MsgCreateAtomicSwap) Reset()      { *m = MsgCreateAtomicSwap{} }
@@ -441,9 +442,9 @@ func (m *MsgCreateAtomicSwap) GetAmount() github_com_cosmos_cosmos_sdk_types.Coi
 	return nil
 }
 
-func (m *MsgCreateAtomicSwap) GetTimeSpan() int64 {
+func (m *MsgCreateAtomicSwap) GetTimeSpanMin() int64 {
 	if m != nil {
-		return m.TimeSpan
+		return m.TimeSpanMin
 	}
 	return 0
 }
@@ -963,8 +964,8 @@ func (m *MsgCreateAtomicSwap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.TimeSpan != 0 {
-		i = encodeVarintSwap(dAtA, i, uint64(m.TimeSpan))
+	if m.TimeSpanMin != 0 {
+		i = encodeVarintSwap(dAtA, i, uint64(m.TimeSpanMin))
 		i--
 		dAtA[i] = 0x40
 	}
@@ -1308,8 +1309,8 @@ func (m *MsgCreateAtomicSwap) Size() (n int) {
 			n += 1 + l + sovSwap(uint64(l))
 		}
 	}
-	if m.TimeSpan != 0 {
-		n += 1 + sovSwap(uint64(m.TimeSpan))
+	if m.TimeSpanMin != 0 {
+		n += 1 + sovSwap(uint64(m.TimeSpanMin))
 	}
 	return n
 }
@@ -2465,7 +2466,7 @@ func (m *MsgCreateAtomicSwap) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TimeSpan |= int64(b&0x7F) << shift
+				m.TimeSpanMin |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

@@ -138,7 +138,8 @@ message MsgCreateAtomicSwap {
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable) = false
   ];
-  int64 time_span = 8[(gogoproto.moretags) = "yaml:\"time_span\""];
+  // minutes span before time expiration
+  int64 time_span_min = 8[(gogoproto.moretags) = "yaml:\"time_span_min\""];
 }
 
 // type MsgClaimAtomicSwap struct {

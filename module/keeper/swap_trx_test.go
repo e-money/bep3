@@ -268,7 +268,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[5],
 				timestamp:           suite.timestamps[5],
-				timeSpan:            types.DefaultSwapTimeSpan - 1,
+				timeSpan:            0,
 				sender:              suite.addrs[5],
 				recipient:           suite.deputy,
 				senderOtherChain:    TestSenderOtherChain,
@@ -286,7 +286,7 @@ func (suite *AtomicSwapTestSuite) TestCreateAtomicSwap() {
 			args{
 				randomNumberHash:    suite.randomNumberHashes[6],
 				timestamp:           suite.timestamps[6],
-				timeSpan:            types.ThreeDaySeconds + 1,
+				timeSpan:            types.ThreeDayMinutes + 1,
 				sender:              suite.addrs[6],
 				recipient:           suite.deputy,
 				senderOtherChain:    TestSenderOtherChain,
@@ -518,7 +518,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 		},
 		{
 			"normal incoming swap rate-limited",
-			suite.ctx.WithBlockTime(currentTmTime.Add(time.Second * 10)),
+			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute * 1)),
 			args{
 				coins:        cs(c(OTHER_DENOM, 50000)),
 				swapID:       []byte{},
@@ -562,7 +562,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 		},
 		{
 			"past expiration",
-			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute * 10)),
+			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute * time.Duration(types.DefaultSwapTimeSpan)+1)),
 			args{
 				coins:        cs(c(BNB_DENOM, 50000)),
 				swapID:       []byte{},

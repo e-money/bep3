@@ -53,7 +53,7 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
-					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 				types.AssetParam{
@@ -70,7 +70,7 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(100000000000),
-					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 			},

@@ -38,7 +38,7 @@ func (m msgServer)CreateAtomicSwap(goCtx context.Context, msg *types.MsgCreateAt
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "to")
 	}
 	res, err := m.k.CreateAtomicSwapState(ctx, msg.RandomNumberHash, msg.Timestamp,
-		msg.TimeSpan, fromAcc, toAcc, msg.SenderOtherChain, msg.RecipientOtherChain, msg.Amount, true)
+		msg.TimeSpanMin, fromAcc, toAcc, msg.SenderOtherChain, msg.RecipientOtherChain, msg.Amount, true)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (m msgServer)CreateAtomicSwap(goCtx context.Context, msg *types.MsgCreateAt
 	}, nil
 }
 
-func (m msgServer)ClaimAtomicSwap(goCtx context.Context, msg *types.MsgClaimAtomicSwap)(*types.MsgClaimAtomicSwap, error) {
+func (m msgServer)ClaimAtomicSwap(goCtx context.Context, msg *types.MsgClaimAtomicSwap)(*types.MsgClaimAtomicSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	fromAcc, err := sdk.AccAddressFromBech32(msg.From)
 	if err != nil {

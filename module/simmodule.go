@@ -139,7 +139,7 @@ func genSupportedAsset(r *rand.Rand, denom string) types.AssetParam {
 		MinSwapAmount: minSwapAmount,
 		MaxSwapAmount: GenMaxSwapAmount(r, minSwapAmount, limit),
 		SwapTimestamp: time.Now().Unix(),
-		SwapTimeSpan:  limit.Int64(),
+		SwapTimeSpanMin:  limit.Int64(),
 	}
 }
 
@@ -370,7 +370,7 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k 
 			randomNumberHash,
 			timestamp,
 			coins,
-			asset.SwapTimeSpan,
+			asset.SwapTimeSpanMin,
 		)
 
 		txGen := simappparams.MakeTestEncodingConfig().TxConfig
@@ -404,7 +404,7 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k 
 		if r.Intn(100) < 50 {
 			// Claim future operation - choose between next block and the block before time span
 			executionTime :=
-				time.Unix(ctx.BlockTime().Unix()+1+int64(r.Intn(int(asset.SwapTimeSpan-1))), 0)
+				time.Unix(ctx.BlockTime().Unix()+1+int64(r.Intn(int(asset.SwapTimeSpanMin-1))), 0)
 
 			futureOp = simtypes.FutureOperation{
 				BlockTime: executionTime,
@@ -412,7 +412,7 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k 
 			}
 		} else {
 			// Refund future operation
-			executionTime := time.Unix(ctx.BlockTime().Unix()+msg.TimeSpan, 0)
+			executionTime := time.Unix(ctx.BlockTime().Unix()+msg.TimeSpanMin, 0)
 			futureOp = simtypes.FutureOperation{
 				BlockTime: executionTime,
 				Op:        operationRefundAtomicSwap(ak, bk, k, swapID),
