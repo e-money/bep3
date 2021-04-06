@@ -20,10 +20,10 @@ type ParamsTestSuite struct {
 }
 
 func (suite *ParamsTestSuite) SetupTest() {
-	ctx, bep3Keeper, _, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, _, _, appModule := app.CreateTestComponents(suite.T())
 
 	_, addrs := app.GeneratePrivKeyAddressPairs(10)
-	appModule.InitGenesis(ctx, NewBep3GenState(addrs[0]))
+	appModule.InitGenesis(ctx, jsonMarshaller, NewBep3GenState(addrs[0]))
 
 	suite.keeper = bep3Keeper
 	suite.ctx = ctx
@@ -50,12 +50,15 @@ func (suite *ParamsTestSuite) TestGetAssets() {
 func (suite *ParamsTestSuite) TestGetSetDeputyAddress() {
 	asset, err := suite.keeper.GetAsset(suite.ctx, "bnb")
 	suite.Require().NoError(err)
-	asset.DeputyAddress = suite.addrs[1]
+	asset.DeputyAddress = suite.addrs[1].String()
 	suite.NotPanics(func() { suite.keeper.SetAsset(suite.ctx, asset) })
 
 	asset, err = suite.keeper.GetAsset(suite.ctx, "bnb")
 	suite.Require().NoError(err)
-	suite.Equal(suite.addrs[1], asset.DeputyAddress)
+
+	depAccAddr, err := sdk.AccAddressFromBech32(asset.DeputyAddress)
+	suite.Nil(err, "invalid bech32")
+	suite.Equal(suite.addrs[1], depAccAddr)
 	addr, err := suite.keeper.GetDeputyAddress(suite.ctx, "bnb")
 	suite.Require().NoError(err)
 	suite.Equal(suite.addrs[1], addr)
@@ -95,10 +98,10 @@ func (suite *ParamsTestSuite) TestGetMinMaxBlockLock() {
 	suite.Require().NoError(err)
 	suite.Equal(swapTimestamp, res)
 
-	swapTimeSpan := asset.SwapTimeSpan
-	res, err = suite.keeper.GetTimeSpan(suite.ctx, asset.Denom)
+	swapTimeSpanMin := asset.SwapTimeSpanMin
+	res, err = suite.keeper.GetTimeSpanMin(suite.ctx, asset.Denom)
 	suite.Require().NoError(err)
-	suite.Equal(swapTimeSpan, res)
+	suite.Equal(swapTimeSpanMin, res)
 }
 
 func (suite *ParamsTestSuite) TestGetAssetByCoinID() {

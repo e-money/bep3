@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bep3 "github.com/e-money/bep3/module"
 	app "github.com/e-money/bep3/testapp"
@@ -21,7 +22,7 @@ type HandlerTestSuite struct {
 }
 
 func (suite *HandlerTestSuite) SetupTest() {
-	ctx, bep3Keeper, accountKeeper, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, accountKeeper, bankKeeper, appModule := app.CreateTestComponents(suite.T())
 
 	// Set up genesis state and initialize
 	_, addrs := app.GeneratePrivKeyAddressPairs(3)
@@ -29,13 +30,13 @@ func (suite *HandlerTestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		if err := account.SetCoins(coins); err != nil {
+		if err := bankKeeper.SetBalances(ctx, addr, coins); err != nil {
 			panic(err)
 		}
 		accountKeeper.SetAccount(ctx, account)
 	}
 
-	appModule.InitGenesis(ctx, NewBep3GenState(addrs[0]))
+	appModule.InitGenesis(ctx, jsonMarshaller, NewBep3GenState(addrs[0]))
 
 	suite.addrs = addrs
 	suite.handler = bep3.NewHandler(bep3Keeper)
@@ -51,12 +52,18 @@ func (suite *HandlerTestSuite) AddAtomicSwap() (tmbytes.HexBytes, tmbytes.HexByt
 	randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 
 	// Create atomic swap and check err to confirm creation
-	err := suite.keeper.CreateAtomicSwap(suite.ctx, randomNumberHash, timestamp, expireTimeSpan,
-		suite.addrs[0], suite.addrs[1], TestSenderOtherChain, TestRecipientOtherChain,
-		amount, true)
+
+	_, err := suite.keeper.CreateAtomicSwapState(
+		suite.ctx, randomNumberHash, timestamp, expireTimeSpan,
+		suite.addrs[0], suite.addrs[1], TestSenderOtherChain,
+		TestRecipientOtherChain,
+		amount, true,
+	)
 	suite.Nil(err)
 
-	swapID := bep3.CalculateSwapID(randomNumberHash, suite.addrs[0], TestSenderOtherChain)
+	swapID := bep3.CalculateSwapID(
+		randomNumberHash, suite.addrs[0], TestSenderOtherChain,
+	)
 	return swapID, randomNumber[:]
 }
 
@@ -67,9 +74,15 @@ func (suite *HandlerTestSuite) TestMsgCreateAtomicSwap() {
 	randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 
 	msg := bep3.NewMsgCreateAtomicSwap(
-		suite.addrs[0], suite.addrs[2], TestRecipientOtherChain,
-		TestSenderOtherChain, randomNumberHash, timestamp, amount,
-		bep3.DefaultSwapTimeSpan)
+		suite.addrs[0].String(),
+		suite.addrs[2].String(),
+		TestRecipientOtherChain,
+		TestSenderOtherChain,
+		randomNumberHash,
+		timestamp,
+		amount,
+		bep3.DefaultSwapTimeSpan,
+	)
 
 	res, err := suite.handler(suite.ctx, msg)
 	suite.Require().NoError(err)
@@ -80,8 +93,12 @@ func (suite *HandlerTestSuite) TestMsgClaimAtomicSwap() {
 	// Attempt claim msg on fake atomic swap
 	badRandomNumber, _ := bep3.GenerateSecureRandomNumber()
 	badRandomNumberHash := bep3.CalculateRandomHash(badRandomNumber[:], ts(0))
-	badSwapID := bep3.CalculateSwapID(badRandomNumberHash, suite.addrs[0], TestSenderOtherChain)
-	badMsg := bep3.NewMsgClaimAtomicSwap(suite.addrs[0], badSwapID, badRandomNumber[:])
+	badSwapID := bep3.CalculateSwapID(
+		badRandomNumberHash, suite.addrs[0], TestSenderOtherChain,
+	)
+	badMsg := bep3.NewMsgClaimAtomicSwap(
+		suite.addrs[0], badSwapID, badRandomNumber[:],
+	)
 	badRes, err := suite.handler(suite.ctx, badMsg)
 	suite.Require().Error(err)
 	suite.Require().Nil(badRes)
@@ -108,7 +125,9 @@ func (suite *HandlerTestSuite) TestMsgRefundAtomicSwap() {
 	// Attempt refund msg on fake atomic swap
 	badRandomNumber, _ := bep3.GenerateSecureRandomNumber()
 	badRandomNumberHash := bep3.CalculateRandomHash(badRandomNumber[:], ts(0))
-	badSwapID := bep3.CalculateSwapID(badRandomNumberHash, suite.addrs[0], TestSenderOtherChain)
+	badSwapID := bep3.CalculateSwapID(
+		badRandomNumberHash, suite.addrs[0], TestSenderOtherChain,
+	)
 	badMsg := bep3.NewMsgRefundAtomicSwap(suite.addrs[0], badSwapID)
 	badRes, err := suite.handler(suite.ctx, badMsg)
 	suite.Require().Error(err)
@@ -132,7 +151,7 @@ func (suite *HandlerTestSuite) TestMsgRefundAtomicSwap() {
 }
 
 func (suite *HandlerTestSuite) TestInvalidMsg() {
-	res, err := suite.handler(suite.ctx, sdk.NewTestMsg())
+	res, err := suite.handler(suite.ctx, testdata.NewTestMsg())
 	suite.Require().Error(err)
 	suite.Require().Nil(res)
 }

@@ -25,16 +25,15 @@ func (suite *ParamsTestSuite) SetupTest() {
 		Limit:          sdk.NewInt(10000000000000),
 		TimeLimited:    false,
 		TimeBasedLimit: sdk.ZeroInt(),
-		TimePeriod:     time.Hour,
+		TimePeriod:     int64(time.Hour),
 	}
 	supply2 := types.SupplyLimit{
 		Limit:          sdk.NewInt(10000000000000),
 		TimeLimited:    true,
 		TimeBasedLimit: sdk.NewInt(100000000000),
-		TimePeriod:     time.Hour * 24,
+		TimePeriod:     int64(time.Hour * 24),
 	}
 	suite.supply = append(suite.supply, supply1, supply2)
-	return
 }
 
 func (suite *ParamsTestSuite) TestParamValidation() {
@@ -109,8 +108,9 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 		{
 			name: "invalid denom - bad format",
 			args: args{
+				// note updated SDK denom regex mask  = `[a-zA-Z][a-zA-Z0-9/]{2,127}`
 				assetParams: types.AssetParams{types.NewAssetParam(
-					"BNB", 714, suite.supply[0], true,
+					"1BNB", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
 					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
@@ -134,10 +134,10 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714, suite.supply[0], true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
-					244, types.DefaultSwapTimeSpan-1)},
+					244, 0)},
 			},
 			expectPass:  false,
-			expectedErr: "asset bnb swap time span be within [60, 3 days in seconds] 59",
+			expectedErr: "asset bnb swap time span be within [1, 3 days in minutes(4320)]",
 		},
 		{
 			name: "min swap not positive",
@@ -188,7 +188,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 			args: args{
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714,
-					types.SupplyLimit{sdk.NewInt(-10000000000000), false, time.Hour, sdk.ZeroInt()}, true,
+					types.SupplyLimit{sdk.NewInt(-10000000000000), false, int64(time.Hour), sdk.ZeroInt()}, true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
 					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
@@ -200,7 +200,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 			args: args{
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714,
-					types.SupplyLimit{sdk.NewInt(10000000000000), false, time.Hour, sdk.NewInt(-10000000000000)}, true,
+					types.SupplyLimit{sdk.NewInt(10000000000000), false, int64(time.Hour), sdk.NewInt(-10000000000000)}, true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
 					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},
 			},
@@ -212,7 +212,7 @@ func (suite *ParamsTestSuite) TestParamValidation() {
 			args: args{
 				assetParams: types.AssetParams{types.NewAssetParam(
 					"bnb", 714,
-					types.SupplyLimit{sdk.NewInt(10000000000000), true, time.Hour, sdk.NewInt(100000000000000)},
+					types.SupplyLimit{sdk.NewInt(10000000000000), true, int64(time.Hour), sdk.NewInt(100000000000000)},
 					true,
 					suite.addr, sdk.NewInt(1000), sdk.NewInt(100000000), sdk.NewInt(100000000000),
 					types.DefaultSwapBlockTimestamp, types.DefaultSwapTimeSpan)},

@@ -21,7 +21,7 @@ type AssetTestSuite struct {
 }
 
 func (suite *AssetTestSuite) SetupTest() {
-	ctx, bep3Keeper, _, _, appModule := app.CreateTestComponents(suite.T())
+	ctx, jsonMarshaller, bep3Keeper, _, _, appModule := app.CreateTestComponents(suite.T())
 
 	config := sdk.GetConfig()
 	app.SetBech32AddressPrefixes(config)
@@ -29,7 +29,7 @@ func (suite *AssetTestSuite) SetupTest() {
 	// Initialize genesis state
 	deputy, err := sdk.AccAddressFromBech32(TestDeputy)
 	suite.NoError(err)
-	appModule.InitGenesis(ctx, NewBep3GenState(deputy))
+	appModule.InitGenesis(ctx, jsonMarshaller, NewBep3GenState(deputy))
 
 	params := bep3Keeper.GetParams(ctx)
 	params.AssetParams[0].SupplyLimit.Limit = sdk.NewInt(50)
@@ -37,16 +37,15 @@ func (suite *AssetTestSuite) SetupTest() {
 	params.AssetParams[1].SupplyLimit.TimeBasedLimit = sdk.NewInt(15)
 	bep3Keeper.SetParams(ctx, params)
 	// Set asset supply with standard value for testing
-	supply := types.NewAssetSupply(c("bnb", 5), c("bnb", 5), c("bnb", 40), c("bnb", 0), time.Duration(0))
+	supply := types.NewAssetSupply(c("bnb", 5), c("bnb", 5), c("bnb", 40), c("bnb", 0), 0)
 	bep3Keeper.SetAssetSupply(ctx, supply, supply.IncomingSupply.Denom)
 
-	supply = types.NewAssetSupply(c("inc", 10), c("inc", 5), c("inc", 5), c("inc", 0), time.Duration(0))
+	supply = types.NewAssetSupply(c("inc", 10), c("inc", 5), c("inc", 5), c("inc", 0), 0)
 	bep3Keeper.SetAssetSupply(ctx, supply, supply.IncomingSupply.Denom)
 	bep3Keeper.SetPreviousBlockTime(ctx, ctx.BlockTime())
 
 	suite.ctx = ctx
 	suite.keeper = bep3Keeper
-	return
 }
 
 func (suite *AssetTestSuite) TestIncrementCurrentAssetSupply() {
@@ -130,7 +129,7 @@ func (suite *AssetTestSuite) TestIncrementTimeLimitedCurrentAssetSupply() {
 					OutgoingSupply:           c("inc", 5),
 					CurrentSupply:            c("inc", 10),
 					TimeLimitedCurrentSupply: c("inc", 5),
-					TimeElapsed:              time.Duration(0),
+					TimeElapsed:              0,
 				},
 			},
 			errArgs{
@@ -305,7 +304,7 @@ func (suite *AssetTestSuite) TestIncrementTimeLimitedIncomingAssetSupply() {
 					OutgoingSupply:           c("inc", 5),
 					CurrentSupply:            c("inc", 5),
 					TimeLimitedCurrentSupply: c("inc", 0),
-					TimeElapsed:              time.Duration(0),
+					TimeElapsed:              0,
 				},
 			},
 			errArgs{
@@ -559,7 +558,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 			args{
 				asset:          "inc",
 				duration:       time.Hour + time.Second,
-				expectedSupply: types.NewAssetSupply(c("inc", 10), c("inc", 5), c("inc", 5), c("inc", 0), time.Duration(0)),
+				expectedSupply: types.NewAssetSupply(c("inc", 10), c("inc", 5), c("inc", 5), c("inc", 0), 0),
 			},
 			errArgs{
 				expectPanic: false,
@@ -571,7 +570,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 			args{
 				asset:          "inc",
 				duration:       time.Hour,
-				expectedSupply: types.NewAssetSupply(c("inc", 10), c("inc", 5), c("inc", 5), c("inc", 0), time.Duration(0)),
+				expectedSupply: types.NewAssetSupply(c("inc", 10), c("inc", 5), c("inc", 5), c("inc", 0), 0),
 			},
 			errArgs{
 				expectPanic: false,
@@ -583,7 +582,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 			args{
 				asset:          "inc",
 				duration:       time.Hour * 4,
-				expectedSupply: types.NewAssetSupply(c("inc", 10), c("inc", 5), c("inc", 5), c("inc", 0), time.Duration(0)),
+				expectedSupply: types.NewAssetSupply(c("inc", 10), c("inc", 5), c("inc", 5), c("inc", 0), 0),
 			},
 			errArgs{
 				expectPanic: false,
@@ -595,7 +594,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 			args{
 				asset:          "bnb",
 				duration:       time.Second,
-				expectedSupply: types.NewAssetSupply(c("bnb", 5), c("bnb", 5), c("bnb", 40), c("bnb", 0), time.Duration(0)),
+				expectedSupply: types.NewAssetSupply(c("bnb", 5), c("bnb", 5), c("bnb", 40), c("bnb", 0), 0),
 			},
 			errArgs{
 				expectPanic: false,
@@ -628,14 +627,14 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 							Limit:          sdk.NewInt(350000000000000),
 							TimeLimited:    false,
 							TimeBasedLimit: sdk.ZeroInt(),
-							TimePeriod:     time.Hour,
+							TimePeriod:     int64(time.Hour),
 						},
 						Active:        true,
-						DeputyAddress: deputy,
+						DeputyAddress: deputy.String(),
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 					types.AssetParam{
@@ -645,14 +644,14 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 							Limit:          sdk.NewInt(100),
 							TimeLimited:    true,
 							TimeBasedLimit: sdk.NewInt(10),
-							TimePeriod:     time.Hour,
+							TimePeriod:     int64(time.Hour),
 						},
 						Active:        false,
-						DeputyAddress: deputy,
+						DeputyAddress: deputy.String(),
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 					types.AssetParam{
@@ -662,14 +661,14 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 							Limit:          sdk.NewInt(100),
 							TimeLimited:    true,
 							TimeBasedLimit: sdk.NewInt(10),
-							TimePeriod:     time.Hour,
+							TimePeriod:     int64(time.Hour),
 						},
 						Active:        false,
-						DeputyAddress: deputy,
+						DeputyAddress: deputy.String(),
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 				},

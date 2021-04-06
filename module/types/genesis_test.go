@@ -23,8 +23,8 @@ func (suite *GenesisTestSuite) SetupTest() {
 	coin := sdk.NewCoin("kava", sdk.OneInt())
 	suite.swaps = atomicSwaps(10)
 
-	supply := types.NewAssetSupply(coin, coin, coin, coin, time.Duration(0))
-	suite.supplies = types.AssetSupplies{supply}
+	supply := types.NewAssetSupply(coin, coin, coin, coin, 0)
+	suite.supplies = types.AssetSupplies{AssetSupplies: []types.AssetSupply{supply}}
 }
 
 func (suite *GenesisTestSuite) TestValidate() {
@@ -67,7 +67,15 @@ func (suite *GenesisTestSuite) TestValidate() {
 			"invalid supply",
 			args{
 				swaps:             types.AtomicSwaps{},
-				supplies:          types.AssetSupplies{types.AssetSupply{IncomingSupply: sdk.Coin{"Invalid", sdk.ZeroInt()}}},
+				supplies:          types.AssetSupplies{
+					AssetSupplies: []types.AssetSupply{
+						{
+							IncomingSupply: sdk.Coin{
+								Denom: "Invalid", Amount: sdk.ZeroInt(),
+							},
+						},
+					},
+				},
 				previousBlockTime: types.DefaultPreviousBlockTime,
 			},
 			false,
@@ -99,7 +107,7 @@ func (suite *GenesisTestSuite) TestValidate() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.name, func() {
-			var gs types.GenesisState
+			var gs *types.GenesisState
 			if tc.name == "default" {
 				gs = types.DefaultGenesisState()
 			} else {

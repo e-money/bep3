@@ -8,9 +8,9 @@ import (
 )
 
 // InitGenesis initializes the store state from a genesis state.
-func InitGenesis(ctx sdk.Context, keeper Keeper, supplyKeeper types.SupplyKeeper, gs GenesisState) {
+func InitGenesis(ctx sdk.Context, keeper Keeper, accountKeeper types.AccountKeeper, gs GenesisState) {
 	// Check if the module account exists
-	moduleAcc := supplyKeeper.GetModuleAccount(ctx, ModuleName)
+	moduleAcc := accountKeeper.GetModuleAccount(ctx, ModuleName)
 	if moduleAcc == nil {
 		panic(fmt.Sprintf("%s module account has not been set", ModuleName))
 	}
@@ -22,7 +22,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, supplyKeeper types.SupplyKeeper
 	keeper.SetPreviousBlockTime(ctx, gs.PreviousBlockTime)
 
 	keeper.SetParams(ctx, gs.Params)
-	for _, supply := range gs.Supplies {
+	for _, supply := range gs.Supplies.AssetSupplies {
 		keeper.SetAssetSupply(ctx, supply, supply.GetDenom())
 	}
 
@@ -77,7 +77,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, supplyKeeper types.SupplyKeeper
 
 	// Asset's given incoming/outgoing supply much match the amount of coins in incoming/outgoing atomic swaps
 	supplies := keeper.GetAllAssetSupplies(ctx)
-	for _, supply := range supplies {
+	for _, supply := range supplies.AssetSupplies {
 		incomingSupply := incomingSupplies.AmountOf(supply.GetDenom())
 		if !supply.IncomingSupply.Amount.Equal(incomingSupply) {
 			panic(fmt.Sprintf("asset's incoming supply %s does not match amount %s in incoming atomic swaps",
@@ -109,7 +109,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, supplyKeeper types.SupplyKeeper
 }
 
 // ExportGenesis writes the current store values to a genesis file, which can be imported again with InitGenesis
-func ExportGenesis(ctx sdk.Context, k Keeper) (data GenesisState) {
+func ExportGenesis(ctx sdk.Context, k Keeper) (data *GenesisState) {
 	params := k.GetParams(ctx)
 	swaps := k.GetAllAtomicSwaps(ctx)
 	supplies := k.GetAllAssetSupplies(ctx)

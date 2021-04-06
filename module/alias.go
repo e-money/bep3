@@ -67,7 +67,6 @@ var (
 	NewKeeper                  = keeper.NewKeeper
 	NewQuerier                 = keeper.NewQuerier
 	NewAssetSupply             = types.NewAssetSupply
-	RegisterCodec              = types.RegisterCodec
 	NewGenesisState            = types.NewGenesisState
 	DefaultGenesisState        = types.DefaultGenesisState
 	GenerateSecureRandomNumber = types.GenerateSecureRandomNumber
@@ -115,7 +114,6 @@ var (
 	AtomicSwapLongtermStoragePrefix = types.AtomicSwapLongtermStoragePrefix
 	AtomicSwapCoinsAccAddr          = types.AtomicSwapCoinsAccAddr
 	KeyAssetParams                  = types.KeyAssetParams
-	DefaultBnbDeputyFixedFee        = types.DefaultBnbDeputyFixedFee
 	DefaultPreviousBlockTime        = types.DefaultPreviousBlockTime
 	DefaultSwapBlockTimestamp       = types.DefaultSwapBlockTimestamp
 	DefaultSwapTimeSpan             = types.DefaultSwapTimeSpan

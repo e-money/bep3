@@ -5,28 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/pkg/errors"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 )
-
-// AtomicSwap contains the information for an atomic swap
-type AtomicSwap struct {
-	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
-	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
-	ExpireTimestamp     int64            `json:"expire_timestamp"  yaml:"expire_timestamp"`
-	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
-	Sender              sdk.AccAddress   `json:"sender"  yaml:"sender"`
-	Recipient           sdk.AccAddress   `json:"recipient"  yaml:"recipient"`
-	SenderOtherChain    string           `json:"sender_other_chain"  yaml:"sender_other_chain"`
-	RecipientOtherChain string           `json:"recipient_other_chain"  yaml:"recipient_other_chain"`
-	ClosedBlock         int64            `json:"closed_block"  yaml:"closed_block"`
-	Status              SwapStatus       `json:"status"  yaml:"status"`
-	CrossChain          bool             `json:"cross_chain"  yaml:"cross_chain"`
-	Direction           SwapDirection    `json:"direction"  yaml:"direction"`
-}
 
 // NewAtomicSwap returns a new AtomicSwap
 func NewAtomicSwap(amount sdk.Coins, randomNumberHash tmbytes.HexBytes, expireTimestamp, timestamp int64,
@@ -37,8 +22,8 @@ func NewAtomicSwap(amount sdk.Coins, randomNumberHash tmbytes.HexBytes, expireTi
 		RandomNumberHash:    randomNumberHash,
 		ExpireTimestamp:     expireTimestamp,
 		Timestamp:           timestamp,
-		Sender:              sender,
-		Recipient:           recipient,
+		Sender:              sender.String(),
+		Recipient:           recipient.String(),
 		SenderOtherChain:    senderOtherChain,
 		RecipientOtherChain: recipientOtherChain,
 		ClosedBlock:         closedBlock,
@@ -50,7 +35,12 @@ func NewAtomicSwap(amount sdk.Coins, randomNumberHash tmbytes.HexBytes, expireTi
 
 // GetSwapID calculates the ID of an atomic swap
 func (a AtomicSwap) GetSwapID() tmbytes.HexBytes {
-	return CalculateSwapID(a.RandomNumberHash, a.Sender, a.SenderOtherChain)
+	sender, err := sdk.AccAddressFromBech32(a.Sender)
+	if err != nil {
+		return nil
+	}
+
+	return CalculateSwapID(a.RandomNumberHash, sender, a.SenderOtherChain)
 }
 
 // GetCoins returns the swap's amount as sdk.Coins
@@ -75,16 +65,27 @@ func (a AtomicSwap) Validate() error {
 	if a.Timestamp == 0 {
 		return errors.New("timestamp cannot be 0")
 	}
-	if a.Sender.Empty() {
+	if time.Unix(a.Timestamp, 0).Add(24 * time.Hour).Before(time.Now()) {
+		return errors.New("timestamp cannot be more than 1 day in the past")
+	}
+	if len(a.Sender) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "sender cannot be empty")
 	}
-	if a.Recipient.Empty() {
+	if len(a.Recipient) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient cannot be empty")
 	}
-	if len(a.Sender) != AddrByteCount {
+	senderAcc, err := sdk.AccAddressFromBech32(a.Sender)
+	if err != nil {
+		return fmt.Errorf("expected Bech32 address for sender %s", a.Sender)
+	}
+	if len(senderAcc.Bytes()) != AddrByteCount {
 		return fmt.Errorf("the expected address length is %d, actual length is %d", AddrByteCount, len(a.Sender))
 	}
-	if len(a.Recipient) != AddrByteCount {
+	recAcc, err := sdk.AccAddressFromBech32(a.Recipient)
+	if err != nil {
+		return fmt.Errorf("expected Bech32 address for recipient %s", a.Recipient)
+	}
+	if len(recAcc.Bytes()) != AddrByteCount {
 		return fmt.Errorf("the expected address length is %d, actual length is %d", AddrByteCount, len(a.Recipient))
 	}
 	// NOTE: These adresses may not have a bech32 prefix.
@@ -124,7 +125,7 @@ func (a AtomicSwap) String() string {
 		"\n    Direction:                %s",
 		a.GetSwapID(), a.Status.String(), a.Amount.String(),
 		hex.EncodeToString(a.RandomNumberHash), a.ExpireTimestamp,
-		a.Timestamp, a.Sender.String(), a.Recipient.String(),
+		a.Timestamp, a.Sender, a.Recipient,
 		a.SenderOtherChain, a.RecipientOtherChain, a.ClosedBlock,
 		a.CrossChain, a.Direction)
 }
@@ -264,25 +265,6 @@ func (direction SwapDirection) IsValid() bool {
 	return false
 }
 
-type AugmentedAtomicSwap struct {
-	ID string `json:"id" yaml:"id"`
-
-	// Embed AtomicSwap fields explicity in order to output as top level JSON fields
-	// This prevents breaking changes for clients using REST API
-	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
-	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
-	ExpireTimestamp     int64            `json:"expire_timestamp"  yaml:"expire_timestamp"`
-	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
-	Sender              sdk.AccAddress   `json:"sender"  yaml:"sender"`
-	Recipient           sdk.AccAddress   `json:"recipient"  yaml:"recipient"`
-	SenderOtherChain    string           `json:"sender_other_chain"  yaml:"sender_other_chain"`
-	RecipientOtherChain string           `json:"recipient_other_chain"  yaml:"recipient_other_chain"`
-	ClosedBlock         int64            `json:"closed_block"  yaml:"closed_block"`
-	Status              SwapStatus       `json:"status"  yaml:"status"`
-	CrossChain          bool             `json:"cross_chain"  yaml:"cross_chain"`
-	Direction           SwapDirection    `json:"direction"  yaml:"direction"`
-}
-
 func NewAugmentedAtomicSwap(swap AtomicSwap) AugmentedAtomicSwap {
 	return AugmentedAtomicSwap{
 		ID:                  hex.EncodeToString(swap.GetSwapID()),
@@ -300,5 +282,3 @@ func NewAugmentedAtomicSwap(swap AtomicSwap) AugmentedAtomicSwap {
 		Direction:           swap.Direction,
 	}
 }
-
-type AugmentedAtomicSwaps []AugmentedAtomicSwap

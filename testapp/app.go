@@ -3,10 +3,10 @@ package testapp
 import (
 	"math/rand"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/ed25519"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 )
 
 const (
@@ -22,9 +22,9 @@ func SetBech32AddressPrefixes(config *sdk.Config) {
 // Migrated from github/kava/app/test_common.go
 // GeneratePrivKeyAddressPairsFromRand generates (deterministically) a total of n private keys and addresses.
 // TODO only generate secp256 keys?
-func GeneratePrivKeyAddressPairs(n int) (keys []crypto.PrivKey, addrs []sdk.AccAddress) {
+func GeneratePrivKeyAddressPairs(n int) (keys []cryptotypes.PrivKey, addrs []sdk.AccAddress) {
 	r := rand.New(rand.NewSource(12345)) // make the generation deterministic
-	keys = make([]crypto.PrivKey, n)
+	keys = make([]cryptotypes.PrivKey, n)
 	addrs = make([]sdk.AccAddress, n)
 	for i := 0; i < n; i++ {
 		secret := make([]byte, 32)
@@ -33,7 +33,7 @@ func GeneratePrivKeyAddressPairs(n int) (keys []crypto.PrivKey, addrs []sdk.AccA
 			panic("Could not read randomness")
 		}
 		if r.Int63()%2 == 0 {
-			keys[i] = secp256k1.GenPrivKeySecp256k1(secret)
+			keys[i] = secp256k1.GenPrivKeyFromSecret(secret)
 		} else {
 			keys[i] = ed25519.GenPrivKeyFromSecret(secret)
 		}

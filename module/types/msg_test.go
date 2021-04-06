@@ -46,8 +46,8 @@ func TestMsgCreateAtomicSwap(t *testing.T) {
 
 	for i, tc := range tests {
 		msg := types.NewMsgCreateAtomicSwap(
-			tc.from,
-			tc.to,
+			tc.from.String(),
+			tc.to.String(),
 			tc.recipientOtherChain,
 			tc.senderOtherChain,
 			tc.randomNumberHash,

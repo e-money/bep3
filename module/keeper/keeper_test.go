@@ -6,7 +6,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/keeper"
 	"github.com/e-money/bep3/module/types"
@@ -18,35 +18,38 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	ctx          sdk.Context
-	cdc          *codec.Codec
-	keeper       keeper.Keeper
-	supplyKeeper supply.Keeper
-	appModule    bep3.AppModule
+	ctx           sdk.Context
+	cdc           *codec.LegacyAmino
+	keeper        keeper.Keeper
+	bankKeeper    types.BankKeeper
+	accountKeeper types.AccountKeeper
+	encConfig     bep3.EncodingConfig
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
 	config := sdk.GetConfig()
 	app.SetBech32AddressPrefixes(config)
-	suite.ResetChain()
 
-	suite.cdc = codec.New()
-	types.RegisterCodec(suite.cdc)
-	suite.cdc.Seal()
+	suite.encConfig = bep3.MakeProtoEncodingConfig()
+	// suite.encConfig = bep3.MakeAminoEncodingConfig()
+	suite.cdc = suite.encConfig.Amino
+
+	suite.ResetChain()
 }
 
 func (suite *KeeperTestSuite) ResetChain() {
-	ctx, bep3Keeper, _, supplyKeeper, _ := app.CreateTestComponents(suite.T())
+	ctx, _, bep3Keeper, accountKeeper, bankKeeper, _ := app.CreateTestComponents(suite.T())
 
 	suite.ctx = ctx
 	suite.keeper = bep3Keeper
-	suite.supplyKeeper = supplyKeeper
+	suite.accountKeeper = accountKeeper
+	suite.bankKeeper = bankKeeper
 }
 
 func (suite *KeeperTestSuite) TestEnsureModuleAccountPermissions() {
-	suite.supplyKeeper.SetModuleAccount(suite.ctx, supply.NewEmptyModuleAccount(types.ModuleName)) // no permisions
+	suite.accountKeeper.SetModuleAccount(suite.ctx, authtypes.NewEmptyModuleAccount(types.ModuleName)) // no permisions
 
-	supplyKeeper := suite.supplyKeeper
+	supplyKeeper := suite.bankKeeper
 	testCoins := cs(c("busd", 1000_00_000_000))
 
 	// Ensure there are no minting and burning permissions.
@@ -346,7 +349,7 @@ func (suite *KeeperTestSuite) TestIterateAtomicSwapsLongtermStorage() {
 func (suite *KeeperTestSuite) TestGetSetAssetSupply() {
 	denom := "bnb"
 	// Put asset supply in store
-	assetSupply := types.NewAssetSupply(c(denom, 0), c(denom, 0), c(denom, 50000), c(denom, 0), time.Duration(0))
+	assetSupply := types.NewAssetSupply(c(denom, 0), c(denom, 0), c(denom, 50000), c(denom, 0), 0)
 	suite.keeper.SetAssetSupply(suite.ctx, assetSupply, denom)
 
 	// Check asset in store
@@ -362,13 +365,13 @@ func (suite *KeeperTestSuite) TestGetSetAssetSupply() {
 
 func (suite *KeeperTestSuite) TestGetAllAssetSupplies() {
 	// Put asset supply in store
-	assetSupply := types.NewAssetSupply(c("bnb", 0), c("bnb", 0), c("bnb", 50000), c("bnb", 0), time.Duration(0))
+	assetSupply := types.NewAssetSupply(c("bnb", 0), c("bnb", 0), c("bnb", 50000), c("bnb", 0), 0)
 	suite.keeper.SetAssetSupply(suite.ctx, assetSupply, "bnb")
-	assetSupply = types.NewAssetSupply(c("inc", 0), c("inc", 0), c("inc", 50000), c("inc", 0), time.Duration(0))
+	assetSupply = types.NewAssetSupply(c("inc", 0), c("inc", 0), c("inc", 50000), c("inc", 0), 0)
 	suite.keeper.SetAssetSupply(suite.ctx, assetSupply, "inc")
 
 	supplies := suite.keeper.GetAllAssetSupplies(suite.ctx)
-	suite.Equal(2, len(supplies))
+	suite.Equal(2, len(supplies.AssetSupplies))
 }
 
 func TestKeeperTestSuite(t *testing.T) {

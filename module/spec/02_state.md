@@ -51,7 +51,7 @@ AtomicSwap stores information about an individual atomic swap, including the sen
 type AtomicSwap struct {
 	Amount              sdk.Coins        `json:"amount"  yaml:"amount"`
 	RandomNumberHash    tmbytes.HexBytes `json:"random_number_hash"  yaml:"random_number_hash"`
-	ExpireHeight        int64            `json:"expire_height"  yaml:"expire_height"`
+	ExpireTimestamp     int64            `json:"expire_timestamp"  yaml:"expire_timestamp"`
 	Timestamp           int64            `json:"timestamp"  yaml:"timestamp"`
 	Sender              sdk.AccAddress   `json:"sender"  yaml:"sender"`
 	Recipient           sdk.AccAddress   `json:"recipient"  yaml:"recipient"`

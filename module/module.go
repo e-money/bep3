@@ -1,19 +1,23 @@
 package bep3
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"math/rand"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	sim "github.com/cosmos/cosmos-sdk/x/simulation"
+	sdksim "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/e-money/bep3/module/client/cli"
 	"github.com/e-money/bep3/module/client/rest"
-	"github.com/e-money/bep3/module/simulation"
-	"github.com/e-money/bep3/module/types"
+	"github.com/e-money/bep3/module/keeper"
+	bep3types "github.com/e-money/bep3/module/types"
 	"github.com/gorilla/mux"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -25,28 +29,35 @@ var (
 )
 
 // AppModuleBasic defines the basic application module used by the bep3 module.
-type AppModuleBasic struct{}
+type AppModuleBasic struct {
+	cdc *codec.LegacyAmino
+}
 
 // Name returns the bep3 module's name.
 func (AppModuleBasic) Name() string {
 	return ModuleName
 }
 
-// RegisterCodec registers the bep3 module's types for the given codec.
-func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	RegisterCodec(cdc)
+// RegisterLegacyAminoCodec registers the bep3 module's types for Amino.
+func (ab AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	bep3types.RegisterLegacyAminoCodec(cdc)
+	ab.cdc = cdc
+}
+
+func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
+	bep3types.RegisterInterfaces(registry)
 }
 
 // DefaultGenesis returns default genesis state as raw bytes for the bep3
 // module.
-func (AppModuleBasic) DefaultGenesis() json.RawMessage {
-	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
+func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
+	return cdc.MustMarshalJSON(DefaultGenesisState())
 }
 
 // ValidateGenesis performs genesis state validation for the bep3 module.
-func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxEncodingConfig, bz json.RawMessage) error {
 	var gs GenesisState
-	err := ModuleCdc.UnmarshalJSON(bz, &gs)
+	err := cdc.UnmarshalJSON(bz, &gs)
 	if err != nil {
 		return err
 	}
@@ -54,18 +65,25 @@ func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 }
 
 // RegisterRESTRoutes registers the REST routes for the bep3 module.
-func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
+func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
 	rest.RegisterRoutes(ctx, rtr)
 }
 
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
+	err := bep3types.RegisterQueryHandlerClient(context.Background(), mux, bep3types.NewQueryClient(clientCtx))
+	if err != nil {
+		panic(fmt.Errorf("Cannot register Bep3 gRPC http end points:%w", err))
+	}
+}
+
 // GetTxCmd returns the root tx command for the bep3 module.
-func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
-	return cli.GetTxCmd(cdc)
+func (AppModuleBasic) GetTxCmd() *cobra.Command {
+	return cli.GetTxCmd()
 }
 
 // GetQueryCmd returns no root query command for the bep3 module.
-func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	return cli.GetQueryCmd(StoreKey, cdc)
+func (AppModuleBasic) GetQueryCmd() *cobra.Command {
+	return cli.GetQueryCmd()
 }
 
 //____________________________________________________________________________
@@ -75,17 +93,17 @@ type AppModule struct {
 	AppModuleBasic
 
 	keeper        Keeper
-	accountKeeper types.AccountKeeper
-	supplyKeeper  types.SupplyKeeper
+	accountKeeper bep3types.AccountKeeper
+	bankKeeper    bep3types.BankKeeper
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper Keeper, accountKeeper types.AccountKeeper, supplyKeeper types.SupplyKeeper) AppModule {
+func NewAppModule(keeper Keeper, accountKeeper bep3types.AccountKeeper, bankKeeper bep3types.BankKeeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
 		accountKeeper:  accountKeeper,
-		supplyKeeper:   supplyKeeper,
+		bankKeeper:     bankKeeper,
 	}
 }
 
@@ -98,8 +116,8 @@ func (AppModule) Name() string {
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the bep3 module.
-func (AppModule) Route() string {
-	return RouterKey
+func (am AppModule) Route() sdk.Route {
+	return sdk.NewRoute(bep3types.RouterKey, NewHandler(am.keeper))
 }
 
 // NewHandler returns an sdk.Handler for the bep3 module.
@@ -112,6 +130,10 @@ func (AppModule) QuerierRoute() string {
 	return QuerierRoute
 }
 
+func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+	return keeper.NewQuerier(am.keeper)
+}
+
 // NewQuerierHandler returns the bep3 module sdk.Querier.
 func (am AppModule) NewQuerierHandler() sdk.Querier {
 	return NewQuerier(am.keeper)
@@ -119,18 +141,23 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 
 // InitGenesis performs genesis initialization for the bep3 module. It returns
 // no validator updates.
-func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState GenesisState
-	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, am.supplyKeeper, genesisState)
+	cdc.MustUnmarshalJSON(data, &genesisState)
+	InitGenesis(ctx, am.keeper, am.accountKeeper, genesisState)
 	return []abci.ValidatorUpdate{}
 }
 
 // ExportGenesis returns the exported genesis state as raw bytes for the bep3
 // module.
-func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
+func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
-	return ModuleCdc.MustMarshalJSON(gs)
+	return cdc.MustMarshalJSON(gs)
+}
+
+func (am AppModule) RegisterServices(cfg module.Configurator) {
+	bep3types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	bep3types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 }
 
 // BeginBlock returns the begin blocker for the bep3 module.
@@ -143,29 +170,29 @@ func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.Valid
 	return []abci.ValidatorUpdate{}
 }
 
+// WeightedOperations returns the all the bep3 module operations with their respective weights.
+func (am AppModule) WeightedOperations(simState module.SimulationState) []sdksim.WeightedOperation {
+	return WeightedOperations(simState.AppParams, simState.Cdc, am.accountKeeper, am.bankKeeper, am.keeper)
+}
+
 //____________________________________________________________________________
 
 // GenerateGenesisState creates a randomized GenState of the bep3 module
 func (AppModuleBasic) GenerateGenesisState(simState *module.SimulationState) {
-	simulation.RandomizedGenState(simState)
+	RandomizedGenState(simState)
 }
 
 // ProposalContents doesn't return any content functions for governance proposals.
-func (AppModuleBasic) ProposalContents(_ module.SimulationState) []sim.WeightedProposalContent {
+func (AppModuleBasic) ProposalContents(_ module.SimulationState) []sdksim.WeightedProposalContent {
 	return nil
 }
 
-// RandomizedParams returns nil because bep3 has no params.
-func (AppModuleBasic) RandomizedParams(r *rand.Rand) []sim.ParamChange {
-	return simulation.ParamChanges(r)
-}
-
 // RegisterStoreDecoder registers a decoder for bep3 module's types
-func (AppModuleBasic) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
-	sdr[StoreKey] = simulation.DecodeStore
+func (ab AppModuleBasic) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
+	sdr[StoreKey] = NewDecodeStore(ab.cdc)
 }
 
-// WeightedOperations returns the all the bep3 module operations with their respective weights.
-func (am AppModule) WeightedOperations(simState module.SimulationState) []sim.WeightedOperation {
-	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, am.accountKeeper, am.keeper)
+// RandomizedParams returns nil because bep3 has no params.
+func (AppModuleBasic) RandomizedParams(r *rand.Rand) []sdksim.ParamChange {
+	return ParamChanges(r)
 }

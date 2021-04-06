@@ -59,7 +59,11 @@ func (k Keeper) GetDeputyAddress(ctx sdk.Context, denom string) (sdk.AccAddress,
 	if err != nil {
 		return sdk.AccAddress{}, err
 	}
-	return asset.DeputyAddress, nil
+	depAddr, err := sdk.AccAddressFromBech32(asset.DeputyAddress)
+	if err != nil {
+		return sdk.AccAddress{}, err
+	}
+	return depAddr, nil
 }
 
 // GetFixedFee returns the fixed fee for incoming swaps
@@ -98,17 +102,17 @@ func (k Keeper) GetSwapTime(ctx sdk.Context, denom string) (int64, error) {
 	return asset.SwapTimestamp, nil
 }
 
-// GetTimeSpan returns the swap seconds allowance
-func (k Keeper) GetTimeSpan(ctx sdk.Context, denom string) (int64, error) {
+// GetTimeSpanMin returns the swap minutes allowance
+func (k Keeper) GetTimeSpanMin(ctx sdk.Context, denom string) (int64, error) {
 	asset, err := k.GetAsset(ctx, denom)
 	if err != nil {
 		return int64(0), err
 	}
-	return asset.SwapTimeSpan, nil
+	return asset.SwapTimeSpanMin, nil
 }
 
 // GetAssetByCoinID returns an asset by its denom
-func (k Keeper) GetAssetByCoinID(ctx sdk.Context, coinID int) (types.AssetParam, bool) {
+func (k Keeper) GetAssetByCoinID(ctx sdk.Context, coinID int64) (types.AssetParam, bool) {
 	params := k.GetParams(ctx)
 	for _, asset := range params.AssetParams {
 		if asset.CoinID == coinID {

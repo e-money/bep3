@@ -7,17 +7,9 @@ import (
 	"time"
 )
 
-// GenesisState - all bep3 state that must be provided at genesis
-type GenesisState struct {
-	Params            Params        `json:"params" yaml:"params"`
-	AtomicSwaps       AtomicSwaps   `json:"atomic_swaps" yaml:"atomic_swaps"`
-	Supplies          AssetSupplies `json:"supplies" yaml:"supplies"`
-	PreviousBlockTime time.Time     `json:"previous_block_time" yaml:"previous_block_time"`
-}
-
 // NewGenesisState creates a new GenesisState object
-func NewGenesisState(params Params, swaps AtomicSwaps, supplies AssetSupplies, previousBlockTime time.Time) GenesisState {
-	return GenesisState{
+func NewGenesisState(params Params, swaps AtomicSwaps, supplies AssetSupplies, previousBlockTime time.Time) *GenesisState {
+	return &GenesisState{
 		Params:            params,
 		AtomicSwaps:       swaps,
 		Supplies:          supplies,
@@ -26,7 +18,7 @@ func NewGenesisState(params Params, swaps AtomicSwaps, supplies AssetSupplies, p
 }
 
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
-func DefaultGenesisState() GenesisState {
+func DefaultGenesisState() *GenesisState {
 	return NewGenesisState(
 		DefaultParams(),
 		AtomicSwaps{},
@@ -37,8 +29,8 @@ func DefaultGenesisState() GenesisState {
 
 // Equal checks whether two GenesisState structs are equivalent.
 func (gs GenesisState) Equal(gs2 GenesisState) bool {
-	b1 := ModuleCdc.MustMarshalBinaryBare(gs)
-	b2 := ModuleCdc.MustMarshalBinaryBare(gs2)
+	b1 := ModuleCdc.LegacyAmino.MustMarshalBinaryBare(gs)
+	b2 := ModuleCdc.LegacyAmino.MustMarshalBinaryBare(gs2)
 	return bytes.Equal(b1, b2)
 }
 
@@ -67,7 +59,7 @@ func (gs GenesisState) Validate() error {
 	}
 
 	supplyDenoms := map[string]bool{}
-	for _, supply := range gs.Supplies {
+	for _, supply := range gs.Supplies.AssetSupplies {
 		if err := supply.Validate(); err != nil {
 			return err
 		}

@@ -5,8 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
@@ -26,14 +25,13 @@ var (
 	TestUser2 = sdk.AccAddress(crypto.AddressHash([]byte("KavaTestUser2")))
 )
 
-func i(in int64) sdk.Int                    { return sdk.NewInt(in) }
 func c(denom string, amount int64) sdk.Coin { return sdk.NewInt64Coin(denom, amount) }
 func cs(coins ...sdk.Coin) sdk.Coins        { return sdk.NewCoins(coins...) }
 func ts(minOffset int) int64                { return tmtime.Now().Add(time.Duration(minOffset) * time.Minute).Unix() }
 
-func NewAuthGenStateFromAccs(accounts ...authexported.GenesisAccount) app.GenesisState {
-	authGenesis := auth.NewGenesisState(auth.DefaultParams(), accounts)
-	return app.GenesisState{auth.ModuleName: auth.ModuleCdc.MustMarshalJSON(authGenesis)}
+func NewAuthGenStateFromAccs(accounts ...authtypes.GenesisAccount) app.GenesisState {
+	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), accounts)
+	return app.GenesisState{authtypes.ModuleName: authtypes.ModuleCdc.MustMarshalJSON(authGenesis)}
 }
 
 func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
@@ -47,14 +45,14 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 						Limit:          sdk.NewInt(350000000000000),
 						TimeLimited:    false,
 						TimeBasedLimit: sdk.ZeroInt(),
-						TimePeriod:     time.Hour,
+						TimePeriod:     int64(time.Hour),
 					},
 					Active:        true,
-					DeputyAddress: deputyAddress,
+					DeputyAddress: deputyAddress.String(),
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(1000000000000),
-					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 				types.AssetParam{
@@ -64,38 +62,40 @@ func NewBep3GenState(deputyAddress sdk.AccAddress) json.RawMessage {
 						Limit:          sdk.NewInt(100000000000000),
 						TimeLimited:    true,
 						TimeBasedLimit: sdk.NewInt(50000000000),
-						TimePeriod:     time.Hour,
+						TimePeriod:     int64(time.Hour),
 					},
 					Active:        false,
-					DeputyAddress: deputyAddress,
+					DeputyAddress: deputyAddress.String(),
 					FixedFee:      sdk.NewInt(1000),
 					MinSwapAmount: sdk.OneInt(),
 					MaxSwapAmount: sdk.NewInt(100000000000),
-					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
+					SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
 					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 				},
 			},
 		},
 		Supplies: types.AssetSupplies{
-			types.NewAssetSupply(
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				time.Duration(0),
-			),
-			types.NewAssetSupply(
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				time.Duration(0),
-			),
+			AssetSupplies: []types.AssetSupply{
+				{
+					IncomingSupply:sdk.NewCoin("bnb", sdk.ZeroInt()),
+					OutgoingSupply:sdk.NewCoin("bnb", sdk.ZeroInt()),
+					CurrentSupply:sdk.NewCoin("bnb", sdk.ZeroInt()),
+					TimeLimitedCurrentSupply:sdk.NewCoin("bnb", sdk.ZeroInt()),
+					TimeElapsed:0,
+				},
+				{
+					IncomingSupply:sdk.NewCoin("inc", sdk.ZeroInt()),
+					OutgoingSupply:sdk.NewCoin("inc", sdk.ZeroInt()),
+					CurrentSupply:sdk.NewCoin("inc", sdk.ZeroInt()),
+					TimeLimitedCurrentSupply:sdk.NewCoin("inc", sdk.ZeroInt()),
+					TimeElapsed:0,
+				},
+			},
 		},
 		PreviousBlockTime: types.DefaultPreviousBlockTime,
 	}
 
-	return types.ModuleCdc.MustMarshalJSON(bep3Genesis)
+	return types.ModuleCdc.MustMarshalJSON(&bep3Genesis)
 }
 
 func atomicSwaps(ctx sdk.Context, count int) types.AtomicSwaps {
@@ -117,22 +117,4 @@ func atomicSwap(ctx sdk.Context, index int) types.AtomicSwap {
 		ctx.BlockTime().Unix()+expireOffset, timestamp, TestUser1, TestUser2,
 		TestSenderOtherChain, TestRecipientOtherChain, 0, types.Open,
 		true, types.Incoming)
-}
-
-func assetSupplies(count int) types.AssetSupplies {
-	if count > 5 { // Max 5 asset supplies
-		return types.AssetSupplies{}
-	}
-
-	var supplies types.AssetSupplies
-
-	for i := 0; i < count; i++ {
-		supply := assetSupply(DenomMap[i])
-		supplies = append(supplies, supply)
-	}
-	return supplies
-}
-
-func assetSupply(denom string) types.AssetSupply {
-	return types.NewAssetSupply(c(denom, 0), c(denom, 0), c(denom, 0), c(denom, 0), time.Duration(0))
 }

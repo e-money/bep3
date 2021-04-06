@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bep3 "github.com/e-money/bep3/module"
+	"github.com/e-money/bep3/module/types"
 	app "github.com/e-money/bep3/testapp"
 	tmtime "github.com/tendermint/tendermint/types/time"
 )
@@ -23,19 +24,31 @@ var (
 )
 
 func i(in int64) sdk.Int                    { return sdk.NewInt(in) }
-func d(de int64) sdk.Dec                    { return sdk.NewDec(de) }
 func c(denom string, amount int64) sdk.Coin { return sdk.NewInt64Coin(denom, amount) }
 func cs(coins ...sdk.Coin) sdk.Coins        { return sdk.NewCoins(coins...) }
 func ts(minOffset int) int64                { return tmtime.Now().Add(time.Duration(minOffset) * time.Minute).Unix() }
 
 func NewBep3GenState(deputy sdk.AccAddress) json.RawMessage {
 	bep3Genesis := baseGenState(deputy)
-	return bep3.ModuleCdc.MustMarshalJSON(bep3Genesis)
+	return bep3.ModuleCdc.MustMarshalJSON(&bep3Genesis)
 }
 
 func NewBep3GenStateMulti(deputy sdk.AccAddress) app.GenesisState {
 	bep3Genesis := baseGenState(deputy)
-	return app.GenesisState{bep3.ModuleName: bep3.ModuleCdc.MustMarshalJSON(bep3Genesis)}
+	return app.GenesisState{bep3.ModuleName: bep3.ModuleCdc.MustMarshalJSON(&bep3Genesis)}
+}
+
+func getBep3Coins() ([]string, sdk.Coins) {
+	// bep3 genesis for supported coins
+	bep3Denoms := []string{"bnb", "inc", "echf", "edkk", "eeur", "enok", "esek", "ungm"}
+	coins := make(sdk.Coins, len(bep3Denoms))
+	amount := sdk.NewInt(int64(bep3.MaxSupplyLimit))
+
+	for idx, denom := range bep3Denoms {
+		coins[idx] = sdk.NewCoin(denom, amount)
+	}
+
+	return bep3Denoms, coins
 }
 
 func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
@@ -50,15 +63,15 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 						Limit:          sdk.NewInt(350000000000000),
 						TimeLimited:    false,
 						TimeBasedLimit: sdk.ZeroInt(),
-						TimePeriod:     time.Hour,
+						TimePeriod:     int64(time.Hour),
 					},
-					Active:        true,
-					DeputyAddress: deputy,
-					FixedFee:      sdk.NewInt(1000),
-					MinSwapAmount: sdk.OneInt(),
-					MaxSwapAmount: sdk.NewInt(1000000000000),
-					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
-					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
+					Active:          true,
+					DeputyAddress:   deputy.String(),
+					FixedFee:        sdk.NewInt(1000),
+					MinSwapAmount:   sdk.OneInt(),
+					MaxSwapAmount:   sdk.NewInt(1000000000000),
+					SwapTimeSpanMin: bep3.DefaultSwapTimeSpan,
+					SwapTimestamp:   bep3.DefaultSwapBlockTimestamp,
 				},
 				bep3.AssetParam{
 					Denom:  "inc",
@@ -67,33 +80,35 @@ func baseGenState(deputy sdk.AccAddress) bep3.GenesisState {
 						Limit:          sdk.NewInt(100000000000),
 						TimeLimited:    false,
 						TimeBasedLimit: sdk.ZeroInt(),
-						TimePeriod:     time.Hour,
+						TimePeriod:     int64(time.Hour),
 					},
-					Active:        true,
-					DeputyAddress: deputy,
-					FixedFee:      sdk.NewInt(1000),
-					MinSwapAmount: sdk.OneInt(),
-					MaxSwapAmount: sdk.NewInt(1000000000000),
-					SwapTimeSpan:  bep3.DefaultSwapTimeSpan,
-					SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
+					Active:          true,
+					DeputyAddress:   deputy.String(),
+					FixedFee:        sdk.NewInt(1000),
+					MinSwapAmount:   sdk.OneInt(),
+					MaxSwapAmount:   sdk.NewInt(1000000000000),
+					SwapTimeSpanMin: bep3.DefaultSwapTimeSpan,
+					SwapTimestamp:   bep3.DefaultSwapBlockTimestamp,
 				},
 			},
 		},
 		Supplies: bep3.AssetSupplies{
-			bep3.NewAssetSupply(
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				sdk.NewCoin("bnb", sdk.ZeroInt()),
-				time.Duration(0),
-			),
-			bep3.NewAssetSupply(
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				sdk.NewCoin("inc", sdk.ZeroInt()),
-				time.Duration(0),
-			),
+			AssetSupplies: []types.AssetSupply{
+				{
+					IncomingSupply:           sdk.NewCoin("bnb", sdk.ZeroInt()),
+					OutgoingSupply:           sdk.NewCoin("bnb", sdk.ZeroInt()),
+					CurrentSupply:            sdk.NewCoin("bnb", sdk.ZeroInt()),
+					TimeLimitedCurrentSupply: sdk.NewCoin("bnb", sdk.ZeroInt()),
+					TimeElapsed:              0,
+				},
+				{
+					IncomingSupply:           sdk.NewCoin("inc", sdk.ZeroInt()),
+					OutgoingSupply:           sdk.NewCoin("inc", sdk.ZeroInt()),
+					CurrentSupply:            sdk.NewCoin("inc", sdk.ZeroInt()),
+					TimeLimitedCurrentSupply: sdk.NewCoin("inc", sdk.ZeroInt()),
+					TimeElapsed:              0,
+				},
+			},
 		},
 		PreviousBlockTime: bep3.DefaultPreviousBlockTime,
 	}
@@ -111,7 +126,7 @@ func loadSwapAndSupply(addr sdk.AccAddress, index int) (bep3.AtomicSwap, bep3.As
 		TestRecipientOtherChain, 1, bep3.Open, true, bep3.Incoming)
 
 	supply := bep3.NewAssetSupply(coin, c(coin.Denom, 0),
-		c(coin.Denom, 0), c(coin.Denom, 0), time.Duration(0))
+		c(coin.Denom, 0), c(coin.Denom, 0), 0)
 
 	return swap, supply
 }

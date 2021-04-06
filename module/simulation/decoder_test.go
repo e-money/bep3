@@ -7,17 +7,18 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/kv"
+	bep3 "github.com/e-money/bep3/module"
 	"github.com/e-money/bep3/module/types"
 	"github.com/stretchr/testify/require"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	"github.com/tendermint/tendermint/libs/kv"
 )
 
-func makeTestCodec() (cdc *codec.Codec) {
-	cdc = codec.New()
-	sdk.RegisterCodec(cdc)
-	types.RegisterCodec(cdc)
-	return
+func makeTestCodec() (cdc *codec.LegacyAmino) {
+	encConfig := bep3.MakeProtoEncodingConfig()
+	// encConfig := bep3.MakeAminoEncodingConfig()
+
+	return encConfig.Amino
 }
 
 func TestDecodeBep3Store(t *testing.T) {
@@ -25,17 +26,24 @@ func TestDecodeBep3Store(t *testing.T) {
 	prevBlockTime := time.Now().UTC()
 
 	oneCoin := sdk.NewCoin("coin", sdk.OneInt())
-	swap := types.NewAtomicSwap(sdk.Coins{oneCoin}, nil, 10, 100, nil, nil, "otherChainSender", "otherChainRec", 200, types.Completed, true, types.Outgoing)
-	supply := types.AssetSupply{IncomingSupply: oneCoin, OutgoingSupply: oneCoin, CurrentSupply: oneCoin, TimeLimitedCurrentSupply: oneCoin, TimeElapsed: time.Duration(0)}
+	swap := types.NewAtomicSwap(sdk.Coins{oneCoin}, nil, 10, 100,
+		nil, nil, "otherChainSender", "otherChainRec",
+		200, types.Completed, true, types.Outgoing)
+	supply := types.AssetSupply{
+		IncomingSupply: oneCoin, OutgoingSupply: oneCoin, CurrentSupply: oneCoin,
+		TimeLimitedCurrentSupply: oneCoin, TimeElapsed: 0,
+	}
 	bz := tmbytes.HexBytes([]byte{1, 2})
 
 	kvPairs := kv.Pairs{
-		kv.Pair{Key: types.AtomicSwapKeyPrefix, Value: cdc.MustMarshalBinaryLengthPrefixed(swap)},
-		kv.Pair{Key: types.AssetSupplyPrefix, Value: cdc.MustMarshalBinaryLengthPrefixed(supply)},
-		kv.Pair{Key: types.AtomicSwapByBlockPrefix, Value: bz},
-		kv.Pair{Key: types.AtomicSwapByBlockPrefix, Value: bz},
-		kv.Pair{Key: types.PreviousBlockTimeKey, Value: cdc.MustMarshalBinaryLengthPrefixed(prevBlockTime)},
-		kv.Pair{Key: []byte{0x99}, Value: []byte{0x99}},
+		Pairs: []kv.Pair{
+			{Key: types.AtomicSwapKeyPrefix, Value: cdc.MustMarshalBinaryLengthPrefixed(swap)},
+			{Key: types.AssetSupplyPrefix, Value: cdc.MustMarshalBinaryLengthPrefixed(supply)},
+			{Key: types.AtomicSwapByBlockPrefix, Value: bz},
+			{Key: types.AtomicSwapByBlockPrefix, Value: bz},
+			{Key: types.PreviousBlockTimeKey, Value: cdc.MustMarshalBinaryLengthPrefixed(prevBlockTime)},
+			{Key: []byte{0x99}, Value: []byte{0x99}},
+		},
 	}
 
 	tests := []struct {
@@ -49,14 +57,17 @@ func TestDecodeBep3Store(t *testing.T) {
 		{"PreviousBlockTime", fmt.Sprintf("%s\n%s", prevBlockTime, prevBlockTime)},
 		{"other", ""},
 	}
+
+	decodeStore := bep3.NewDecodeStore(cdc)
+
 	for i, tt := range tests {
 		i, tt := i, tt
 		t.Run(tt.name, func(t *testing.T) {
 			switch i {
 			case len(tests) - 1:
-				require.Panics(t, func() { DecodeStore(cdc, kvPairs[i], kvPairs[i]) }, tt.name)
+				require.Panics(t, func() { decodeStore(kvPairs.Pairs[i], kvPairs.Pairs[i]) }, tt.name)
 			default:
-				require.Equal(t, tt.expectedLog, DecodeStore(cdc, kvPairs[i], kvPairs[i]), tt.name)
+				require.Equal(t, tt.expectedLog, decodeStore(kvPairs.Pairs[i], kvPairs.Pairs[i]), tt.name)
 			}
 		})
 	}

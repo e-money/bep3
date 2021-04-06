@@ -8,15 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// AssetSupply contains information about an asset's supply
-type AssetSupply struct {
-	IncomingSupply           sdk.Coin      `json:"incoming_supply"  yaml:"incoming_supply"`
-	OutgoingSupply           sdk.Coin      `json:"outgoing_supply"  yaml:"outgoing_supply"`
-	CurrentSupply            sdk.Coin      `json:"current_supply"  yaml:"current_supply"`
-	TimeLimitedCurrentSupply sdk.Coin      `json:"time_limited_current_supply" yaml:"time_limited_current_supply"`
-	TimeElapsed              time.Duration `json:"time_elapsed" yaml:"time_elapsed"`
-}
-
 // NewAssetSupply initializes a new AssetSupply
 func NewAssetSupply(incomingSupply, outgoingSupply, currentSupply, timeLimitedSupply sdk.Coin, timeElapsed time.Duration) AssetSupply {
 	return AssetSupply{
@@ -24,7 +15,7 @@ func NewAssetSupply(incomingSupply, outgoingSupply, currentSupply, timeLimitedSu
 		OutgoingSupply:           outgoingSupply,
 		CurrentSupply:            currentSupply,
 		TimeLimitedCurrentSupply: timeLimitedSupply,
-		TimeElapsed:              timeElapsed,
+		TimeElapsed:              int64(timeElapsed),
 	}
 }
 
@@ -56,11 +47,11 @@ func (a AssetSupply) Equal(b AssetSupply) bool {
 	if a.GetDenom() != b.GetDenom() {
 		return false
 	}
-	return (a.IncomingSupply.IsEqual(b.IncomingSupply) &&
+	return a.IncomingSupply.IsEqual(b.IncomingSupply) &&
 		a.CurrentSupply.IsEqual(b.CurrentSupply) &&
 		a.OutgoingSupply.IsEqual(b.OutgoingSupply) &&
 		a.TimeLimitedCurrentSupply.IsEqual(b.TimeLimitedCurrentSupply) &&
-		a.TimeElapsed == b.TimeElapsed)
+		a.TimeElapsed == b.TimeElapsed
 }
 
 // String implements stringer
@@ -73,13 +64,10 @@ func (a AssetSupply) String() string {
 		Time-limited current cupply: %s
 		Time elapsed: %s
 		`,
-		a.IncomingSupply, a.OutgoingSupply, a.CurrentSupply, a.TimeLimitedCurrentSupply, a.TimeElapsed)
+		a.IncomingSupply, a.OutgoingSupply, a.CurrentSupply, a.TimeLimitedCurrentSupply, time.Duration(a.TimeElapsed))
 }
 
 // GetDenom getter method for the denom of the asset supply
 func (a AssetSupply) GetDenom() string {
 	return a.CurrentSupply.Denom
 }
-
-// AssetSupplies is a slice of AssetSupply
-type AssetSupplies []AssetSupply

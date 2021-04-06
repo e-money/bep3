@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"fmt"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -37,7 +38,6 @@ func (suite *AtomicSwapTestSuite) SetupTest() {
 	suite.addrs = addrs
 	suite.timestamps = timestamps
 	suite.randomNumberHashes = randomNumberHashes
-	return
 }
 
 func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
@@ -53,8 +53,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash:    suite.randomNumberHashes[0],
 				ExpireTimestamp:     360,
 				Timestamp:           suite.timestamps[0],
-				Sender:              suite.addrs[0],
-				Recipient:           suite.addrs[5],
+				Sender:              suite.addrs[0].String(),
+				Recipient:           suite.addrs[5].String(),
 				RecipientOtherChain: "bnb1urfermcg92dwq36572cx4xg84wpk3lfpksr5g7",
 				SenderOtherChain:    "bnb1uky3me9ggqypmrsvxk7ur6hqkzq7zmv4ed4ng7",
 				ClosedBlock:         1,
@@ -112,7 +112,7 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash: suite.randomNumberHashes[0],
 				ExpireTimestamp:  10,
 				Timestamp:        10,
-				Sender:           nil,
+				Sender:           "",
 			},
 			false,
 		},
@@ -123,8 +123,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash: suite.randomNumberHashes[0],
 				ExpireTimestamp:  10,
 				Timestamp:        10,
-				Sender:           suite.addrs[0],
-				Recipient:        nil,
+				Sender:           suite.addrs[0].String(),
+				Recipient:        "",
 			},
 			false,
 		},
@@ -135,8 +135,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash: suite.randomNumberHashes[0],
 				ExpireTimestamp:  10,
 				Timestamp:        10,
-				Sender:           suite.addrs[0][:10],
-				Recipient:        suite.addrs[5],
+				Sender:           suite.addrs[0].String()[:10],
+				Recipient:        suite.addrs[5].String(),
 			},
 			false,
 		},
@@ -147,8 +147,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash: suite.randomNumberHashes[0],
 				ExpireTimestamp:  10,
 				Timestamp:        10,
-				Sender:           suite.addrs[0],
-				Recipient:        suite.addrs[5][:10],
+				Sender:           suite.addrs[0].String(),
+				Recipient:        suite.addrs[5].String()[:10],
 			},
 			false,
 		},
@@ -159,8 +159,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash: suite.randomNumberHashes[0],
 				ExpireTimestamp:  10,
 				Timestamp:        10,
-				Sender:           suite.addrs[0],
-				Recipient:        suite.addrs[5],
+				Sender:           suite.addrs[0].String(),
+				Recipient:        suite.addrs[5].String(),
 				SenderOtherChain: "",
 			},
 			false,
@@ -172,8 +172,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash:    suite.randomNumberHashes[0],
 				ExpireTimestamp:     10,
 				Timestamp:           10,
-				Sender:              suite.addrs[0],
-				Recipient:           suite.addrs[5],
+				Sender:              suite.addrs[0].String(),
+				Recipient:           suite.addrs[5].String(),
 				SenderOtherChain:    "bnb1uky3me9ggqypmrsvxk7ur6hqkzq7zmv4ed4ng7",
 				RecipientOtherChain: "",
 			},
@@ -186,8 +186,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash:    suite.randomNumberHashes[0],
 				ExpireTimestamp:     10,
 				Timestamp:           10,
-				Sender:              suite.addrs[0],
-				Recipient:           suite.addrs[5],
+				Sender:              suite.addrs[0].String(),
+				Recipient:           suite.addrs[5].String(),
 				SenderOtherChain:    "bnb1uky3me9ggqypmrsvxk7ur6hqkzq7zmv4ed4ng7",
 				RecipientOtherChain: "bnb1urfermcg92dwq36572cx4xg84wpk3lfpksr5g7",
 				ClosedBlock:         0,
@@ -202,8 +202,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash:    suite.randomNumberHashes[0],
 				ExpireTimestamp:     10,
 				Timestamp:           10,
-				Sender:              suite.addrs[0],
-				Recipient:           suite.addrs[5],
+				Sender:              suite.addrs[0].String(),
+				Recipient:           suite.addrs[5].String(),
 				SenderOtherChain:    "bnb1uky3me9ggqypmrsvxk7ur6hqkzq7zmv4ed4ng7",
 				RecipientOtherChain: "bnb1urfermcg92dwq36572cx4xg84wpk3lfpksr5g7",
 				ClosedBlock:         1,
@@ -218,8 +218,8 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 				RandomNumberHash:    suite.randomNumberHashes[0],
 				ExpireTimestamp:     10,
 				Timestamp:           10,
-				Sender:              suite.addrs[0],
-				Recipient:           suite.addrs[5],
+				Sender:              suite.addrs[0].String(),
+				Recipient:           suite.addrs[5].String(),
 				SenderOtherChain:    "bnb1uky3me9ggqypmrsvxk7ur6hqkzq7zmv4ed4ng7",
 				RecipientOtherChain: "bnb1urfermcg92dwq36572cx4xg84wpk3lfpksr5g7",
 				ClosedBlock:         1,
@@ -237,7 +237,10 @@ func (suite *AtomicSwapTestSuite) TestNewAtomicSwap() {
 			suite.Require().NoError(err, tc.msg)
 			suite.Require().Equal(tc.swap.Amount, tc.swap.GetCoins())
 
-			expectedSwapID := types.CalculateSwapID(tc.swap.RandomNumberHash, tc.swap.Sender, tc.swap.SenderOtherChain)
+			senderAddr, err := sdk.AccAddressFromBech32(tc.swap.Sender)
+			suite.Require().NoError(err, fmt.Sprintf("cannot create sender account from bech32 address:%s",
+				tc.swap.Sender))
+			expectedSwapID := types.CalculateSwapID(tc.swap.RandomNumberHash, senderAddr, tc.swap.SenderOtherChain)
 			suite.Require().Equal(tmbytes.HexBytes(expectedSwapID), tc.swap.GetSwapID())
 		} else {
 			suite.Require().Error(err)
