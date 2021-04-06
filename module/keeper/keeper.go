@@ -127,11 +127,6 @@ func (k Keeper) InsertIntoByTimestamp(ctx sdk.Context, atomicSwap types.AtomicSw
 	swapKey := types.GetAtomicSwapByTimestampKey(
 		atomicSwap.ExpireTimestamp, atomicSwap.GetSwapID())
 
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Printf("\n\n***panic occurred at InsertIntoByTimestamp:%v,%s\n", err, err)
-		}
-	}()
 	store.Set(swapKey, atomicSwap.GetSwapID())
 }
 
