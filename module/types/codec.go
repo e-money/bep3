@@ -33,6 +33,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgClaimAtomicSwap{},
 	)
 	sdk.RegisterInterfaces(registry)
+	cryptocodec.RegisterInterfaces(registry)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
