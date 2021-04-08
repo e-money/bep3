@@ -634,7 +634,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
+						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpanMinutes,
 						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 					types.AssetParam{
@@ -651,7 +651,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
+						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpanMinutes,
 						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 					types.AssetParam{
@@ -668,7 +668,7 @@ func (suite *AssetTestSuite) TestUpdateTimeBasedSupplyLimits() {
 						FixedFee:      sdk.NewInt(1000),
 						MinSwapAmount: sdk.OneInt(),
 						MaxSwapAmount: sdk.NewInt(1000000000000),
-						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpan,
+						SwapTimeSpanMin:  bep3.DefaultSwapTimeSpanMinutes,
 						SwapTimestamp: bep3.DefaultSwapBlockTimestamp,
 					},
 				},

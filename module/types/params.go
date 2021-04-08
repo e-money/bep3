@@ -21,11 +21,11 @@ const (
 var (
 	KeyAssetParams = []byte("AssetParams")
 
-	DefaultMinAmount          sdk.Int = sdk.ZeroInt()
-	DefaultMaxAmount          sdk.Int = sdk.NewInt(1000000000000) // 10,000 BNB
-	DefaultPreviousBlockTime          = tmtime.Canonical(time.Unix(0, 0))
-	DefaultSwapBlockTimestamp int64   = 10 // At 10th second.
-	DefaultSwapTimeSpan       int64   = 180 // 5 minutes
+	DefaultMinAmount           sdk.Int = sdk.ZeroInt()
+	DefaultMaxAmount           sdk.Int = sdk.NewInt(1000000000000) // 10,000 BNB
+	DefaultPreviousBlockTime           = tmtime.Canonical(time.Unix(0, 0))
+	DefaultSwapBlockTimestamp  int64   = 10 // At 10th second.
+	DefaultSwapTimeSpanMinutes int64   = 5  // 5 minutes
 )
 
 // String implements fmt.Stringer

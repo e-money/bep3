@@ -161,7 +161,7 @@ func (k Keeper) IterateAtomicSwapsByBlock(ctx sdk.Context, inclusiveCutoffTime i
 // ------------------------------------------
 
 // InsertIntoLongtermStorage adds a swap ID and deletion time into the longterm storage index.
-// Completed swaps are stored for 1 week.
+// Completed swaps are stored for roughly 1 week.
 func (k Keeper) InsertIntoLongtermStorage(ctx sdk.Context, atomicSwap types.AtomicSwap) {
 	store := prefix.NewStore(ctx.KVStore(k.key), types.AtomicSwapLongtermStoragePrefix)
 

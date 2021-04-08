@@ -56,7 +56,7 @@ func (suite *QuerierTestSuite) SetupTest() {
 	isSwapID := make(map[string]bool)
 	for i := 0; i < 10; i++ {
 		// Set up atomic swap variables
-		expireTimestamp := types.DefaultSwapBlockTimestamp + types.DefaultSwapTimeSpan
+		expireTimestamp := types.DefaultSwapBlockTimestamp + types.DefaultSwapTimeSpanMinutes
 		amount := cs(c("bnb", 100))
 		timestamp := ts(0)
 		randomNumber, _ := types.GenerateSecureRandomNumber()

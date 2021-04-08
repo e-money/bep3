@@ -51,7 +51,7 @@ func (suite *ABCITestSuite) ResetKeeper() {
 		// Set up atomic swap variables
 		amount := cs(c("bnb", int64(10000)))
 		timestamp := ts(i)
-		swapTimeSpan := bep3.DefaultSwapTimeSpan
+		swapTimeSpan := bep3.DefaultSwapTimeSpanMinutes
 		randomNumber, _ := bep3.GenerateSecureRandomNumber()
 		randomNumberHash := bep3.CalculateRandomHash(randomNumber[:], timestamp)
 
@@ -70,11 +70,11 @@ func (suite *ABCITestSuite) ResetKeeper() {
 	suite.randomNumbers = randomNumbers
 }
 
-// getContextPlusSec returns a context forward or backward in time and block
+// getContextPlusMinutes returns a context forward or backward in time and block
 // index. Assuming 1 second finality.
-func (suite *ABCITestSuite) getContextPlusSec(plusSeconds int64) sdk.Context {
-	offset := int64(plusSeconds)
-	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Second))
+func (suite *ABCITestSuite) getContextPlusMinutes(plusMinutes int64) sdk.Context {
+	offset := int64(plusMinutes)
+	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Minute))
 	ctx = ctx.WithBlockHeight(ctx.BlockHeight() + offset)
 
 	return ctx
@@ -91,28 +91,28 @@ func (suite *ABCITestSuite) TestBeginBlocker_UpdateExpiredAtomicSwaps() {
 		{
 			name:            "normal",
 			firstCtx:        suite.ctx,
-			secondCtx:       suite.getContextPlusSec(10),
+			secondCtx:       suite.getContextPlusMinutes(1),
 			expectedStatus:  bep3.Open,
 			expectInStorage: true,
 		},
 		{
 			name:            "after expiration",
-			firstCtx:        suite.getContextPlusSec(bep3.DefaultSwapTimeSpan),
-			secondCtx:       suite.getContextPlusSec(bep3.DefaultSwapTimeSpan + 10),
+			firstCtx:        suite.getContextPlusMinutes(bep3.DefaultSwapTimeSpanMinutes),
+			secondCtx:       suite.getContextPlusMinutes(bep3.DefaultSwapTimeSpanMinutes + 10),
 			expectedStatus:  bep3.Expired,
 			expectInStorage: true,
 		},
 		{
 			name:            "after completion",
-			firstCtx:        suite.getContextPlusSec(1),
-			secondCtx:       suite.getContextPlusSec(10),
+			firstCtx:        suite.getContextPlusMinutes(1),
+			secondCtx:       suite.getContextPlusMinutes(10),
 			expectedStatus:  bep3.Completed,
 			expectInStorage: true,
 		},
 		{
 			name:            "after deletion",
-			firstCtx:        suite.getContextPlusSec(bep3.DefaultSwapTimeSpan),
-			secondCtx:       suite.getContextPlusSec(bep3.DefaultSwapTimeSpan + int64(bep3.DefaultLongtermStorageDuration)),
+			firstCtx:        suite.getContextPlusMinutes(bep3.DefaultSwapTimeSpanMinutes),
+			secondCtx:       suite.getContextPlusMinutes(bep3.DefaultSwapTimeSpanMinutes + int64(bep3.DefaultLongtermStorageDuration)),
 			expectedStatus:  bep3.NULL,
 			expectInStorage: false,
 		},

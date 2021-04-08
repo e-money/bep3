@@ -13,7 +13,7 @@ import (
 )
 
 // createAtomicSwap creates a new atomic swap.
-func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
+func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpanMin int64,
 	sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, amount sdk.Coins,
 	crossChain bool) (*sdk.Result, error) {
 	// Confirm that this is not a duplicate swap
@@ -82,10 +82,10 @@ func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, 
 	case types.Outgoing:
 
 		// Outgoing swaps must have a seconds time span within [60, 3 days]
-		if swapTimeSpan < 1 || swapTimeSpan > types.ThreeDayMinutes {
+		if swapTimeSpanMin < 1 || swapTimeSpanMin > types.ThreeDayMinutes {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidTimeSpan,
-				"seconds span %d outside range of 1 min...1 day[%d, %d]",
-				swapTimeSpan, 1, types.ThreeDayMinutes,
+				"minutes span %d outside range of 1 min...1 day[%d, %d]",
+				swapTimeSpanMin, 1, types.ThreeDayMinutes,
 			)
 		}
 		// Amount in outgoing swaps must be able to pay the deputy's fixed fee.
@@ -107,7 +107,7 @@ func (k Keeper) CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, 
 	}
 
 	// Store the details of the swap
-	expireTime := ctx.BlockTime().Add(time.Duration(swapTimeSpan) * time.Second)
+	expireTime := ctx.BlockTime().Add(time.Duration(swapTimeSpanMin) * time.Minute)
 	atomicSwap := types.NewAtomicSwap(amount, randomNumberHash, expireTime.Unix(), timestamp, sender, recipient,
 		senderOtherChain, recipientOtherChain, 0, types.Open, crossChain, direction)
 

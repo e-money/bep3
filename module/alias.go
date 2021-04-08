@@ -116,7 +116,7 @@ var (
 	KeyAssetParams                  = types.KeyAssetParams
 	DefaultPreviousBlockTime        = types.DefaultPreviousBlockTime
 	DefaultSwapBlockTimestamp       = types.DefaultSwapBlockTimestamp
-	DefaultSwapTimeSpan             = types.DefaultSwapTimeSpan
+	DefaultSwapTimeSpanMinutes      = types.DefaultSwapTimeSpanMinutes
 	ModulePermissionsUpgradeTime    = types.ModulePermissionsUpgradeTime
 )
 

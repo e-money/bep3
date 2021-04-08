@@ -12,7 +12,7 @@ import (
 var _ types.MsgServer = msgServer{}
 
 type bep3Keeper interface {
-	CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpan int64,
+	CreateAtomicSwapState(ctx sdk.Context, randomNumberHash []byte, timestamp, swapTimeSpanMin int64,
 		sender, recipient sdk.AccAddress, senderOtherChain, recipientOtherChain string, amount sdk.Coins,
 		crossChain bool) (*sdk.Result, error)
 	ClaimAtomicSwapState(ctx sdk.Context, from sdk.AccAddress, swapID []byte, randomNumber []byte) (*sdk.Result, error)

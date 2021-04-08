@@ -45,7 +45,7 @@ func (suite *HandlerTestSuite) SetupTest() {
 }
 
 func (suite *HandlerTestSuite) AddAtomicSwap() (tmbytes.HexBytes, tmbytes.HexBytes) {
-	expireTimeSpan := bep3.DefaultSwapTimeSpan
+	expireTimeSpan := bep3.DefaultSwapTimeSpanMinutes
 	amount := cs(c("bnb", int64(50000)))
 	timestamp := ts(0)
 	randomNumber, _ := bep3.GenerateSecureRandomNumber()
@@ -81,7 +81,7 @@ func (suite *HandlerTestSuite) TestMsgCreateAtomicSwap() {
 		randomNumberHash,
 		timestamp,
 		amount,
-		bep3.DefaultSwapTimeSpan,
+		bep3.DefaultSwapTimeSpanMinutes,
 	)
 
 	res, err := suite.handler(suite.ctx, msg)
@@ -111,11 +111,11 @@ func (suite *HandlerTestSuite) TestMsgClaimAtomicSwap() {
 	suite.Require().NotNil(res)
 }
 
-// getContextPlusSec returns a context forward or backward in time and block
+// getContextPlusMinutes returns a context forward or backward in time and block
 // index. Assuming 1 second finality.
-func (suite *HandlerTestSuite) getContextPlusSec(plusSeconds int64) sdk.Context {
-	offset := plusSeconds
-	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Second))
+func (suite *HandlerTestSuite) getContextPlusMinutes(plusMinutes int64) sdk.Context {
+	offset := plusMinutes
+	ctx := suite.ctx.WithBlockTime(suite.ctx.BlockTime().Add(time.Duration(offset) * time.Minute))
 	ctx = ctx.WithBlockTime(time.Unix(ctx.BlockTime().Unix()+offset, 0))
 
 	return ctx
@@ -143,7 +143,7 @@ func (suite *HandlerTestSuite) TestMsgRefundAtomicSwap() {
 	suite.Require().Nil(res1)
 
 	// Expire the atomic swap with begin blocker and attempt refund
-	laterCtx := suite.getContextPlusSec(bep3.DefaultSwapTimeSpan)
+	laterCtx := suite.getContextPlusMinutes(bep3.DefaultSwapTimeSpanMinutes)
 	bep3.BeginBlocker(laterCtx, suite.keeper)
 	res2, err := suite.handler(laterCtx, msg)
 	suite.Require().NoError(err)
