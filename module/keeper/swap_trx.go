@@ -334,13 +334,20 @@ func (k Keeper) UpdateExpiredAtomicSwaps(ctx sdk.Context) {
 	})
 
 	// Emit 'swaps_expired' event
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
+	if len(expiredSwapIDs) > 0 {
+		expEv := sdk.NewEvent(
 			types.EventTypeSwapsExpired,
-			sdk.NewAttribute(types.AttributeKeyAtomicSwapIDs, fmt.Sprintf("%s", expiredSwapIDs)),
-			sdk.NewAttribute(types.AttributeExpirationBlock, fmt.Sprintf("%d", ctx.BlockHeight())),
-		),
-	)
+			sdk.NewAttribute(
+				types.AttributeKeyAtomicSwapIDs,
+				fmt.Sprintf("%s", expiredSwapIDs),
+			),
+			sdk.NewAttribute(
+				types.AttributeExpirationBlock,
+				fmt.Sprintf("%d", ctx.BlockHeight()),
+			),
+		)
+		ctx.EventManager().EmitEvent(expEv)
+	}
 }
 
 // DeleteClosedAtomicSwapsFromLongtermStorage removes swaps one week after completion.
