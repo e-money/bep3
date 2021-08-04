@@ -37,11 +37,11 @@ func TestDecodeBep3Store(t *testing.T) {
 
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{
-			{Key: types.AtomicSwapKeyPrefix, Value: cdc.MustMarshalBinaryLengthPrefixed(swap)},
-			{Key: types.AssetSupplyPrefix, Value: cdc.MustMarshalBinaryLengthPrefixed(supply)},
+			{Key: types.AtomicSwapKeyPrefix, Value: cdc.MustMarshalLengthPrefixed(swap)},
+			{Key: types.AssetSupplyPrefix, Value: cdc.MustMarshalLengthPrefixed(supply)},
 			{Key: types.AtomicSwapByBlockPrefix, Value: bz},
 			{Key: types.AtomicSwapByBlockPrefix, Value: bz},
-			{Key: types.PreviousBlockTimeKey, Value: cdc.MustMarshalBinaryLengthPrefixed(prevBlockTime)},
+			{Key: types.PreviousBlockTimeKey, Value: cdc.MustMarshalLengthPrefixed(prevBlockTime)},
 			{Key: []byte{0x99}, Value: []byte{0x99}},
 		},
 	}

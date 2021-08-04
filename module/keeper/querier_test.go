@@ -2,6 +2,11 @@ package keeper_test
 
 import (
 	"encoding/hex"
+	"strings"
+	"testing"
+
+	bep3 "github.com/e-money/bep3/module"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/e-money/bep3/module/keeper"
@@ -10,8 +15,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
-	"strings"
-	"testing"
 )
 
 const (
@@ -20,13 +23,13 @@ const (
 
 type QuerierTestSuite struct {
 	suite.Suite
-	keeper        keeper.Keeper
-	ctx           sdk.Context
-	querier       sdk.Querier
-	addrs         []sdk.AccAddress
-	swapIDs       []tmbytes.HexBytes
-	isSwapID      map[string]bool
-	marshaller    codec.JSONMarshaler
+	keeper     keeper.Keeper
+	ctx        sdk.Context
+	querier    sdk.Querier
+	addrs      []sdk.AccAddress
+	swapIDs    []tmbytes.HexBytes
+	isSwapID   map[string]bool
+	marshaller codec.JSONCodec
 }
 
 func (suite *QuerierTestSuite) SetupTest() {
@@ -37,7 +40,7 @@ func (suite *QuerierTestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		if err := bankKeeper.SetBalances(ctx, addr, coins); err != nil {
+		if err := bep3.FundAccount(ctx, bankKeeper, addr, coins); err != nil {
 			panic(err)
 		}
 		accountKeeper.SetAccount(ctx, account)

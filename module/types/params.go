@@ -175,8 +175,8 @@ func validateAssetParams(i interface{}) error {
 		if err != nil {
 			return err
 		}
-		if len(depAddr.Bytes()) != sdk.AddrLen {
-			return fmt.Errorf("%s deputy address invalid bytes length got %d, want %d", asset.Denom, len([]byte(asset.DeputyAddress)), sdk.AddrLen)
+		if len(depAddr.Bytes()) < 20 {
+			return fmt.Errorf("%s deputy address invalid bytes length got %d, want at least %d", asset.Denom, len([]byte(asset.DeputyAddress)), 20)
 		}
 
 		if asset.FixedFee.IsNegative() {

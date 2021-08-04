@@ -55,7 +55,7 @@ func (suite *AtomicSwapTestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		err := bankKeeper.SetBalances(ctx, addr, coins)
+		err := bep3.FundAccount(ctx, bankKeeper, addr, coins)
 		suite.Require().Nil(err)
 		accountKeeper.SetAccount(ctx, account)
 	}
@@ -561,7 +561,7 @@ func (suite *AtomicSwapTestSuite) TestClaimAtomicSwap() {
 		},
 		{
 			"past expiration",
-			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute * time.Duration(types.DefaultSwapTimeSpanMinutes)+1)),
+			suite.ctx.WithBlockTime(currentTmTime.Add(time.Minute*time.Duration(types.DefaultSwapTimeSpanMinutes) + 1)),
 			args{
 				coins:        cs(c(BNB_DENOM, 50000)),
 				swapID:       []byte{},

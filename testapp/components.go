@@ -23,7 +23,7 @@ import (
 
 func CreateTestComponents(t *testing.T) (
 	sdk.Context,
-	codec.JSONMarshaler,
+	codec.JSONCodec,
 	bep3.Keeper,
 	bep3types.AccountKeeper,
 	bep3types.BankKeeper,
@@ -68,7 +68,8 @@ func CreateTestComponents(t *testing.T) (
 		bep3Keeper    = bep3.NewKeeper(encoding.Marshaller, keys[bep3.StoreKey], bankKeeper, accountKeeper, bep3Subspace, make(map[string]bool))
 	)
 
-	bankKeeper.SetSupply(ctx, banktypes.NewSupply(sdk.NewCoins()))
+	err = bankKeeper.MintCoins(ctx, bep3.ModuleName, sdk.NewCoins())
+	require.NoError(t, err)
 
 	return ctx,
 		codec.NewProtoCodec(nil),

@@ -16,7 +16,7 @@ import (
 // This is provided for compatibility between protobuf and amino implementations.
 type EncodingConfig struct {
 	InterfaceRegistry types.InterfaceRegistry
-	Marshaller        codec.Marshaler
+	Marshaller        codec.Codec
 	TxConfig          client.TxConfig
 	Amino             *codec.LegacyAmino
 }

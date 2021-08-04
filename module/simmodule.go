@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
@@ -160,7 +162,16 @@ func loadRandomBep3GenState(simState *module.SimulationState) types.GenesisState
 }
 
 type CodecUnmarshaler interface {
-	MustUnmarshalBinaryLengthPrefixed(bz []byte, ptr interface{})
+	MustUnmarshalLengthPrefixed(bz []byte, ptr interface{})
+}
+
+// FundAccount is a utility function that funds an account by minting and sending the coins to the address
+func FundAccount(ctx sdk.Context, bk types.BankKeeper, addr sdk.AccAddress, amount sdk.Coins) error {
+	err := bk.MintCoins(ctx, ModuleName, amount)
+	if err != nil {
+		return err
+	}
+	return bk.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr, amount)
 }
 
 // NewDecodeStore returns a decoder function closure that unmarshals the KVPair's
@@ -170,8 +181,8 @@ func NewDecodeStore(cdc CodecUnmarshaler) func(kvA, kvB kv.Pair) string {
 		switch {
 		case bytes.Equal(kvA.Key[:1], types.AtomicSwapKeyPrefix):
 			var swapA, swapB types.AtomicSwap
-			cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &swapA)
-			cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &swapB)
+			cdc.MustUnmarshalLengthPrefixed(kvA.Value, &swapA)
+			cdc.MustUnmarshalLengthPrefixed(kvB.Value, &swapB)
 			return fmt.Sprintf("%v\n%v", swapA, swapB)
 
 		case bytes.Equal(kvA.Key[:1], types.AtomicSwapByBlockPrefix),
@@ -181,13 +192,13 @@ func NewDecodeStore(cdc CodecUnmarshaler) func(kvA, kvB kv.Pair) string {
 			return fmt.Sprintf("%s\n%s", bytesA.String(), bytesB.String())
 		case bytes.Equal(kvA.Key[:1], types.AssetSupplyPrefix):
 			var supplyA, supplyB types.AssetSupply
-			cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &supplyA)
-			cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &supplyB)
+			cdc.MustUnmarshalLengthPrefixed(kvA.Value, &supplyA)
+			cdc.MustUnmarshalLengthPrefixed(kvB.Value, &supplyB)
 			return fmt.Sprintf("%s\n%s", supplyA, supplyB)
 		case bytes.Equal(kvA.Key[:1], types.PreviousBlockTimeKey):
 			var timeA, timeB time.Time
-			cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &timeA)
-			cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &timeB)
+			cdc.MustUnmarshalLengthPrefixed(kvA.Value, &timeA)
+			cdc.MustUnmarshalLengthPrefixed(kvB.Value, &timeB)
 			return fmt.Sprintf("%s\n%s", timeA, timeB)
 
 		default:
@@ -213,7 +224,7 @@ func ParamChanges(r *rand.Rand) []simtypes.ParamChange {
 
 // WeightedOperations returns all the operations from the module with their respective weights
 func WeightedOperations(
-	appParams simtypes.AppParams, cdc codec.JSONMarshaler, ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper,
+	appParams simtypes.AppParams, cdc codec.JSONCodec, ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper,
 ) simmod.WeightedOperations {
 	var weightCreateAtomicSwap int
 
@@ -227,13 +238,13 @@ func WeightedOperations(
 	return simmod.WeightedOperations{
 		simmod.NewWeightedOperation(
 			weightCreateAtomicSwap,
-			SimulateMsgCreateAtomicSwap(ak, bk, k),
+			SimulateMsgCreateAtomicSwap(ak, bk, k, nil),
 		),
 	}
 }
 
 // SimulateMsgCreateAtomicSwap generates a MsgCreateAtomicSwap with random values
-func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper, cdc *codec.ProtoCodec) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -273,7 +284,7 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k 
 
 		depAddr, err := sdk.AccAddressFromBech32(selectedAsset.DeputyAddress)
 		if err != nil {
-			return simtypes.NewOperationMsg(&types.MsgCreateAtomicSwap{}, false, fmt.Sprintf("%+v", err)), nil, err
+			return simtypes.NewOperationMsg(&types.MsgCreateAtomicSwap{}, false, fmt.Sprintf("%+v", err), cdc), nil, err
 		}
 
 		// If an outgoing swap can be created, it's chosen 50% of the time.
@@ -382,12 +393,12 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k 
 			sender.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err)), nil, err
+			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err), nil), nil, err
 		}
 
 		_, result, err := app.Deliver(txGen.TxEncoder(), tx)
 		if err != nil {
-			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err)), nil, err
+			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err), nil), nil, err
 		}
 
 		// Construct a MsgClaimAtomicSwap or MsgRefundAtomicSwap future operation
@@ -395,7 +406,7 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k 
 
 		fromAddr, err := sdk.AccAddressFromBech32(selectedAsset.DeputyAddress)
 		if err != nil {
-			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err)), nil, err
+			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err), nil), nil, err
 		}
 		swapID := types.CalculateSwapID(msg.RandomNumberHash, fromAddr, msg.SenderOtherChain)
 		if r.Intn(100) < 50 {
@@ -416,7 +427,7 @@ func SimulateMsgCreateAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k 
 			}
 		}
 
-		return simtypes.NewOperationMsg(msg, true, result.Log), []simtypes.FutureOperation{futureOp}, nil
+		return simtypes.NewOperationMsg(msg, true, result.Log, nil), []simtypes.FutureOperation{futureOp}, nil
 	}
 }
 
@@ -488,14 +499,14 @@ func operationClaimAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k kee
 			simAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err)), nil, err
+			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err), nil), nil, err
 		}
 
 		_, result, err := app.Deliver(txGen.TxEncoder(), tx)
 		if err != nil {
-			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err)), nil, err
+			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err), nil), nil, err
 		}
-		return simtypes.NewOperationMsg(msg, true, result.Log), nil, nil
+		return simtypes.NewOperationMsg(msg, true, result.Log, nil), nil, nil
 	}
 }
 
@@ -542,14 +553,14 @@ func operationRefundAtomicSwap(ak types.AccountKeeper, bk types.BankKeeper, k ke
 			simAccount.PrivKey,
 		)
 		if err != nil {
-			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err)), nil, err
+			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err), nil), nil, err
 		}
 
 		_, result, err := app.Deliver(txGen.TxEncoder(), tx)
 		if err != nil {
-			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err)), nil, err
+			return simtypes.NewOperationMsg(msg, false, fmt.Sprintf("%+v", err), nil), nil, err
 		}
-		return simtypes.NewOperationMsg(msg, true, result.Log), nil, nil
+		return simtypes.NewOperationMsg(msg, true, result.Log, nil), nil, nil
 	}
 }
 

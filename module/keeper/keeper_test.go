@@ -160,7 +160,7 @@ func (suite *KeeperTestSuite) TestInsertIntoByBlockIndex() {
 
 	// Marshal the expected swapID
 	cdc := suite.cdc
-	res, _ := cdc.MarshalBinaryBare(atomicSwap.GetSwapID())
+	res, _ := cdc.Marshal(atomicSwap.GetSwapID())
 	expectedSwapID := res[1:]
 
 	suite.Equal(expectedSwapID, swapIDs[0])
@@ -261,7 +261,7 @@ func (suite *KeeperTestSuite) TestInsertIntoLongtermStorage() {
 
 	// Marshal the expected swapID
 	cdc := suite.cdc
-	res, _ := cdc.MarshalBinaryBare(atomicSwap.GetSwapID())
+	res, _ := cdc.Marshal(atomicSwap.GetSwapID())
 	expectedSwapID := res[1:]
 
 	suite.Equal(expectedSwapID, swapIDs[0])

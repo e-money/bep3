@@ -21,7 +21,7 @@ type GenesisTestSuite struct {
 	ctx           sdk.Context
 	keeper        bep3.Keeper
 	addrs         []sdk.AccAddress
-	jsonMarshaler codec.JSONMarshaler
+	jsonMarshaler codec.JSONCodec
 }
 
 func (suite *GenesisTestSuite) SetupTest() {

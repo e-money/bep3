@@ -203,7 +203,7 @@ func queryAssetSuppliesHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		cliCtx = cliCtx.WithHeight(height)
 
 		var supplies types.AssetSupplies
-		err = cliCtx.JSONMarshaler.UnmarshalJSON(res, &supplies)
+		err = cliCtx.JSONCodec.UnmarshalJSON(res, &supplies)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

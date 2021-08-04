@@ -30,7 +30,7 @@ func (suite *HandlerTestSuite) SetupTest() {
 
 	for _, addr := range addrs {
 		account := accountKeeper.NewAccountWithAddress(ctx, addr)
-		if err := bankKeeper.SetBalances(ctx, addr, coins); err != nil {
+		if err := bep3.FundAccount(ctx, bankKeeper, addr, coins); err != nil {
 			panic(err)
 		}
 		accountKeeper.SetAccount(ctx, account)
